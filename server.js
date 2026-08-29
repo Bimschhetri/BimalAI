@@ -8,48 +8,103 @@ const path = require("path");
 
 const app = express();
 
-// Render ले PORT दिन्छ, local मा 3000
-const PORT = process.env.PORT || 3000;
+const PORT =
+    process.env.PORT || 3000;
 
-// Render HTTPS proxy पछाडि session cookie सही काम गर्न
+
+/* =========================================
+   TRUST RENDER PROXY
+========================================= */
+
 app.set("trust proxy", 1);
 
-// =================================
-// FILE STORAGE
-// =================================
 
-const DATA_DIR = path.join(__dirname, "data");
-const CHATS_FILE = path.join(DATA_DIR, "chats.json");
+/* =========================================
+   DIRECTORIES
+========================================= */
+
+const DATA_DIR =
+    path.join(__dirname, "data");
+
+const CHATS_FILE =
+    path.join(DATA_DIR, "chats.json");
+
+const UPLOAD_DIR =
+    path.join(DATA_DIR, "uploads");
+
 
 if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+
+    fs.mkdirSync(
+        DATA_DIR,
+        { recursive: true }
+    );
+
 }
+
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+
+    fs.mkdirSync(
+        UPLOAD_DIR,
+        { recursive: true }
+    );
+
+}
+
 
 if (!fs.existsSync(CHATS_FILE)) {
-    fs.writeFileSync(CHATS_FILE, "[]", "utf8");
+
+    fs.writeFileSync(
+        CHATS_FILE,
+        "[]",
+        "utf8"
+    );
+
 }
 
-// =================================
-// MIDDLEWARE
-// =================================
 
-app.use(express.json({ limit: "20mb" }));
+/* =========================================
+   MIDDLEWARE
+========================================= */
+
+app.use(
+    express.json({
+        limit: "35mb"
+    })
+);
+
+
+app.use(
+    express.urlencoded({
+        extended: true,
+        limit: "35mb"
+    })
+);
+
+
+/* =========================================
+   SESSION
+========================================= */
 
 app.use(
     session({
+
         secret:
             process.env.SESSION_SECRET ||
-            "bimalai-session-secret-change-me",
+            "bimalai-session-secret-change-this",
 
         resave: false,
 
         saveUninitialized: false,
 
         cookie: {
+
             httpOnly: true,
 
             secure:
-                process.env.NODE_ENV === "production",
+                process.env.NODE_ENV ===
+                "production",
 
             sameSite: "lax",
 
@@ -59,218 +114,477 @@ app.use(
                 60 *
                 24 *
                 30
+
         }
+
     })
 );
 
-// =================================
-// AUTH CONFIG
-// =================================
+
+/* =========================================
+   AUTH
+========================================= */
 
 const LOGIN_USERNAME =
-    process.env.BIMALAI_USERNAME || "Simran";
+    process.env.BIMALAI_USERNAME ||
+    "Simran";
+
 
 const LOGIN_PASSWORD =
-    process.env.BIMALAI_PASSWORD || "Bimal";
+    process.env.BIMALAI_PASSWORD ||
+    "Bimal";
+
 
 let PASSWORD_HASH = null;
 
-// =================================
-// AUTH MIDDLEWARE
-// =================================
 
-function requireLogin(req, res, next) {
+function requireLogin(
+    req,
+    res,
+    next
+){
 
-    if (
+    if(
         req.session &&
         req.session.authenticated === true
-    ) {
+    ){
+
         return next();
+
     }
 
+
     return res.status(401).json({
-        error: "Authentication required"
+
+        error:
+            "Authentication required"
+
     });
+
 }
 
-// =================================
-// LOGIN
-// =================================
 
-app.post("/api/login", async (req, res) => {
+/* =========================================
+   LOGIN
+========================================= */
 
-    try {
+app.post(
+    "/api/login",
+    async (req, res) => {
 
-        const {
-            username,
-            password
-        } = req.body || {};
+        try {
 
-        if (!username || !password) {
+            const {
+                username,
+                password
+            } =
+                req.body || {};
 
-            return res.status(400).json({
-                error:
-                    "Username and password are required"
-            });
 
-        }
+            if(
+                !username ||
+                !password
+            ){
 
-        if (!PASSWORD_HASH) {
+                return res.status(400).json({
 
-            return res.status(503).json({
-                error:
-                    "Authentication system is starting. Please try again."
-            });
-
-        }
-
-        const usernameCorrect =
-            username.trim() === LOGIN_USERNAME;
-
-        const passwordCorrect =
-            await bcrypt.compare(
-                password,
-                PASSWORD_HASH
-            );
-
-        if (
-            !usernameCorrect ||
-            !passwordCorrect
-        ) {
-
-            return res.status(401).json({
-                error:
-                    "Incorrect username or password"
-            });
-
-        }
-
-        req.session.authenticated = true;
-        req.session.username = LOGIN_USERNAME;
-
-        // Important:
-        // session लाई पहिले save गराएर मात्र response पठाउने
-        req.session.save((error) => {
-
-            if (error) {
-
-                console.error(
-                    "SESSION SAVE ERROR:",
-                    error
-                );
-
-                return res.status(500).json({
                     error:
-                        "Could not create login session"
+                        "Username and password are required"
+
                 });
 
             }
 
-            return res.json({
-                success: true,
-                username: LOGIN_USERNAME
+
+            if(!PASSWORD_HASH){
+
+                return res.status(503).json({
+
+                    error:
+                        "Authentication system is starting. Please try again."
+
+                });
+
+            }
+
+
+            const usernameCorrect =
+                username.trim() ===
+                LOGIN_USERNAME;
+
+
+            const passwordCorrect =
+                await bcrypt.compare(
+                    password,
+                    PASSWORD_HASH
+                );
+
+
+            if(
+                !usernameCorrect ||
+                !passwordCorrect
+            ){
+
+                return res.status(401).json({
+
+                    error:
+                        "Incorrect username or password"
+
+                });
+
+            }
+
+
+            req.session.authenticated =
+                true;
+
+
+            req.session.username =
+                LOGIN_USERNAME;
+
+
+            req.session.save(
+                error => {
+
+                    if(error){
+
+                        console.error(
+                            "SESSION SAVE ERROR:",
+                            error
+                        );
+
+
+                        return res.status(500).json({
+
+                            error:
+                                "Could not create login session"
+
+                        });
+
+                    }
+
+
+                    return res.json({
+
+                        success: true,
+
+                        username:
+                            LOGIN_USERNAME
+
+                    });
+
+                }
+            );
+
+
+        } catch(error){
+
+            console.error(
+                "LOGIN ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                error:
+                    "Login failed"
+
             });
 
-        });
-
-    } catch (error) {
-
-        console.error(
-            "LOGIN ERROR:",
-            error
-        );
-
-        return res.status(500).json({
-            error: "Login failed"
-        });
+        }
 
     }
+);
 
-});
 
-// =================================
-// LOGOUT
-// =================================
+/* =========================================
+   LOGOUT
+========================================= */
 
 app.post(
     "/api/logout",
     requireLogin,
     (req, res) => {
 
-        req.session.destroy((error) => {
+        req.session.destroy(
+            error => {
 
-            if (error) {
+                if(error){
 
-                console.error(
-                    "LOGOUT ERROR:",
-                    error
+                    console.error(
+                        "LOGOUT ERROR:",
+                        error
+                    );
+
+
+                    return res.status(500).json({
+
+                        error:
+                            "Logout failed"
+
+                    });
+
+                }
+
+
+                res.clearCookie(
+                    "connect.sid"
                 );
 
-                return res.status(500).json({
-                    error: "Logout failed"
+
+                return res.json({
+
+                    success: true
+
                 });
 
             }
+        );
 
-            res.clearCookie("connect.sid");
+    }
+);
 
-            return res.json({
-                success: true
-            });
+
+/* =========================================
+   AUTH STATUS
+========================================= */
+
+app.get(
+    "/api/auth",
+    (req, res) => {
+
+        return res.json({
+
+            authenticated:
+                !!(
+                    req.session &&
+                    req.session.authenticated === true
+                ),
+
+            username:
+                req.session?.username ||
+                null
 
         });
 
     }
 );
 
-// =================================
-// AUTH STATUS
-// =================================
 
-app.get("/api/auth", (req, res) => {
+/* =========================================
+   HEALTH
+========================================= */
 
-    return res.json({
+app.get(
+    "/health",
+    (req, res) => {
 
-        authenticated:
-            !!(
-                req.session &&
-                req.session.authenticated === true
-            ),
+        res.json({
 
-        username:
-            req.session?.username || null
+            status: "ok",
 
-    });
+            name: "BimalAI",
 
-});
+            version: "3.0"
 
-// =================================
-// HEALTH
-// =================================
+        });
 
-app.get("/health", (req, res) => {
+    }
+);
 
-    res.json({
-        status: "ok",
-        name: "BimalAI",
-        version: "2.0"
-    });
 
-});
-
-// =================================
-// STATIC FRONTEND
-// =================================
+/* =========================================
+   STATIC FILES
+========================================= */
 
 app.use(
     express.static(
-        path.join(__dirname, "public")
+        path.join(
+            __dirname,
+            "public"
+        )
     )
 );
 
-// =================================
-// MODELS
-// =================================
+
+/* =========================================
+   UPLOADS
+========================================= */
+
+app.use(
+    "/uploads",
+    requireLogin,
+    express.static(
+        UPLOAD_DIR
+    )
+);
+
+
+/* =========================================
+   FILE SAVE API
+========================================= */
+
+app.post(
+    "/api/upload",
+    requireLogin,
+    async (req, res) => {
+
+        try {
+
+            const {
+                name,
+                type,
+                data
+            } =
+                req.body || {};
+
+
+            if(
+                !name ||
+                !data
+            ){
+
+                return res.status(400).json({
+
+                    error:
+                        "File name and data are required"
+
+                });
+
+            }
+
+
+            /*
+             * Expected format:
+             * data:image/png;base64,.....
+             */
+
+            const match =
+                String(data).match(
+                    /^data:([^;]+);base64,(.+)$/
+                );
+
+
+            if(!match){
+
+                return res.status(400).json({
+
+                    error:
+                        "Invalid file data"
+
+                });
+
+            }
+
+
+            const base64 =
+                match[2];
+
+
+            const buffer =
+                Buffer.from(
+                    base64,
+                    "base64"
+                );
+
+
+            /*
+             * Prevent very large uploads.
+             */
+
+            if(
+                buffer.length >
+                20 * 1024 * 1024
+            ){
+
+                return res.status(413).json({
+
+                    error:
+                        "File too large"
+
+                });
+
+            }
+
+
+            const safeName =
+                path.basename(name)
+                    .replace(
+                        /[^a-zA-Z0-9._-]/g,
+                        "_"
+                    );
+
+
+            const filename =
+                Date.now() +
+                "-" +
+                Math.random()
+                    .toString(36)
+                    .slice(2) +
+                "-" +
+                safeName;
+
+
+            const filePath =
+                path.join(
+                    UPLOAD_DIR,
+                    filename
+                );
+
+
+            fs.writeFileSync(
+                filePath,
+                buffer
+            );
+
+
+            return res.json({
+
+                success: true,
+
+                name: safeName,
+
+                type:
+                    type ||
+                    match[1],
+
+                size:
+                    buffer.length,
+
+                url:
+                    "/uploads/" +
+                    encodeURIComponent(
+                        filename
+                    )
+
+            });
+
+
+        } catch(error){
+
+            console.error(
+                "UPLOAD ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                error:
+                    "Upload failed"
+
+            });
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   MODELS
+========================================= */
 
 app.get(
     "/api/models",
@@ -279,12 +593,22 @@ app.get(
 
         try {
 
+            if(
+                !process.env.OPENROUTER_API_KEY
+            ){
+
+                return res.json([]);
+
+            }
+
+
             const response =
                 await fetch(
                     "https://openrouter.ai/api/v1/models"
                 );
 
-            if (!response.ok) {
+
+            if(!response.ok){
 
                 throw new Error(
                     `Models request failed: ${response.status}`
@@ -292,40 +616,79 @@ app.get(
 
             }
 
+
             const data =
                 await response.json();
+
 
             const freeModels =
                 (data.data || [])
 
-                    .filter(model =>
-                        model.pricing?.prompt === "0" &&
-                        model.pricing?.completion === "0"
+                    .filter(
+                        model => {
+
+                            const prompt =
+                                String(
+                                    model.pricing?.prompt ??
+                                    ""
+                                );
+
+                            const completion =
+                                String(
+                                    model.pricing?.completion ??
+                                    ""
+                                );
+
+
+                            return (
+                                prompt === "0" &&
+                                completion === "0"
+                            );
+
+                        }
                     )
 
-                    .map(model => ({
-                        id: model.id,
-                        name: model.name,
-                        context_length:
-                            model.context_length
-                    }))
+                    .map(
+                        model => ({
 
-                    .sort((a, b) =>
-                        a.name.localeCompare(b.name)
+                            id:
+                                model.id,
+
+                            name:
+                                model.name,
+
+                            context_length:
+                                model.context_length
+
+                        })
+                    )
+
+                    .sort(
+                        (a,b)=>
+                            a.name.localeCompare(
+                                b.name
+                            )
                     );
 
-            res.json(freeModels);
 
-        } catch (error) {
+            res.json(
+                freeModels
+            );
+
+
+        } catch(error){
 
             console.error(
                 "MODEL ERROR:",
                 error
             );
 
+
             res.status(500).json({
+
                 error:
                     "Could not load models"
+
             });
 
         }
@@ -333,11 +696,12 @@ app.get(
     }
 );
 
-// =================================
-// CHAT STORAGE
-// =================================
 
-function loadChats() {
+/* =========================================
+   CHAT STORAGE
+========================================= */
+
+function loadChats(){
 
     try {
 
@@ -356,7 +720,8 @@ function loadChats() {
 
 }
 
-function saveChats(chats) {
+
+function saveChats(chats){
 
     fs.writeFileSync(
         CHATS_FILE,
@@ -370,9 +735,10 @@ function saveChats(chats) {
 
 }
 
-// =================================
-// GET CHATS
-// =================================
+
+/* =========================================
+   GET CHATS
+========================================= */
 
 app.get(
     "/api/chats",
@@ -386,188 +752,165 @@ app.get(
     }
 );
 
-// =================================
-// SAVE CHAT
-// =================================
+
+/* =========================================
+   SAVE CHAT
+========================================= */
 
 app.post(
     "/api/chats",
     requireLogin,
     (req, res) => {
 
-        const { chat } =
-            req.body || {};
+        try {
 
-        if (!chat) {
+            const {
+                chat
+            } =
+                req.body || {};
 
-            return res.status(400).json({
+
+            if(!chat){
+
+                return res.status(400).json({
+
+                    error:
+                        "Chat is required"
+
+                });
+
+            }
+
+
+            const chats =
+                loadChats();
+
+
+            const index =
+                chats.findIndex(
+                    item =>
+                        String(item.id) ===
+                        String(chat.id)
+                );
+
+
+            if(index >= 0){
+
+                chats[index] =
+                    chat;
+
+            }else{
+
+                chats.unshift(
+                    chat
+                );
+
+            }
+
+
+            /*
+             * Keep latest 100 conversations.
+             */
+
+            const limited =
+                chats.slice(
+                    0,
+                    100
+                );
+
+
+            saveChats(
+                limited
+            );
+
+
+            res.json({
+
+                success: true
+
+            });
+
+
+        } catch(error){
+
+            console.error(
+                "SAVE CHAT ERROR:",
+                error
+            );
+
+
+            res.status(500).json({
+
                 error:
-                    "Chat is required"
+                    "Could not save chat"
+
             });
 
         }
 
-        const chats =
-            loadChats();
-
-        const index =
-            chats.findIndex(
-                item =>
-                    item.id === chat.id
-            );
-
-        if (index >= 0) {
-
-            chats[index] = chat;
-
-        } else {
-
-            chats.unshift(chat);
-
-        }
-
-        saveChats(chats);
-
-        res.json({
-            success: true
-        });
-
     }
 );
 
-// =================================
-// DELETE CHAT
-// =================================
+
+/* =========================================
+   DELETE CHAT
+========================================= */
 
 app.delete(
     "/api/chats/:id",
     requireLogin,
     (req, res) => {
 
-        const chats =
-            loadChats();
-
-        const filtered =
-            chats.filter(
-                item =>
-                    item.id !==
-                    req.params.id
-            );
-
-        saveChats(filtered);
-
-        res.json({
-            success: true
-        });
-
-    }
-);
-// =================================
-// FILE / IMAGE UPLOAD
-// =================================
-
-const multer = require("multer");
-const os = require("os");
-
-const upload = multer({
-    dest: path.join(os.tmpdir(), "bimalai-uploads"),
-    limits: {
-        fileSize: 20 * 1024 * 1024
-    }
-});
-
-app.post(
-    "/api/upload",
-    requireLogin,
-    upload.single("file"),
-    async (req, res) => {
-
         try {
 
-            if (!req.file) {
-                return res.status(400).json({
-                    error: "No file uploaded"
-                });
-            }
+            const chats =
+                loadChats();
 
-            const allowed = [
-                "image/jpeg",
-                "image/png",
-                "image/webp",
-                "application/pdf",
-                "text/plain",
-                "text/csv",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ];
 
-            if (!allowed.includes(req.file.mimetype)) {
-
-                fs.unlink(
-                    req.file.path,
-                    () => {}
+            const filtered =
+                chats.filter(
+                    item =>
+                        String(item.id) !==
+                        String(req.params.id)
                 );
 
-                return res.status(400).json({
-                    error: "Unsupported file type"
-                });
-            }
 
-            const fileData =
-                fs.readFileSync(
-                    req.file.path
-                );
-
-            const base64 =
-                fileData.toString("base64");
-
-            const isImage =
-                req.file.mimetype.startsWith(
-                    "image/"
-                );
-
-            fs.unlink(
-                req.file.path,
-                () => {}
+            saveChats(
+                filtered
             );
 
-            return res.json({
 
-                success: true,
+            res.json({
 
-                file: {
-                    name: req.file.originalname,
-                    type: req.file.mimetype,
-                    size: req.file.size,
-
-                    ...(isImage
-                        ? {
-                            data:
-                                `data:${req.file.mimetype};base64,${base64}`
-                        }
-                        : {})
-                }
+                success: true
 
             });
 
-        } catch (error) {
+
+        } catch(error){
 
             console.error(
-                "UPLOAD ERROR:",
+                "DELETE CHAT ERROR:",
                 error
             );
 
-            return res.status(500).json({
+
+            res.status(500).json({
+
                 error:
-                    "File upload failed"
+                    "Could not delete chat"
+
             });
 
         }
 
     }
 );
-// =================================
-// AI CHAT
-// =================================
+
+
+/* =========================================
+   AI CHAT
+========================================= */
 
 app.post(
     "/api/chat",
@@ -579,41 +922,121 @@ app.post(
             const {
                 messages,
                 model
-            } = req.body || {};
+            } =
+                req.body || {};
 
-            if (
+
+            if(
                 !Array.isArray(messages) ||
                 messages.length === 0
-            ) {
+            ){
 
                 return res.status(400).json({
+
                     error:
                         "Messages are required"
+
                 });
 
             }
 
-            if (
+
+            if(
                 !process.env.OPENROUTER_API_KEY
-            ) {
+            ){
 
                 return res.status(500).json({
+
                     error:
                         "OpenRouter API key is not configured"
+
                 });
 
             }
+
+
+            /*
+             * Protect server from accidentally
+             * receiving an enormous request.
+             */
+
+            const requestSize =
+                Buffer.byteLength(
+                    JSON.stringify(messages),
+                    "utf8"
+                );
+
+
+            if(
+                requestSize >
+                30 * 1024 * 1024
+            ){
+
+                return res.status(413).json({
+
+                    error:
+                        "Conversation or attachment is too large"
+
+                });
+
+            }
+
 
             const selectedModel =
                 model ||
                 "openrouter/free";
+
+
+            const systemPrompt = {
+
+                role:
+                    "system",
+
+                content:
+`You are BimalAI, Bimal's personal AI assistant.
+
+You are shared by Bimal and Simran.
+
+Be intelligent, helpful, accurate, clear and friendly.
+
+You can help with:
+- study and exam preparation
+- mathematics
+- physics
+- civil engineering
+- thermodynamics
+- hydraulics
+- hydropower
+- coding
+- programming
+- planning
+- writing
+- documents
+- images
+- everyday tasks
+
+When an image is attached, analyze what is actually visible.
+Do not invent details that cannot be seen.
+
+When files are provided as text, use their contents carefully.
+
+Use Markdown when useful.
+
+For calculations, show the important steps.
+
+If information is uncertain, say so instead of inventing facts.
+
+Keep answers practical and easy to understand.`
+            };
+
 
             const response =
                 await fetch(
                     "https://openrouter.ai/api/v1/chat/completions",
                     {
 
-                        method: "POST",
+                        method:
+                            "POST",
 
                         headers: {
 
@@ -639,112 +1062,120 @@ app.post(
                                     selectedModel,
 
                                 messages: [
-
-                                    {
-                                        role:
-                                            "system",
-
-                                        content:
-                                            `You are BimalAI, Bimal's personal AI assistant.
-
-You are shared by Bimal and Simran.
-
-Be intelligent, helpful, accurate and clear.
-Remember conversation context.
-Help with study, coding, planning, writing and everyday tasks.
-Use Markdown when useful.
-Do not invent facts.`
-                                    },
-
+                                    systemPrompt,
                                     ...messages
-
                                 ],
 
-                                stream: true
+                                stream:
+                                    true
 
                             })
 
                     }
                 );
 
-            if (!response.ok) {
+
+            if(!response.ok){
 
                 const errorText =
                     await response.text();
+
 
                 console.error(
                     "OPENROUTER ERROR:",
                     errorText
                 );
 
+
                 return res.status(
                     response.status
                 ).json({
+
                     error:
                         errorText ||
                         "OpenRouter request failed"
+
                 });
 
             }
 
-            if (!response.body) {
+
+            if(!response.body){
 
                 return res.status(500).json({
+
                     error:
                         "No response body"
+
                 });
 
             }
+
+
+            /*
+             * Streaming response
+             */
 
             res.setHeader(
                 "Content-Type",
                 "text/event-stream; charset=utf-8"
             );
 
+
             res.setHeader(
                 "Cache-Control",
                 "no-cache, no-transform"
             );
+
 
             res.setHeader(
                 "Connection",
                 "keep-alive"
             );
 
+
             res.setHeader(
                 "X-Accel-Buffering",
                 "no"
             );
 
-            if (
+
+            if(
                 typeof res.flushHeaders ===
                 "function"
-            ) {
+            ){
 
                 res.flushHeaders();
 
             }
 
+
             try {
 
-                for await (
+                for await(
                     const chunk
                     of response.body
-                ) {
+                ){
 
-                    if (
+                    if(
                         res.writableEnded
-                    ) {
+                    ){
+
                         break;
+
                     }
 
+
                     res.write(
-                        Buffer.from(chunk)
+                        Buffer.from(
+                            chunk
+                        )
                     );
 
                 }
 
-            } catch (streamError) {
+
+            } catch(streamError){
 
                 console.error(
                     "STREAM ERROR:",
@@ -753,32 +1184,39 @@ Do not invent facts.`
 
             }
 
-            if (
+
+            if(
                 !res.writableEnded
-            ) {
+            ){
 
                 res.end();
 
             }
 
-        } catch (error) {
+
+        } catch(error){
 
             console.error(
                 "AI ERROR:",
                 error
             );
 
-            if (!res.headersSent) {
+
+            if(
+                !res.headersSent
+            ){
 
                 res.status(500).json({
+
                     error:
                         error.message ||
                         "Internal server error"
+
                 });
 
-            } else if (
+            }else if(
                 !res.writableEnded
-            ) {
+            ){
 
                 res.end();
 
@@ -789,9 +1227,10 @@ Do not invent facts.`
     }
 );
 
-// =================================
-// FRONTEND FALLBACK
-// =================================
+
+/* =========================================
+   FRONTEND FALLBACK
+========================================= */
 
 app.use(
     (req, res) => {
@@ -807,11 +1246,12 @@ app.use(
     }
 );
 
-// =================================
-// START SERVER
-// =================================
 
-async function startServer() {
+/* =========================================
+   START
+========================================= */
+
+async function startServer(){
 
     try {
 
@@ -821,39 +1261,58 @@ async function startServer() {
                 12
             );
 
+
         app.listen(
             PORT,
             "0.0.0.0",
             () => {
 
                 console.log(`
-=================================
-        BimalAI 2.0
-=================================
-Running on port ${PORT}
+========================================
+              BimalAI 3.0
+========================================
 
-🔐 Login enabled
-👤 Username: ${LOGIN_USERNAME}
-🔒 Password: protected
-🤖 OpenRouter enabled
-☁️ Cloud ready
-=================================
+Running on port:
+${PORT}
+
+Login:
+Username: ${LOGIN_USERNAME}
+
+Password:
+Protected
+
+Features:
+✓ Persistent login
+✓ OpenRouter AI
+✓ Streaming responses
+✓ Free model list
+✓ Chat history
+✓ File upload
+✓ Image upload
+✓ Image analysis
+✓ Browser photo editor
+✓ Mobile responsive
+
+========================================
                 `);
 
             }
         );
 
-    } catch (error) {
+
+    } catch(error){
 
         console.error(
             "STARTUP ERROR:",
             error
         );
 
+
         process.exit(1);
 
     }
 
 }
+
 
 startServer();
