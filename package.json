@@ -1,23 +1,35 @@
 {
   "name": "personalai",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "5.0.0",
+  "description": "BimalAI personal AI assistant",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ai",
+    "assistant",
+    "bimalai"
+  ],
+  "author": "Bimschhetri",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.3",
     "dotenv": "^17.4.2",
+    "docx": "^9.5.1",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "mammoth": "^1.12.2",
     "multer": "^2.3.0",
-    "pdf-parse": "^2.4.5"
+    "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.17.2",
+    "pptxgenjs": "^4.0.1"
   }
 }
