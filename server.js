@@ -462,7 +462,109 @@ app.delete(
 
     }
 );
+// =================================
+// FILE / IMAGE UPLOAD
+// =================================
 
+const multer = require("multer");
+const os = require("os");
+
+const upload = multer({
+    dest: path.join(os.tmpdir(), "bimalai-uploads"),
+    limits: {
+        fileSize: 20 * 1024 * 1024
+    }
+});
+
+app.post(
+    "/api/upload",
+    requireLogin,
+    upload.single("file"),
+    async (req, res) => {
+
+        try {
+
+            if (!req.file) {
+                return res.status(400).json({
+                    error: "No file uploaded"
+                });
+            }
+
+            const allowed = [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+                "application/pdf",
+                "text/plain",
+                "text/csv",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ];
+
+            if (!allowed.includes(req.file.mimetype)) {
+
+                fs.unlink(
+                    req.file.path,
+                    () => {}
+                );
+
+                return res.status(400).json({
+                    error: "Unsupported file type"
+                });
+            }
+
+            const fileData =
+                fs.readFileSync(
+                    req.file.path
+                );
+
+            const base64 =
+                fileData.toString("base64");
+
+            const isImage =
+                req.file.mimetype.startsWith(
+                    "image/"
+                );
+
+            fs.unlink(
+                req.file.path,
+                () => {}
+            );
+
+            return res.json({
+
+                success: true,
+
+                file: {
+                    name: req.file.originalname,
+                    type: req.file.mimetype,
+                    size: req.file.size,
+
+                    ...(isImage
+                        ? {
+                            data:
+                                `data:${req.file.mimetype};base64,${base64}`
+                        }
+                        : {})
+                }
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "UPLOAD ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                error:
+                    "File upload failed"
+            });
+
+        }
+
+    }
+);
 // =================================
 // AI CHAT
 // =================================
