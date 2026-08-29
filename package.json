@@ -1,28 +1,35 @@
 {
   "name": "personalai",
-  "version": "1.0.0",
-  "description": "BimalAI personal AI assistant",
+  "version": "4.0.0",
+  "description": "BimalAI personal AI assistant with document generation",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\""
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ai",
+    "assistant",
+    "bimalai"
+  ],
+  "author": "Bimschhetri",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.3",
     "dotenv": "^17.4.2",
+    "docx": "^9.5.1",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "mammoth": "^1.12.2",
     "multer": "^2.3.0",
     "pdf-parse": "^2.4.5",
     "pdfkit": "^0.17.2",
-    "docx": "^9.5.1",
-    "exceljs": "^4.4.0",
     "pptxgenjs": "^4.0.1"
   }
 }
