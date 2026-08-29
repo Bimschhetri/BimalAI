@@ -19,6 +19,10 @@
     "express-session": "^1.19.0",
     "mammoth": "^1.12.2",
     "multer": "^2.3.0",
-    "pdf-parse": "^2.4.5"
+    "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.17.2",
+    "docx": "^9.5.1",
+    "exceljs": "^4.4.0",
+    "pptxgenjs": "^4.0.1"
   }
 }
