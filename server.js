@@ -3,155 +3,153 @@ require("dotenv").config();
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const multer = require("multer");
 
 const app = express();
-const PORT = 3000;
+
+// Render provides PORT automatically.
+// Locally it will use 3000.
+const PORT = process.env.PORT || 3000;
+
+// ================================
+// DIRECTORIES
+// ================================
 
 const DATA_DIR = path.join(__dirname, "data");
 const CHATS_FILE = path.join(DATA_DIR, "chats.json");
-const MEMORY_FILE = path.join(DATA_DIR, "memory.json");
 
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
 if (!fs.existsSync(CHATS_FILE)) {
-    fs.writeFileSync(CHATS_FILE, "[]");
+    fs.writeFileSync(CHATS_FILE, "[]", "utf8");
 }
 
-if (!fs.existsSync(MEMORY_FILE)) {
-    fs.writeFileSync(MEMORY_FILE, "[]");
-}
+// ================================
+// MIDDLEWARE
+// ================================
 
-app.use(express.json({ limit: "30mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json({ limit: "20mb" }));
 
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-        fileSize: 15 * 1024 * 1024
-    }
-});
+app.use(
+    express.static(
+        path.join(__dirname, "public")
+    )
+);
 
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function loadJSON(file, fallback = []) {
-    try {
-        return JSON.parse(fs.readFileSync(file, "utf8"));
-    } catch {
-        return fallback;
-    }
-}
-
-function saveJSON(file, data) {
-    fs.writeFileSync(
-        file,
-        JSON.stringify(data, null, 2),
-        "utf8"
-    );
-}
+// ================================
+// CHAT STORAGE
+// ================================
 
 function loadChats() {
-    return loadJSON(CHATS_FILE, []);
+    try {
+        return JSON.parse(
+            fs.readFileSync(CHATS_FILE, "utf8")
+        );
+    } catch (error) {
+        console.error("Chat load error:", error);
+        return [];
+    }
 }
 
 function saveChats(chats) {
-    saveJSON(CHATS_FILE, chats);
+    try {
+        fs.writeFileSync(
+            CHATS_FILE,
+            JSON.stringify(chats, null, 2),
+            "utf8"
+        );
+    } catch (error) {
+        console.error("Chat save error:", error);
+    }
 }
 
-function loadMemory() {
-    return loadJSON(MEMORY_FILE, []);
-}
+// ================================
+// HEALTH CHECK
+// ================================
 
-function saveMemory(memory) {
-    saveJSON(MEMORY_FILE, memory);
-}
+app.get("/health", (req, res) => {
+    res.json({
+        status: "ok",
+        name: "BimalAI",
+        version: "2.0"
+    });
+});
 
-
-/* =========================================================
-   MODELS
-========================================================= */
+// ================================
+// MODELS
+// ================================
 
 app.get("/api/models", async (req, res) => {
-
     try {
-
         const response = await fetch(
             "https://openrouter.ai/api/v1/models"
         );
 
         if (!response.ok) {
-            throw new Error("Could not load OpenRouter models");
+            throw new Error(
+                `OpenRouter models request failed: ${response.status}`
+            );
         }
 
         const data = await response.json();
 
-        const models = (data.data || [])
-            .filter(model => {
-
-                return (
-                    model.pricing?.prompt === "0" &&
-                    model.pricing?.completion === "0"
-                );
-
-            })
+        const freeModels = (data.data || [])
+            .filter(model =>
+                model.pricing?.prompt === "0" &&
+                model.pricing?.completion === "0"
+            )
             .map(model => ({
                 id: model.id,
                 name: model.name,
-                context_length: model.context_length || 0
+                context_length:
+                    model.context_length
             }))
             .sort((a, b) =>
                 a.name.localeCompare(b.name)
             );
 
-        res.json(models);
+        res.json(freeModels);
 
     } catch (error) {
-
-        console.error("MODEL ERROR:", error);
+        console.error(
+            "MODEL ERROR:",
+            error
+        );
 
         res.status(500).json({
             error: "Could not load models"
         });
-
     }
-
 });
 
-
-/* =========================================================
-   CHATS
-========================================================= */
+// ================================
+// GET CHATS
+// ================================
 
 app.get("/api/chats", (req, res) => {
-
     res.json(loadChats());
-
 });
 
+// ================================
+// SAVE CHAT
+// ================================
 
 app.post("/api/chats", (req, res) => {
 
     const { chat } = req.body;
 
     if (!chat) {
-
         return res.status(400).json({
             error: "Chat is required"
         });
-
     }
 
     const chats = loadChats();
 
-    const index =
-        chats.findIndex(
-            item => item.id === chat.id
-        );
+    const index = chats.findIndex(
+        item => item.id === chat.id
+    );
 
     if (index >= 0) {
         chats[index] = chat;
@@ -164,211 +162,30 @@ app.post("/api/chats", (req, res) => {
     res.json({
         success: true
     });
-
 });
 
+// ================================
+// DELETE CHAT
+// ================================
 
 app.delete("/api/chats/:id", (req, res) => {
 
     const chats = loadChats();
 
-    const filtered =
-        chats.filter(
-            item => item.id !== req.params.id
-        );
+    const filtered = chats.filter(
+        item => item.id !== req.params.id
+    );
 
     saveChats(filtered);
 
     res.json({
         success: true
     });
-
 });
 
-
-/* =========================================================
-   MEMORY
-========================================================= */
-
-app.get("/api/memory", (req, res) => {
-
-    res.json(loadMemory());
-
-});
-
-
-app.post("/api/memory", (req, res) => {
-
-    const { text } = req.body;
-
-    if (!text || !text.trim()) {
-
-        return res.status(400).json({
-            error: "Memory text required"
-        });
-
-    }
-
-    const memory = loadMemory();
-
-    memory.unshift({
-        id: Date.now().toString(),
-        text: text.trim(),
-        createdAt: new Date().toISOString()
-    });
-
-    saveMemory(memory);
-
-    res.json({
-        success: true,
-        memory
-    });
-
-});
-
-
-app.delete("/api/memory/:id", (req, res) => {
-
-    const memory =
-        loadMemory().filter(
-            item => item.id !== req.params.id
-        );
-
-    saveMemory(memory);
-
-    res.json({
-        success: true
-    });
-
-});
-
-
-/* =========================================================
-   FILE EXTRACTION
-========================================================= */
-
-app.post("/api/upload", upload.single("file"), async (req, res) => {
-
-    try {
-
-        if (!req.file) {
-
-            return res.status(400).json({
-                error: "No file uploaded"
-            });
-
-        }
-
-        const filename =
-            req.file.originalname;
-
-        const extension =
-            path.extname(filename).toLowerCase();
-
-        let text = "";
-
-        if (extension === ".txt" ||
-            extension === ".md" ||
-            extension === ".csv") {
-
-            text =
-                req.file.buffer.toString("utf8");
-
-        }
-
-        else if (extension === ".pdf") {
-
-            const pdfParse =
-                require("pdf-parse");
-
-            const result =
-                await pdfParse(req.file.buffer);
-
-            text =
-                result.text || "";
-
-        }
-
-        else if (extension === ".docx") {
-
-            const mammoth =
-                require("mammoth");
-
-            const result =
-                await mammoth.extractRawText({
-                    buffer: req.file.buffer
-                });
-
-            text =
-                result.value || "";
-
-        }
-
-        else {
-
-            return res.status(400).json({
-                error:
-                    "Supported files: PDF, DOCX, TXT, MD, CSV"
-            });
-
-        }
-
-        text =
-            text
-                .replace(/\0/g, "")
-                .trim();
-
-        if (!text) {
-
-            return res.status(400).json({
-                error: "Could not extract readable text"
-            });
-
-        }
-
-        /*
-          Avoid sending enormous files directly.
-          Keep approximately the first 100k characters.
-        */
-
-        const limitedText =
-            text.slice(0, 100000);
-
-        res.json({
-
-            success: true,
-
-            filename,
-
-            characters:
-                limitedText.length,
-
-            text:
-                limitedText
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "FILE ERROR:",
-            error
-        );
-
-        res.status(500).json({
-            error:
-                "Could not read the file: " +
-                error.message
-        });
-
-    }
-
-});
-
-
-/* =========================================================
-   AI CHAT
-========================================================= */
+// ================================
+// AI CHAT
+// ================================
 
 app.post("/api/chat", async (req, res) => {
 
@@ -376,110 +193,35 @@ app.post("/api/chat", async (req, res) => {
 
         const {
             messages,
-            model,
-            webSearch,
-            memory
+            model
         } = req.body;
 
         if (
             !Array.isArray(messages) ||
             messages.length === 0
         ) {
-
             return res.status(400).json({
                 error: "Messages are required"
             });
+        }
 
+        // Check API key
+        if (!process.env.OPENROUTER_API_KEY) {
+            return res.status(500).json({
+                error:
+                    "OPENROUTER_API_KEY is not configured."
+            });
         }
 
         const selectedModel =
             model || "openrouter/free";
 
-        const storedMemory =
-            Array.isArray(memory)
-                ? memory
-                : loadMemory();
-
-        let memoryText = "";
-
-        if (storedMemory.length) {
-
-            memoryText =
-                "\n\nIMPORTANT USER MEMORY:\n" +
-                storedMemory
-                    .slice(0, 30)
-                    .map(
-                        item =>
-                            "- " + item.text
-                    )
-                    .join("\n");
-
-        }
-
-        const systemPrompt = `
-You are BimalAI, Bimal's personal AI assistant.
-
-Your job is to be highly useful, intelligent, accurate and practical.
-
-Communication:
-- Be natural and conversational.
-- Use clear formatting.
-- Use Markdown when useful.
-- Do not unnecessarily repeat the user's question.
-- For technical tasks, give exact commands and explain where to run them.
-- If something is uncertain, say so rather than inventing information.
-- If the user asks for current information and web search is available, use it.
-- When the user asks in Nepali, you may answer naturally in Nepali.
-- When the user mixes Nepali and English, respond naturally in the same style.
-
-You are running as BimalAI, a private personal assistant.
-${memoryText}
-        `.trim();
-
-
-        const requestBody = {
-
-            model: selectedModel,
-
-            messages: [
-                {
-                    role: "system",
-                    content: systemPrompt
-                },
-                ...messages
-            ],
-
-            stream: true
-
-        };
-
-
-        /*
-          Web search is optional.
-          OpenRouter's web plugin lets the model
-          use current web information.
-        */
-
-        if (webSearch === true) {
-
-            requestBody.plugins = [
-                {
-                    id: "web",
-                    max_results: 5
-                }
-            ];
-
-        }
-
-
         const response = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
             {
-
                 method: "POST",
 
                 headers: {
-
                     "Authorization":
                         `Bearer ${process.env.OPENROUTER_API_KEY}`,
 
@@ -487,43 +229,84 @@ ${memoryText}
                         "application/json",
 
                     "HTTP-Referer":
+                        process.env.APP_URL ||
                         "http://localhost:3000",
 
                     "X-Title":
                         "BimalAI"
-
                 },
 
-                body:
-                    JSON.stringify(
-                        requestBody
-                    )
+                body: JSON.stringify({
 
+                    model: selectedModel,
+
+                    messages: [
+
+                        {
+                            role: "system",
+
+                            content:
+                                `You are BimalAI, Bimal's personal AI assistant.
+
+Your goals:
+- Be helpful, intelligent and accurate.
+- Understand conversation context.
+- Explain difficult topics clearly.
+- Help with studying, coding, planning and everyday tasks.
+- Use concise answers when the question is simple.
+- Give detailed explanations when needed.
+- Never pretend to know something you don't know.
+- Use Markdown when it improves readability.`
+                        },
+
+                        ...messages
+
+                    ],
+
+                    stream: true
+
+                })
             }
         );
 
+        // ================================
+        // OPENROUTER ERROR
+        // ================================
 
         if (!response.ok) {
 
             const errorText =
                 await response.text();
 
+            console.error(
+                "OPENROUTER ERROR:",
+                errorText
+            );
+
             return res.status(
                 response.status
             ).json({
-
                 error:
                     errorText ||
                     "OpenRouter request failed"
-
             });
-
         }
 
+        if (!response.body) {
+
+            return res.status(500).json({
+                error:
+                    "OpenRouter returned no response body."
+            });
+        }
+
+        // ================================
+        // STREAM RESPONSE
+        // ================================
 
         res.setHeader(
             "Content-Type",
-            "text/event-stream"
+            "text/event-stream; charset=utf-8"
         );
 
         res.setHeader(
@@ -536,21 +319,43 @@ ${memoryText}
             "keep-alive"
         );
 
-        res.flushHeaders();
+        res.setHeader(
+            "X-Accel-Buffering",
+            "no"
+        );
 
+        // Send headers immediately
+        if (typeof res.flushHeaders === "function") {
+            res.flushHeaders();
+        }
 
-        for await (
-            const chunk of response.body
-        ) {
+        try {
 
-            res.write(
-                Buffer.from(chunk)
+            for await (
+                const chunk of response.body
+            ) {
+
+                if (res.writableEnded) {
+                    break;
+                }
+
+                res.write(
+                    Buffer.from(chunk)
+                );
+            }
+
+        } catch (streamError) {
+
+            console.error(
+                "STREAM ERROR:",
+                streamError
             );
 
         }
 
-        res.end();
-
+        if (!res.writableEnded) {
+            res.end();
+        }
 
     } catch (error) {
 
@@ -562,60 +367,56 @@ ${memoryText}
         if (!res.headersSent) {
 
             res.status(500).json({
-                error: error.message
+                error:
+                    error.message ||
+                    "Internal server error"
             });
 
-        } else {
+        } else if (!res.writableEnded) {
 
             res.end();
 
         }
-
     }
-
 });
 
+// ================================
+// FRONTEND FALLBACK
+// ================================
 
-/* =========================================================
-   HEALTH
-========================================================= */
+app.use((req, res) => {
 
-app.get("/api/health", (req, res) => {
-
-    res.json({
-        status: "ok",
-        name: "BimalAI",
-        version: "2.0"
-    });
-
+    res.sendFile(
+        path.join(
+            __dirname,
+            "public",
+            "index.html"
+        )
+    );
 });
 
-
-/* =========================================================
-   START
-========================================================= */
+// ================================
+// START SERVER
+// ================================
 
 app.listen(
     PORT,
+    "0.0.0.0",
     () => {
 
-        console.log("");
-        console.log("=================================");
-        console.log("        BimalAI 2.0");
-        console.log("=================================");
-        console.log(
-            `Running at http://localhost:${PORT}`
-        );
-        console.log("");
-        console.log("Features:");
-        console.log("- Free OpenRouter models");
-        console.log("- Streaming");
-        console.log("- Web search");
-        console.log("- PDF/DOCX/TXT upload");
-        console.log("- Persistent memory");
-        console.log("- Chat history");
-        console.log("=================================");
-        console.log("");
+        console.log(`
+=================================
+        BimalAI 2.0
+=================================
+Running on port ${PORT}
 
+Features:
+- Free OpenRouter models
+- Streaming
+- Chat history
+- Persistent local storage
+- Cloud ready
+=================================
+        `);
     }
 );
