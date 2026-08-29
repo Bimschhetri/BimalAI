@@ -7,7 +7,16 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
+
+// Render ले PORT दिन्छ, local मा 3000
 const PORT = process.env.PORT || 3000;
+
+// Render HTTPS proxy पछाडि session cookie सही काम गर्न
+app.set("trust proxy", 1);
+
+// =================================
+// FILE STORAGE
+// =================================
 
 const DATA_DIR = path.join(__dirname, "data");
 const CHATS_FILE = path.join(DATA_DIR, "chats.json");
@@ -20,26 +29,42 @@ if (!fs.existsSync(CHATS_FILE)) {
     fs.writeFileSync(CHATS_FILE, "[]", "utf8");
 }
 
+// =================================
+// MIDDLEWARE
+// =================================
+
 app.use(express.json({ limit: "20mb" }));
 
 app.use(
     session({
         secret:
             process.env.SESSION_SECRET ||
-            "change-this-secret",
+            "bimalai-session-secret-change-me",
+
         resave: false,
+
         saveUninitialized: false,
+
         cookie: {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+
+            secure:
+                process.env.NODE_ENV === "production",
+
             sameSite: "lax",
-            maxAge: 1000 * 60 * 60 * 24 * 30
+
+            maxAge:
+                1000 *
+                60 *
+                60 *
+                24 *
+                30
         }
     })
 );
 
 // =================================
-// AUTH
+// AUTH CONFIG
 // =================================
 
 const LOGIN_USERNAME =
@@ -48,22 +73,22 @@ const LOGIN_USERNAME =
 const LOGIN_PASSWORD =
     process.env.BIMALAI_PASSWORD || "Bimal";
 
-let PASSWORD_HASH;
+let PASSWORD_HASH = null;
 
-async function setupAuth() {
-    PASSWORD_HASH =
-        await bcrypt.hash(
-            LOGIN_PASSWORD,
-            12
-        );
-}
+// =================================
+// AUTH MIDDLEWARE
+// =================================
 
 function requireLogin(req, res, next) {
-    if (req.session.authenticated) {
+
+    if (
+        req.session &&
+        req.session.authenticated === true
+    ) {
         return next();
     }
 
-    res.status(401).json({
+    return res.status(401).json({
         error: "Authentication required"
     });
 }
@@ -79,16 +104,28 @@ app.post("/api/login", async (req, res) => {
         const {
             username,
             password
-        } = req.body;
+        } = req.body || {};
 
         if (!username || !password) {
+
             return res.status(400).json({
-                error: "Username and password are required"
+                error:
+                    "Username and password are required"
             });
+
+        }
+
+        if (!PASSWORD_HASH) {
+
+            return res.status(503).json({
+                error:
+                    "Authentication system is starting. Please try again."
+            });
+
         }
 
         const usernameCorrect =
-            username === LOGIN_USERNAME;
+            username.trim() === LOGIN_USERNAME;
 
         const passwordCorrect =
             await bcrypt.compare(
@@ -100,17 +137,40 @@ app.post("/api/login", async (req, res) => {
             !usernameCorrect ||
             !passwordCorrect
         ) {
+
             return res.status(401).json({
-                error: "Incorrect username or password"
+                error:
+                    "Incorrect username or password"
             });
+
         }
 
         req.session.authenticated = true;
         req.session.username = LOGIN_USERNAME;
 
-        res.json({
-            success: true,
-            username: LOGIN_USERNAME
+        // Important:
+        // session लाई पहिले save गराएर मात्र response पठाउने
+        req.session.save((error) => {
+
+            if (error) {
+
+                console.error(
+                    "SESSION SAVE ERROR:",
+                    error
+                );
+
+                return res.status(500).json({
+                    error:
+                        "Could not create login session"
+                });
+
+            }
+
+            return res.json({
+                success: true,
+                username: LOGIN_USERNAME
+            });
+
         });
 
     } catch (error) {
@@ -120,10 +180,12 @@ app.post("/api/login", async (req, res) => {
             error
         );
 
-        res.status(500).json({
+        return res.status(500).json({
             error: "Login failed"
         });
+
     }
+
 });
 
 // =================================
@@ -135,9 +197,24 @@ app.post(
     requireLogin,
     (req, res) => {
 
-        req.session.destroy(() => {
+        req.session.destroy((error) => {
 
-            res.json({
+            if (error) {
+
+                console.error(
+                    "LOGOUT ERROR:",
+                    error
+                );
+
+                return res.status(500).json({
+                    error: "Logout failed"
+                });
+
+            }
+
+            res.clearCookie("connect.sid");
+
+            return res.json({
                 success: true
             });
 
@@ -152,12 +229,17 @@ app.post(
 
 app.get("/api/auth", (req, res) => {
 
-    res.json({
+    return res.json({
+
         authenticated:
-            !!req.session.authenticated,
+            !!(
+                req.session &&
+                req.session.authenticated === true
+            ),
 
         username:
-            req.session.username || null
+            req.session?.username || null
+
     });
 
 });
@@ -203,9 +285,11 @@ app.get(
                 );
 
             if (!response.ok) {
+
                 throw new Error(
                     `Models request failed: ${response.status}`
                 );
+
             }
 
             const data =
@@ -213,16 +297,19 @@ app.get(
 
             const freeModels =
                 (data.data || [])
+
                     .filter(model =>
                         model.pricing?.prompt === "0" &&
                         model.pricing?.completion === "0"
                     )
+
                     .map(model => ({
                         id: model.id,
                         name: model.name,
                         context_length:
                             model.context_length
                     }))
+
                     .sort((a, b) =>
                         a.name.localeCompare(b.name)
                     );
@@ -240,7 +327,9 @@ app.get(
                 error:
                     "Could not load models"
             });
+
         }
+
     }
 );
 
@@ -264,6 +353,7 @@ function loadChats() {
         return [];
 
     }
+
 }
 
 function saveChats(chats) {
@@ -305,14 +395,14 @@ app.post(
     requireLogin,
     (req, res) => {
 
-        const {
-            chat
-        } = req.body;
+        const { chat } =
+            req.body || {};
 
         if (!chat) {
 
             return res.status(400).json({
-                error: "Chat is required"
+                error:
+                    "Chat is required"
             });
 
         }
@@ -387,7 +477,7 @@ app.post(
             const {
                 messages,
                 model
-            } = req.body;
+            } = req.body || {};
 
             if (
                 !Array.isArray(messages) ||
@@ -420,9 +510,11 @@ app.post(
                 await fetch(
                     "https://openrouter.ai/api/v1/chat/completions",
                     {
+
                         method: "POST",
 
                         headers: {
+
                             "Authorization":
                                 `Bearer ${process.env.OPENROUTER_API_KEY}`,
 
@@ -435,6 +527,7 @@ app.post(
 
                             "X-Title":
                                 "BimalAI"
+
                         },
 
                         body:
@@ -452,8 +545,10 @@ app.post(
                                         content:
                                             `You are BimalAI, Bimal's personal AI assistant.
 
+You are shared by Bimal and Simran.
+
 Be intelligent, helpful, accurate and clear.
-Remember the conversation context.
+Remember conversation context.
 Help with study, coding, planning, writing and everyday tasks.
 Use Markdown when useful.
 Do not invent facts.`
@@ -463,10 +558,10 @@ Do not invent facts.`
 
                                 ],
 
-                                stream:
-                                    true
+                                stream: true
 
                             })
+
                     }
                 );
 
@@ -593,7 +688,7 @@ Do not invent facts.`
 );
 
 // =================================
-// FRONTEND
+// FRONTEND FALLBACK
 // =================================
 
 app.use(
@@ -611,17 +706,25 @@ app.use(
 );
 
 // =================================
-// START
+// START SERVER
 // =================================
 
-setupAuth().then(() => {
+async function startServer() {
 
-    app.listen(
-        PORT,
-        "0.0.0.0",
-        () => {
+    try {
 
-            console.log(`
+        PASSWORD_HASH =
+            await bcrypt.hash(
+                LOGIN_PASSWORD,
+                12
+            );
+
+        app.listen(
+            PORT,
+            "0.0.0.0",
+            () => {
+
+                console.log(`
 =================================
         BimalAI 2.0
 =================================
@@ -633,9 +736,22 @@ Running on port ${PORT}
 🤖 OpenRouter enabled
 ☁️ Cloud ready
 =================================
-            `);
+                `);
 
-        }
-    );
+            }
+        );
 
-});
+    } catch (error) {
+
+        console.error(
+            "STARTUP ERROR:",
+            error
+        );
+
+        process.exit(1);
+
+    }
+
+}
+
+startServer();
