@@ -1,4 +1,4 @@
-﻿const state = {
+const state = {
     chats: [],
     currentChatId: null,
     messages: [],
@@ -152,7 +152,6 @@ loginForm.addEventListener("submit", async (event) => {
             headers: {
                 "Content-Type": "application/json"
             },
-            credentials: "include",
             body: JSON.stringify({
                 username,
                 password
@@ -168,17 +167,16 @@ loginForm.addEventListener("submit", async (event) => {
         }
 
         await showApp();
-
     } catch (error) {
-        loginError.textContent = error.message;
+        loginError.textContent =
+            error.message || "Login failed";
     }
 });
 
 logoutBtn.addEventListener("click", async () => {
     try {
         await fetch("/api/logout", {
-            method: "POST",
-            credentials: "include"
+            method: "POST"
         });
     } catch {}
 
@@ -206,9 +204,7 @@ async function loadModels() {
         modelSelect.innerHTML = "";
 
         const freeModels =
-            Array.isArray(models)
-                ? models
-                : [];
+            Array.isArray(models) ? models : [];
 
         if (freeModels.length === 0) {
             const option =
@@ -272,15 +268,14 @@ modeSelect.addEventListener("change", () => {
 async function loadChats() {
     try {
         const response =
-            await fetch("/api/chats", {
-                credentials: "include"
-            });
+            await fetch("/api/chats");
 
         if (!response.ok) {
             return;
         }
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
         state.chats =
             Array.isArray(data)
@@ -288,7 +283,6 @@ async function loadChats() {
                 : [];
 
         renderChatList();
-
     } catch (error) {
         console.error(
             "CHAT LOAD ERROR:",
@@ -359,13 +353,10 @@ function createNewChat(save = true) {
     }
 }
 
-newChatBtn.addEventListener(
-    "click",
-    () => {
-        createNewChat(true);
-        messageInput.focus();
-    }
-);
+newChatBtn.addEventListener("click", () => {
+    createNewChat(true);
+    messageInput.focus();
+});
 
 function openChat(id) {
     const chat =
@@ -412,27 +403,22 @@ async function saveCurrentChat() {
 
     try {
         const response =
-            await fetch(
-                "/api/chats",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        chat
-                    })
-                }
-            );
+            await fetch("/api/chats", {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    chat
+                })
+            });
 
         if (!response.ok) {
             console.error(
                 "CHAT SAVE FAILED"
             );
         }
-
     } catch (error) {
         console.error(
             "CHAT SAVE ERROR:",
@@ -450,7 +436,9 @@ renameBtn.addEventListener(
             state.chats.find(
                 (item) =>
                     String(item.id) ===
-                    String(state.currentChatId)
+                    String(
+                        state.currentChatId
+                    )
             );
 
         if (!chat) {
@@ -482,11 +470,11 @@ renameBtn.addEventListener(
                             "Content-Type":
                                 "application/json"
                         },
-                        credentials: "include",
-                        body: JSON.stringify({
-                            title:
-                                title.trim()
-                        })
+                        body:
+                            JSON.stringify({
+                                title:
+                                    title.trim()
+                            })
                     }
                 );
 
@@ -510,7 +498,10 @@ renameBtn.addEventListener(
             renderChatList();
 
         } catch (error) {
-            alert(error.message);
+            alert(
+                error.message ||
+                "Rename failed"
+            );
         }
     }
 );
@@ -522,7 +513,9 @@ deleteBtn.addEventListener(
             state.chats.find(
                 (item) =>
                     String(item.id) ===
-                    String(state.currentChatId)
+                    String(
+                        state.currentChatId
+                    )
             );
 
         if (!chat) {
@@ -544,8 +537,7 @@ deleteBtn.addEventListener(
                         chat.id
                     )}`,
                     {
-                        method: "DELETE",
-                        credentials: "include"
+                        method: "DELETE"
                     }
                 );
 
@@ -565,7 +557,10 @@ deleteBtn.addEventListener(
             createNewChat(false);
 
         } catch (error) {
-            alert(error.message);
+            alert(
+                error.message ||
+                "Delete failed"
+            );
         }
     }
 );
@@ -613,8 +608,8 @@ function renderMessages() {
                     "click",
                     () => {
                         messageInput.value =
-                            button.dataset.prompt ||
-                            "";
+                            button.dataset
+                                .prompt || "";
 
                         messageInput.focus();
                         autoResize();
@@ -666,14 +661,14 @@ function addMessageElement(message) {
                 ${
                     message.role === "assistant"
                         ? simpleMarkdown(
-                            message.content
-                        )
+                              message.content
+                          )
                         : escapeHTML(
-                            message.content
-                        ).replace(
-                            /\n/g,
-                            "<br>"
-                        )
+                              message.content
+                          ).replace(
+                              /\n/g,
+                              "<br>"
+                          )
                 }
             </div>
         </div>
@@ -692,7 +687,9 @@ function addMessageElement(message) {
 
 attachBtn.addEventListener(
     "click",
-    () => fileInput.click()
+    () => {
+        fileInput.click();
+    }
 );
 
 fileInput.addEventListener(
@@ -709,12 +706,17 @@ fileInput.addEventListener(
 
 function renderFilePreview() {
     if (state.files.length === 0) {
-        filePreview.classList.add("hidden");
+        filePreview.classList.add(
+            "hidden"
+        );
+
         filePreview.innerHTML = "";
         return;
     }
 
-    filePreview.classList.remove("hidden");
+    filePreview.classList.remove(
+        "hidden"
+    );
 
     filePreview.innerHTML =
         state.files
@@ -722,7 +724,9 @@ function renderFilePreview() {
                 (file) => `
                     <span class="file-chip">
                         📎
-                        ${escapeHTML(file.name)}
+                        ${escapeHTML(
+                            file.name
+                        )}
                     </span>
                 `
             )
@@ -749,7 +753,6 @@ async function uploadFiles() {
             "/api/upload",
             {
                 method: "POST",
-                credentials: "include",
                 body: formData
             }
         );
@@ -766,6 +769,7 @@ async function uploadFiles() {
 
     state.files = [];
     fileInput.value = "";
+
     renderFilePreview();
 
     return data.files || [];
@@ -801,7 +805,10 @@ async function generateBimalAIFile(
     const data =
         await response.json();
 
-    if (!response.ok || !data.success) {
+    if (
+        !response.ok ||
+        !data.success
+    ) {
         throw new Error(
             data.error ||
             "File generation failed"
@@ -861,7 +868,8 @@ async function sendMessage() {
                 uploadedFiles
                     .map((file) => {
                         if (
-                            file.type === "text"
+                            file.type ===
+                            "text"
                         ) {
                             return (
                                 `[Attached file: ${file.name}]\n` +
@@ -870,7 +878,8 @@ async function sendMessage() {
                         }
 
                         if (
-                            file.type === "image"
+                            file.type ===
+                            "image"
                         ) {
                             return (
                                 `[Attached image: ${file.name}]`
@@ -885,14 +894,20 @@ async function sendMessage() {
                     .join("\n");
 
             finalText =
-                `${text || "Please analyze the attached files."}\n\n${fileText}`;
+                `${
+                    text ||
+                    "Please analyze the attached files."
+                }\n\n${fileText}`;
         }
 
         if (!finalText) {
             return;
         }
 
-        if (state.messages.length === 0) {
+        if (
+            state.messages.length ===
+            0
+        ) {
             const chat =
                 state.chats.find(
                     (item) =>
@@ -904,7 +919,10 @@ async function sendMessage() {
 
             if (chat) {
                 chat.title =
-                    text.slice(0, 60) ||
+                    text.slice(
+                        0,
+                        60
+                    ) ||
                     "New conversation";
 
                 chatTitleEl.textContent =
@@ -917,7 +935,9 @@ async function sendMessage() {
             content: finalText
         };
 
-        state.messages.push(userMessage);
+        state.messages.push(
+            userMessage
+        );
 
         renderMessages();
 
@@ -950,25 +970,29 @@ async function sendMessage() {
                             "application/json"
                     },
                     credentials: "include",
-                    body: JSON.stringify({
-                        messages:
-                            state.messages
-                                .filter(
-                                    (message) =>
-                                        message.content
-                                )
-                                .slice(0, -1),
+                    body:
+                        JSON.stringify({
+                            messages:
+                                state.messages
+                                    .filter(
+                                        (message) =>
+                                            message.content
+                                    )
+                                    .slice(
+                                        0,
+                                        -1
+                                    ),
 
-                        model:
-                            state.model ||
-                            modelSelect.value ||
-                            "openrouter/free",
+                            model:
+                                state.model ||
+                                modelSelect.value ||
+                                "openrouter/free",
 
-                        mode:
-                            state.mode ||
-                            modeSelect.value ||
-                            ""
-                    })
+                            mode:
+                                state.mode ||
+                                modeSelect.value ||
+                                ""
+                        })
                 }
             );
 
@@ -983,7 +1007,6 @@ async function sendMessage() {
                 errorMessage =
                     data.error ||
                     errorMessage;
-
             } catch {}
 
             assistantMessage.content =
@@ -1015,7 +1038,8 @@ async function sendMessage() {
             const {
                 value,
                 done
-            } = await reader.read();
+            } =
+                await reader.read();
 
             if (done) {
                 break;
@@ -1069,7 +1093,8 @@ async function sendMessage() {
                     const delta =
                         data
                             .choices?.[0]
-                            ?.delta?.content;
+                            ?.delta
+                            ?.content;
 
                     if (delta) {
                         assistantMessage.content +=
@@ -1082,16 +1107,15 @@ async function sendMessage() {
 
                         scrollToBottom();
                     }
-
                 } catch {
                     /* Ignore incomplete SSE chunks */
                 }
             }
         }
 
-        /* =========================================
-           AUTOMATIC FILE GENERATION
-        ========================================= */
+        /* =====================================
+           AUTO FILE GENERATION
+        ===================================== */
 
         const pdfRequested =
             /\b(pdf|downloadable pdf|generate pdf|create pdf|make pdf)\b/i
@@ -1102,14 +1126,16 @@ async function sendMessage() {
                 .test(text);
 
         const xlsxRequested =
-            /\b(xlsx|excel|spreadsheet|excel file|create spreadsheet)\b/i
+            /\b(xlsx|excel|spreadsheet)\b/i
                 .test(text);
 
         const pptxRequested =
-            /\b(pptx|powerpoint|presentation|ppt)\b/i
+            /\b(pptx|powerpoint|presentation)\b/i
                 .test(text);
 
-        if (assistantMessage.content.trim()) {
+        if (
+            assistantMessage.content.trim()
+        ) {
             try {
                 if (pdfRequested) {
                     console.log(
@@ -1127,10 +1153,6 @@ async function sendMessage() {
                 }
 
                 else if (docxRequested) {
-                    console.log(
-                        "BimalAI: Generating DOCX..."
-                    );
-
                     await generateBimalAIFile(
                         "docx",
                         "BimalAI-Document",
@@ -1142,10 +1164,6 @@ async function sendMessage() {
                 }
 
                 else if (xlsxRequested) {
-                    console.log(
-                        "BimalAI: Generating XLSX..."
-                    );
-
                     await generateBimalAIFile(
                         "xlsx",
                         "BimalAI-Spreadsheet",
@@ -1157,10 +1175,6 @@ async function sendMessage() {
                 }
 
                 else if (pptxRequested) {
-                    console.log(
-                        "BimalAI: Generating PPTX..."
-                    );
-
                     await generateBimalAIFile(
                         "pptx",
                         "BimalAI-Presentation",
@@ -1175,8 +1189,6 @@ async function sendMessage() {
                     simpleMarkdown(
                         assistantMessage.content
                     );
-
-                scrollToBottom();
 
             } catch (fileError) {
                 console.error(
