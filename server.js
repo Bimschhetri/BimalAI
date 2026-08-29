@@ -9,6 +9,16 @@ const multer = require("multer");
 const mammoth = require("mammoth");
 const pdfParse = require("pdf-parse");
 
+const PDFDocument = require("pdfkit");
+const {
+    Document,
+    Packer,
+    Paragraph,
+    HeadingLevel
+} = require("docx");
+const ExcelJS = require("exceljs");
+const pptxgen = require("pptxgenjs");
+
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -18,23 +28,38 @@ app.set("trust proxy", 1);
 const DATA_DIR = path.join(__dirname, "data");
 const PUBLIC_DIR = path.join(__dirname, "public");
 const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
+const GENERATED_DIR = path.join(DATA_DIR, "generated");
 const CHATS_FILE = path.join(DATA_DIR, "chats.json");
 
-for (const dir of [DATA_DIR, UPLOAD_DIR]) {
+for (const dir of [
+    DATA_DIR,
+    UPLOAD_DIR,
+    GENERATED_DIR
+]) {
     if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+        fs.mkdirSync(dir, {
+            recursive: true
+        });
     }
 }
 
 if (!fs.existsSync(CHATS_FILE)) {
-    fs.writeFileSync(CHATS_FILE, "[]", "utf8");
+    fs.writeFileSync(
+        CHATS_FILE,
+        "[]",
+        "utf8"
+    );
 }
 
 /* =========================================
    MIDDLEWARE
 ========================================= */
 
-app.use(express.json({ limit: "50mb" }));
+app.use(
+    express.json({
+        limit: "50mb"
+    })
+);
 
 app.use(
     express.urlencoded({
@@ -57,7 +82,8 @@ app.use(
             httpOnly: true,
 
             secure:
-                process.env.NODE_ENV === "production",
+                process.env.NODE_ENV ===
+                "production",
 
             sameSite: "lax",
 
@@ -76,15 +102,20 @@ app.use(
 ========================================= */
 
 const LOGIN_USERNAME =
-    process.env.BIMALAI_USERNAME || "Simran";
+    process.env.BIMALAI_USERNAME ||
+    "Simran";
 
 const LOGIN_PASSWORD =
-    process.env.BIMALAI_PASSWORD || "Bimal";
+    process.env.BIMALAI_PASSWORD ||
+    "Bimal";
 
 let PASSWORD_HASH = null;
 
-function requireLogin(req, res, next) {
-
+function requireLogin(
+    req,
+    res,
+    next
+) {
     if (
         req.session &&
         req.session.authenticated === true
@@ -93,7 +124,8 @@ function requireLogin(req, res, next) {
     }
 
     return res.status(401).json({
-        error: "Authentication required"
+        error:
+            "Authentication required"
     });
 }
 
@@ -101,89 +133,100 @@ function requireLogin(req, res, next) {
    LOGIN
 ========================================= */
 
-app.post("/api/login", async (req, res) => {
+app.post(
+    "/api/login",
+    async (req, res) => {
+        try {
+            const username =
+                String(
+                    req.body?.username ||
+                    ""
+                ).trim();
 
-    try {
-
-        const username =
-            String(req.body?.username || "").trim();
-
-        const password =
-            String(req.body?.password || "");
-
-        if (!username || !password) {
-
-            return res.status(400).json({
-                error:
-                    "Username and password are required"
-            });
-        }
-
-        if (!PASSWORD_HASH) {
-
-            return res.status(503).json({
-                error:
-                    "Authentication system is starting. Try again."
-            });
-        }
-
-        const usernameCorrect =
-            username === LOGIN_USERNAME;
-
-        const passwordCorrect =
-            await bcrypt.compare(
-                password,
-                PASSWORD_HASH
-            );
-
-        if (
-            !usernameCorrect ||
-            !passwordCorrect
-        ) {
-
-            return res.status(401).json({
-                error:
-                    "Incorrect username or password"
-            });
-        }
-
-        req.session.authenticated = true;
-        req.session.username = LOGIN_USERNAME;
-
-        req.session.save((error) => {
-
-            if (error) {
-
-                console.error(
-                    "SESSION SAVE ERROR:",
-                    error
+            const password =
+                String(
+                    req.body?.password ||
+                    ""
                 );
 
-                return res.status(500).json({
+            if (
+                !username ||
+                !password
+            ) {
+                return res.status(400).json({
                     error:
-                        "Could not create login session"
+                        "Username and password are required"
                 });
             }
 
-            return res.json({
-                success: true,
-                username: LOGIN_USERNAME
+            if (!PASSWORD_HASH) {
+                return res.status(503).json({
+                    error:
+                        "Authentication system is starting. Try again."
+                });
+            }
+
+            const usernameCorrect =
+                username ===
+                LOGIN_USERNAME;
+
+            const passwordCorrect =
+                await bcrypt.compare(
+                    password,
+                    PASSWORD_HASH
+                );
+
+            if (
+                !usernameCorrect ||
+                !passwordCorrect
+            ) {
+                return res.status(401).json({
+                    error:
+                        "Incorrect username or password"
+                });
+            }
+
+            req.session.authenticated =
+                true;
+
+            req.session.username =
+                LOGIN_USERNAME;
+
+            req.session.save(
+                (error) => {
+                    if (error) {
+                        console.error(
+                            "SESSION SAVE ERROR:",
+                            error
+                        );
+
+                        return res.status(500).json({
+                            error:
+                                "Could not create login session"
+                        });
+                    }
+
+                    return res.json({
+                        success: true,
+                        username:
+                            LOGIN_USERNAME
+                    });
+                }
+            );
+
+        } catch (error) {
+            console.error(
+                "LOGIN ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                error:
+                    "Login failed"
             });
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "LOGIN ERROR:",
-            error
-        );
-
-        return res.status(500).json({
-            error: "Login failed"
-        });
+        }
     }
-});
+);
 
 /* =========================================
    LOGOUT
@@ -193,25 +236,24 @@ app.post(
     "/api/logout",
     requireLogin,
     (req, res) => {
+        req.session.destroy(
+            (error) => {
+                if (error) {
+                    return res.status(500).json({
+                        error:
+                            "Logout failed"
+                    });
+                }
 
-        req.session.destroy((error) => {
+                res.clearCookie(
+                    "connect.sid"
+                );
 
-            if (error) {
-
-                return res.status(500).json({
-                    error:
-                        "Logout failed"
+                res.json({
+                    success: true
                 });
             }
-
-            res.clearCookie("connect.sid");
-
-            res.json({
-                success: true
-            });
-
-        });
-
+        );
     }
 );
 
@@ -219,44 +261,46 @@ app.post(
    AUTH STATUS
 ========================================= */
 
-app.get("/api/auth", (req, res) => {
+app.get(
+    "/api/auth",
+    (req, res) => {
+        res.json({
+            authenticated:
+                !!(
+                    req.session &&
+                    req.session.authenticated ===
+                        true
+                ),
 
-    res.json({
-
-        authenticated:
-            !!(
-                req.session &&
-                req.session.authenticated === true
-            ),
-
-        username:
-            req.session?.username || null
-
-    });
-
-});
+            username:
+                req.session?.username ||
+                null
+        });
+    }
+);
 
 /* =========================================
    HEALTH
 ========================================= */
 
-app.get("/health", (req, res) => {
-
-    res.json({
-        status: true,
-        name: "BimalAI",
-        version: "3.0.0"
-    });
-
-});
+app.get(
+    "/health",
+    (req, res) => {
+        res.json({
+            status: true,
+            name: "BimalAI",
+            version: "4.0.0"
+        });
+    }
+);
 
 /* =========================================
    FILE UPLOAD
 ========================================= */
 
 const upload = multer({
-
-    storage: multer.memoryStorage(),
+    storage:
+        multer.memoryStorage(),
 
     limits: {
         fileSize:
@@ -264,17 +308,18 @@ const upload = multer({
 
         files: 10
     }
-
 });
 
 /* =========================================
    FILE TEXT EXTRACTION
 ========================================= */
 
-async function extractFileContent(file) {
-
+async function extractFileContent(
+    file
+) {
     const filename =
-        file.originalname || "file";
+        file.originalname ||
+        "file";
 
     const extension =
         path.extname(filename)
@@ -283,34 +328,31 @@ async function extractFileContent(file) {
     const mime =
         file.mimetype || "";
 
-    /* TXT / CSV / JSON / MD */
-
     if (
         extension === ".txt" ||
         extension === ".csv" ||
         extension === ".json" ||
         extension === ".md"
     ) {
-
         return {
             type: "text",
             name: filename,
             content:
-                file.buffer.toString("utf8")
+                file.buffer.toString(
+                    "utf8"
+                )
         };
     }
-
-    /* PDF */
 
     if (
         extension === ".pdf" ||
         mime === "application/pdf"
     ) {
-
         try {
-
             const result =
-                await pdfParse(file.buffer);
+                await pdfParse(
+                    file.buffer
+                );
 
             return {
                 type: "text",
@@ -320,7 +362,6 @@ async function extractFileContent(file) {
             };
 
         } catch (error) {
-
             console.error(
                 "PDF PARSE ERROR:",
                 error
@@ -335,20 +376,19 @@ async function extractFileContent(file) {
         }
     }
 
-    /* DOCX */
-
     if (
         extension === ".docx" ||
         mime ===
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
-
         try {
-
             const result =
-                await mammoth.extractRawText({
-                    buffer: file.buffer
-                });
+                await mammoth.extractRawText(
+                    {
+                        buffer:
+                            file.buffer
+                    }
+                );
 
             return {
                 type: "text",
@@ -358,7 +398,6 @@ async function extractFileContent(file) {
             };
 
         } catch (error) {
-
             console.error(
                 "DOCX PARSE ERROR:",
                 error
@@ -373,8 +412,6 @@ async function extractFileContent(file) {
         }
     }
 
-    /* IMAGE */
-
     if (
         mime.startsWith("image/") ||
         [
@@ -385,7 +422,6 @@ async function extractFileContent(file) {
             ".gif"
         ].includes(extension)
     ) {
-
         return {
             type: "image",
             name: filename,
@@ -395,7 +431,9 @@ async function extractFileContent(file) {
                 "image/jpeg",
 
             data:
-                file.buffer.toString("base64")
+                file.buffer.toString(
+                    "base64"
+                )
         };
     }
 
@@ -414,16 +452,16 @@ async function extractFileContent(file) {
 app.post(
     "/api/upload",
     requireLogin,
-    upload.array("files", 10),
+    upload.array(
+        "files",
+        10
+    ),
     async (req, res) => {
-
         try {
-
             if (
                 !req.files ||
                 req.files.length === 0
             ) {
-
                 return res.status(400).json({
                     error:
                         "No files uploaded"
@@ -436,13 +474,14 @@ app.post(
                 const file
                 of req.files
             ) {
-
                 const result =
                     await extractFileContent(
                         file
                     );
 
-                results.push(result);
+                results.push(
+                    result
+                );
             }
 
             res.json({
@@ -451,7 +490,6 @@ app.post(
             });
 
         } catch (error) {
-
             console.error(
                 "UPLOAD ERROR:",
                 error
@@ -462,7 +500,6 @@ app.post(
                     "Could not process uploaded files"
             });
         }
-
     }
 );
 
@@ -474,16 +511,13 @@ app.get(
     "/api/models",
     requireLogin,
     async (req, res) => {
-
         try {
-
             const response =
                 await fetch(
                     "https://openrouter.ai/api/v1/models"
                 );
 
             if (!response.ok) {
-
                 throw new Error(
                     `Models request failed: ${response.status}`
                 );
@@ -494,43 +528,41 @@ app.get(
 
             const models =
                 (data.data || [])
-                    .map(model => {
+                    .map(
+                        (model) => {
+                            const prompt =
+                                Number(
+                                    model.pricing?.prompt
+                                );
 
-                        const prompt =
-                            Number(
-                                model.pricing?.prompt
-                            );
+                            const completion =
+                                Number(
+                                    model.pricing?.completion
+                                );
 
-                        const completion =
-                            Number(
-                                model.pricing?.completion
-                            );
+                            return {
+                                id:
+                                    model.id,
 
-                        const isFree =
-                            prompt === 0 &&
-                            completion === 0;
+                                name:
+                                    model.name ||
+                                    model.id,
 
-                        return {
+                                context_length:
+                                    model.context_length ||
+                                    null,
 
-                            id:
-                                model.id,
-
-                            name:
-                                model.name ||
-                                model.id,
-
-                            context_length:
-                                model.context_length ||
-                                null,
-
-                            free:
-                                isFree
-
-                        };
-
-                    })
-                    .filter(model =>
-                        model.free
+                                free:
+                                    prompt ===
+                                        0 &&
+                                    completion ===
+                                        0
+                            };
+                        }
+                    )
+                    .filter(
+                        (model) =>
+                            model.free
                     )
                     .sort(
                         (a, b) =>
@@ -542,7 +574,6 @@ app.get(
             res.json(models);
 
         } catch (error) {
-
             console.error(
                 "MODEL ERROR:",
                 error
@@ -553,7 +584,6 @@ app.get(
                     "Could not load models"
             });
         }
-
     }
 );
 
@@ -562,9 +592,7 @@ app.get(
 ========================================= */
 
 function loadChats() {
-
     try {
-
         const data =
             fs.readFileSync(
                 CHATS_FILE,
@@ -579,13 +607,11 @@ function loadChats() {
             : [];
 
     } catch {
-
         return [];
     }
 }
 
 function saveChats(chats) {
-
     fs.writeFileSync(
         CHATS_FILE,
         JSON.stringify(
@@ -605,7 +631,6 @@ app.get(
     "/api/chats",
     requireLogin,
     (req, res) => {
-
         const chats =
             loadChats();
 
@@ -631,12 +656,10 @@ app.post(
     "/api/chats",
     requireLogin,
     (req, res) => {
-
         const chat =
             req.body?.chat;
 
         if (!chat) {
-
             return res.status(400).json({
                 error:
                     "Chat is required"
@@ -648,13 +671,12 @@ app.post(
 
         const index =
             chats.findIndex(
-                item =>
+                (item) =>
                     String(item.id) ===
                     String(chat.id)
             );
 
         const cleanChat = {
-
             id:
                 String(
                     chat.id ||
@@ -665,7 +687,10 @@ app.post(
                 String(
                     chat.title ||
                     "New conversation"
-                ).slice(0, 200),
+                ).slice(
+                    0,
+                    200
+                ),
 
             messages:
                 Array.isArray(
@@ -677,16 +702,12 @@ app.post(
             updatedAt:
                 chat.updatedAt ||
                 new Date().toISOString()
-
         };
 
         if (index >= 0) {
-
             chats[index] =
                 cleanChat;
-
         } else {
-
             chats.unshift(
                 cleanChat
             );
@@ -696,9 +717,9 @@ app.post(
 
         res.json({
             success: true,
-            chat: cleanChat
+            chat:
+                cleanChat
         });
-
     }
 );
 
@@ -710,19 +731,19 @@ app.patch(
     "/api/chats/:id",
     requireLogin,
     (req, res) => {
-
         const chats =
             loadChats();
 
         const chat =
             chats.find(
-                item =>
+                (item) =>
                     String(item.id) ===
-                    String(req.params.id)
+                    String(
+                        req.params.id
+                    )
             );
 
         if (!chat) {
-
             return res.status(404).json({
                 error:
                     "Chat not found"
@@ -733,11 +754,13 @@ app.patch(
             typeof req.body?.title ===
             "string"
         ) {
-
             chat.title =
                 req.body.title
                     .trim()
-                    .slice(0, 200);
+                    .slice(
+                        0,
+                        200
+                    );
         }
 
         chat.updatedAt =
@@ -749,7 +772,6 @@ app.patch(
             success: true,
             chat
         });
-
     }
 );
 
@@ -761,15 +783,16 @@ app.delete(
     "/api/chats/:id",
     requireLogin,
     (req, res) => {
-
         const chats =
             loadChats();
 
         const filtered =
             chats.filter(
-                item =>
+                (item) =>
                     String(item.id) !==
-                    String(req.params.id)
+                    String(
+                        req.params.id
+                    )
             );
 
         saveChats(filtered);
@@ -777,7 +800,6 @@ app.delete(
         res.json({
             success: true
         });
-
     }
 );
 
@@ -789,19 +811,19 @@ app.get(
     "/api/chats/:id/export",
     requireLogin,
     (req, res) => {
-
         const chats =
             loadChats();
 
         const chat =
             chats.find(
-                item =>
+                (item) =>
                     String(item.id) ===
-                    String(req.params.id)
+                    String(
+                        req.params.id
+                    )
             );
 
         if (!chat) {
-
             return res.status(404).json({
                 error:
                     "Chat not found"
@@ -815,9 +837,9 @@ app.get(
             const message
             of chat.messages || []
         ) {
-
             const role =
-                message.role === "user"
+                message.role ===
+                "user"
                     ? "Bimal"
                     : "BimalAI";
 
@@ -839,7 +861,563 @@ app.get(
         );
 
         res.send(output);
+    }
+);
 
+/* =========================================
+   FILE GENERATION HELPERS
+========================================= */
+
+function cleanFilename(
+    filename
+) {
+    return String(
+        filename || "BimalAI-file"
+    )
+        .replace(
+            /[^a-zA-Z0-9._-]/g,
+            "_"
+        )
+        .slice(
+            0,
+            100
+        );
+}
+
+function normalizeContent(
+    content
+) {
+    if (
+        Array.isArray(content)
+    ) {
+        return content
+            .map(
+                (item) =>
+                    typeof item ===
+                    "string"
+                        ? item
+                        : JSON.stringify(
+                              item
+                          )
+            )
+            .join("\n");
+    }
+
+    return String(
+        content || ""
+    );
+}
+
+/* =========================================
+   PDF GENERATOR
+========================================= */
+
+async function generatePDF(
+    filename,
+    content
+) {
+    return new Promise(
+        (resolve, reject) => {
+            const safeName =
+                cleanFilename(
+                    filename
+                );
+
+            const finalName =
+                safeName.endsWith(
+                    ".pdf"
+                )
+                    ? safeName
+                    : `${safeName}.pdf`;
+
+            const output =
+                path.join(
+                    GENERATED_DIR,
+                    finalName
+                );
+
+            const doc =
+                new PDFDocument({
+                    margin: 50
+                });
+
+            const stream =
+                fs.createWriteStream(
+                    output
+                );
+
+            doc.pipe(stream);
+
+            doc.fontSize(22)
+                .text(
+                    "BimalAI",
+                    {
+                        align:
+                            "center"
+                    }
+                );
+
+            doc.moveDown();
+
+            doc.fontSize(11);
+
+            const text =
+                normalizeContent(
+                    content
+                );
+
+            doc.text(
+                text,
+                {
+                    align:
+                        "left",
+                    lineGap:
+                        4
+                }
+            );
+
+            doc.end();
+
+            stream.on(
+                "finish",
+                () =>
+                    resolve(
+                        finalName
+                    )
+            );
+
+            stream.on(
+                "error",
+                reject
+            );
+        }
+    );
+}
+
+/* =========================================
+   DOCX GENERATOR
+========================================= */
+
+async function generateDOCX(
+    filename,
+    content
+) {
+    const safeName =
+        cleanFilename(
+            filename
+        );
+
+    const finalName =
+        safeName.endsWith(
+            ".docx"
+        )
+            ? safeName
+            : `${safeName}.docx`;
+
+    const output =
+        path.join(
+            GENERATED_DIR,
+            finalName
+        );
+
+    const text =
+        normalizeContent(
+            content
+        );
+
+    const paragraphs =
+        text
+            .split(/\r?\n/)
+            .map(
+                (line) =>
+                    new Paragraph({
+                        text:
+                            line
+                                .trim() ||
+                            " "
+                    })
+            );
+
+    const document =
+        new Document({
+            sections: [
+                {
+                    children: [
+                        new Paragraph({
+                            text:
+                                "BimalAI",
+                            heading:
+                                HeadingLevel.TITLE
+                        }),
+
+                        ...paragraphs
+                    ]
+                }
+            ]
+        });
+
+    const buffer =
+        await Packer.toBuffer(
+            document
+        );
+
+    fs.writeFileSync(
+        output,
+        buffer
+    );
+
+    return finalName;
+}
+
+/* =========================================
+   EXCEL GENERATOR
+========================================= */
+
+async function generateXLSX(
+    filename,
+    content
+) {
+    const safeName =
+        cleanFilename(
+            filename
+        );
+
+    const finalName =
+        safeName.endsWith(
+            ".xlsx"
+        )
+            ? safeName
+            : `${safeName}.xlsx`;
+
+    const output =
+        path.join(
+            GENERATED_DIR,
+            finalName
+        );
+
+    const workbook =
+        new ExcelJS.Workbook();
+
+    const worksheet =
+        workbook.addWorksheet(
+            "BimalAI"
+        );
+
+    const text =
+        normalizeContent(
+            content
+        );
+
+    const lines =
+        text.split(
+            /\r?\n/
+        );
+
+    worksheet.addRow([
+        "BimalAI"
+    ]);
+
+    worksheet.addRow([]);
+
+    for (
+        const line
+        of lines
+    ) {
+        worksheet.addRow([
+            line
+        ]);
+    }
+
+    worksheet.getColumn(
+        1
+    ).width = 100;
+
+    await workbook.xlsx.writeFile(
+        output
+    );
+
+    return finalName;
+}
+
+/* =========================================
+   POWERPOINT GENERATOR
+========================================= */
+
+async function generatePPTX(
+    filename,
+    content
+) {
+    const safeName =
+        cleanFilename(
+            filename
+        );
+
+    const finalName =
+        safeName.endsWith(
+            ".pptx"
+        )
+            ? safeName
+            : `${safeName}.pptx`;
+
+    const output =
+        path.join(
+            GENERATED_DIR,
+            finalName
+        );
+
+    const pptx =
+        new pptxgen();
+
+    pptx.author =
+        "BimalAI";
+
+    pptx.subject =
+        "Generated by BimalAI";
+
+    pptx.title =
+        "BimalAI Presentation";
+
+    pptx.company =
+        "BimalAI";
+
+    const text =
+        normalizeContent(
+            content
+        );
+
+    const lines =
+        text.split(
+            /\r?\n/
+        );
+
+    let slide =
+        pptx.addSlide();
+
+    slide.addText(
+        "BimalAI",
+        {
+            x: 0.7,
+            y: 0.5,
+            w: 8.5,
+            h: 0.7,
+            fontSize: 28,
+            bold: true
+        }
+    );
+
+    let y = 1.4;
+
+    for (
+        const line
+        of lines
+    ) {
+        if (
+            y > 6.5
+        ) {
+            slide =
+                pptx.addSlide();
+
+            y = 0.6;
+        }
+
+        slide.addText(
+            line || " ",
+            {
+                x: 0.7,
+                y,
+                w: 8.5,
+                h: 0.45,
+                fontSize: 16
+            }
+        );
+
+        y += 0.5;
+    }
+
+    await pptx.writeFile({
+        fileName:
+            output
+    });
+
+    return finalName;
+}
+
+/* =========================================
+   GENERATE FILE API
+========================================= */
+
+app.post(
+    "/api/generate",
+    requireLogin,
+    async (req, res) => {
+        try {
+            const {
+                type,
+                filename,
+                content
+            } = req.body || {};
+
+            if (
+                !type ||
+                content ===
+                    undefined ||
+                content ===
+                    null
+            ) {
+                return res.status(400).json({
+                    error:
+                        "type and content are required"
+                });
+            }
+
+            const normalizedType =
+                String(
+                    type
+                )
+                    .toLowerCase()
+                    .replace(
+                        ".",
+                        ""
+                    );
+
+            let finalName;
+
+            if (
+                normalizedType ===
+                    "pdf"
+            ) {
+                finalName =
+                    await generatePDF(
+                        filename ||
+                            "BimalAI-document",
+                        content
+                    );
+            }
+
+            else if (
+                normalizedType ===
+                    "docx"
+            ) {
+                finalName =
+                    await generateDOCX(
+                        filename ||
+                            "BimalAI-document",
+                        content
+                    );
+            }
+
+            else if (
+                normalizedType ===
+                    "xlsx" ||
+                normalizedType ===
+                    "excel"
+            ) {
+                finalName =
+                    await generateXLSX(
+                        filename ||
+                            "BimalAI-spreadsheet",
+                        content
+                    );
+            }
+
+            else if (
+                normalizedType ===
+                    "pptx" ||
+                normalizedType ===
+                    "ppt" ||
+                normalizedType ===
+                    "powerpoint"
+            ) {
+                finalName =
+                    await generatePPTX(
+                        filename ||
+                            "BimalAI-presentation",
+                        content
+                    );
+            }
+
+            else {
+                return res.status(400).json({
+                    error:
+                        "Unsupported file type. Use PDF, DOCX, XLSX or PPTX."
+                });
+            }
+
+            res.json({
+                success: true,
+
+                filename:
+                    finalName,
+
+                downloadUrl:
+                    `/api/generated/${encodeURIComponent(
+                        finalName
+                    )}`
+            });
+
+        } catch (error) {
+            console.error(
+                "GENERATION ERROR:",
+                error
+            );
+
+            res.status(500).json({
+                error:
+                    "Could not generate file",
+                details:
+                    error.message
+            });
+        }
+    }
+);
+
+/* =========================================
+   GENERATED FILE DOWNLOAD
+========================================= */
+
+app.get(
+    "/api/generated/:filename",
+    requireLogin,
+    (req, res) => {
+        try {
+            const filename =
+                path.basename(
+                    req.params.filename
+                );
+
+            const filePath =
+                path.join(
+                    GENERATED_DIR,
+                    filename
+                );
+
+            if (
+                !fs.existsSync(
+                    filePath
+                )
+            ) {
+                return res.status(404).json({
+                    error:
+                        "Generated file not found"
+                });
+            }
+
+            res.download(
+                filePath,
+                filename
+            );
+
+        } catch (error) {
+            console.error(
+                "DOWNLOAD ERROR:",
+                error
+            );
+
+            res.status(500).json({
+                error:
+                    "Could not download file"
+            });
+        }
     }
 );
 
@@ -847,9 +1425,11 @@ app.get(
    SYSTEM PROMPT
 ========================================= */
 
-function buildSystemPrompt(mode) {
-
-    const base = `You are BimalAI, Bimal and Simran's personal AI assistant.
+function buildSystemPrompt(
+    mode
+) {
+    const base = `
+You are BimalAI, Bimal and Simran's personal AI assistant.
 
 Be intelligent, useful, accurate, practical and clear.
 
@@ -869,35 +1449,46 @@ For writing tasks, produce polished, ready-to-use writing.
 
 For planning tasks, create practical structured plans.
 
-Keep responses reasonably concise unless the user asks for detail.`;
+When the user asks for a downloadable document, clearly structure the content so it can be exported into PDF, DOCX, XLSX or PPTX.
+
+Keep responses reasonably concise unless the user asks for detail.
+`;
 
     const modes = {
-
         study:
-            `You are currently in Study Mode.
-Focus on teaching, explanations, examples, formulas, revision and exam preparation.`,
+            `
+You are currently in Study Mode.
+Focus on teaching, explanations, examples, formulas, revision and exam preparation.
+`,
 
         coding:
-            `You are currently in Coding Mode.
-Focus on debugging, architecture, code quality and complete working solutions.`,
+            `
+You are currently in Coding Mode.
+Focus on debugging, architecture, code quality and complete working solutions.
+`,
 
         writing:
-            `You are currently in Writing Mode.
-Focus on polished, natural and professional writing.`,
+            `
+You are currently in Writing Mode.
+Focus on polished, natural and professional writing.
+`,
 
         planning:
-            `You are currently in Planning Mode.
-Create realistic step-by-step plans, schedules and actionable checklists.`,
+            `
+You are currently in Planning Mode.
+Create realistic step-by-step plans, schedules and actionable checklists.
+`,
 
         explain:
-            `You are currently in Explain Mode.
-Explain difficult concepts in simple language and progressively increase depth.`
-
+            `
+You are currently in Explain Mode.
+Explain difficult concepts in simple language and progressively increase depth.
+`
     };
 
     return (
         base +
-        "\n\n" +
+        "\n" +
         (
             modes[mode] ||
             ""
@@ -909,45 +1500,53 @@ Explain difficult concepts in simple language and progressively increase depth.`
    NORMALIZE MESSAGES
 ========================================= */
 
-function normalizeMessages(messages) {
-
+function normalizeMessages(
+    messages
+) {
     return messages
         .filter(
-            message =>
+            (message) =>
                 message &&
                 (
-                    message.role === "user" ||
-                    message.role === "assistant"
+                    message.role ===
+                        "user" ||
+                    message.role ===
+                        "assistant"
                 )
         )
         .slice(-50)
-        .map(message => {
+        .map(
+            (message) => {
+                const role =
+                    message.role;
 
-            const role =
-                message.role;
+                const content =
+                    message.content;
 
-            const content =
-                message.content;
-
-            if (
-                Array.isArray(content)
-            ) {
+                if (
+                    Array.isArray(
+                        content
+                    )
+                ) {
+                    return {
+                        role,
+                        content
+                    };
+                }
 
                 return {
                     role,
-                    content
+                    content:
+                        String(
+                            content ||
+                                ""
+                        ).slice(
+                            0,
+                            100000
+                        )
                 };
             }
-
-            return {
-                role,
-                content:
-                    String(
-                        content || ""
-                    ).slice(0, 100000)
-            };
-
-        });
+        );
 }
 
 /* =========================================
@@ -958,11 +1557,10 @@ app.post(
     "/api/chat",
     requireLogin,
     async (req, res) => {
-
-        let streamStarted = false;
+        let streamStarted =
+            false;
 
         try {
-
             const {
                 messages,
                 model,
@@ -970,10 +1568,12 @@ app.post(
             } = req.body || {};
 
             if (
-                !Array.isArray(messages) ||
-                messages.length === 0
+                !Array.isArray(
+                    messages
+                ) ||
+                messages.length ===
+                    0
             ) {
-
                 return res.status(400).json({
                     error:
                         "Messages are required"
@@ -981,9 +1581,9 @@ app.post(
             }
 
             if (
-                !process.env.OPENROUTER_API_KEY
+                !process.env
+                    .OPENROUTER_API_KEY
             ) {
-
                 return res.status(500).json({
                     error:
                         "OpenRouter API key is not configured"
@@ -1008,34 +1608,31 @@ app.post(
                 await fetch(
                     "https://openrouter.ai/api/v1/chat/completions",
                     {
-
-                        method: "POST",
+                        method:
+                            "POST",
 
                         headers: {
-
-                            "Authorization":
+                            Authorization:
                                 `Bearer ${process.env.OPENROUTER_API_KEY}`,
 
                             "Content-Type":
                                 "application/json",
 
                             "HTTP-Referer":
-                                process.env.APP_URL ||
+                                process.env
+                                    .APP_URL ||
                                 "https://bimalai.onrender.com",
 
                             "X-Title":
                                 "BimalAI"
-
                         },
 
                         body:
                             JSON.stringify({
-
                                 model:
                                     selectedModel,
 
                                 messages: [
-
                                     {
                                         role:
                                             "system",
@@ -1045,19 +1642,15 @@ app.post(
                                     },
 
                                     ...safeMessages
-
                                 ],
 
                                 stream:
                                     true
-
                             })
-
                     }
                 );
 
             if (!response.ok) {
-
                 const errorText =
                     await response.text();
 
@@ -1071,14 +1664,14 @@ app.post(
                     "OpenRouter request failed";
 
                 try {
-
                     const parsed =
                         JSON.parse(
                             errorText
                         );
 
                     message =
-                        parsed.error?.message ||
+                        parsed.error
+                            ?.message ||
                         parsed.error ||
                         message;
 
@@ -1088,12 +1681,13 @@ app.post(
                     response.status
                 ).json({
                     error:
-                        String(message)
+                        String(
+                            message
+                        )
                 });
             }
 
             if (!response.body) {
-
                 return res.status(500).json({
                     error:
                         "No response body received"
@@ -1124,19 +1718,17 @@ app.post(
                 typeof res.flushHeaders ===
                 "function"
             ) {
-
                 res.flushHeaders();
             }
 
-            streamStarted = true;
+            streamStarted =
+                true;
 
             try {
-
                 for await (
                     const chunk
                     of response.body
                 ) {
-
                     if (
                         res.writableEnded
                     ) {
@@ -1144,28 +1736,28 @@ app.post(
                     }
 
                     res.write(
-                        Buffer.from(chunk)
+                        Buffer.from(
+                            chunk
+                        )
                     );
                 }
 
-            } catch (streamError) {
-
+            } catch (
+                streamError
+            ) {
                 console.error(
                     "STREAM ERROR:",
                     streamError
                 );
-
             }
 
             if (
                 !res.writableEnded
             ) {
-
                 res.end();
             }
 
         } catch (error) {
-
             console.error(
                 "AI ERROR:",
                 error
@@ -1175,7 +1767,6 @@ app.post(
                 !streamStarted &&
                 !res.headersSent
             ) {
-
                 return res.status(500).json({
                     error:
                         error.message ||
@@ -1186,7 +1777,6 @@ app.post(
             if (
                 !res.writableEnded
             ) {
-
                 res.end();
             }
         }
@@ -1209,14 +1799,12 @@ app.use(
 
 app.use(
     (req, res) => {
-
         res.sendFile(
             path.join(
                 PUBLIC_DIR,
                 "index.html"
             )
         );
-
     }
 );
 
@@ -1225,9 +1813,7 @@ app.use(
 ========================================= */
 
 async function startServer() {
-
     try {
-
         PASSWORD_HASH =
             await bcrypt.hash(
                 LOGIN_PASSWORD,
@@ -1238,10 +1824,9 @@ async function startServer() {
             PORT,
             "0.0.0.0",
             () => {
-
                 console.log(`
 ========================================
-             BimalAI 3.0
+             BimalAI 4.0
 ========================================
 
 Port:
@@ -1264,14 +1849,19 @@ Features:
 ✓ Vision-ready messages
 ✓ Study/Coding/Writing/Planning modes
 
+NEW:
+✓ PDF generation
+✓ DOCX generation
+✓ XLSX generation
+✓ PPTX generation
+✓ Secure generated-file download
+
 ========================================
                 `);
-
             }
         );
 
     } catch (error) {
-
         console.error(
             "STARTUP ERROR:",
             error
