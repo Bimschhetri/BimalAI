@@ -1,19 +1,14 @@
 {
-  "name": "bimalai",
-  "version": "3.0.0",
-  "description": "BimalAI - Bimal and Simran's personal AI assistant",
+  "name": "personalai",
+  "version": "1.0.0",
+  "description": "BimalAI personal AI assistant",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "test": "echo \"Error: no test specified\""
   },
-  "keywords": [
-    "ai",
-    "openrouter",
-    "assistant",
-    "bimalai"
-  ],
-  "author": "Bimal",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
