@@ -5,106 +5,59 @@ const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
+const multer = require("multer");
+const mammoth = require("mammoth");
+const pdfParse = require("pdf-parse");
 
 const app = express();
 
-const PORT =
-    process.env.PORT || 3000;
-
-
-/* =========================================
-   TRUST RENDER PROXY
-========================================= */
+const PORT = process.env.PORT || 3000;
 
 app.set("trust proxy", 1);
 
+const DATA_DIR = path.join(__dirname, "data");
+const PUBLIC_DIR = path.join(__dirname, "public");
+const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
+const CHATS_FILE = path.join(DATA_DIR, "chats.json");
 
-/* =========================================
-   DIRECTORIES
-========================================= */
-
-const DATA_DIR =
-    path.join(__dirname, "data");
-
-const CHATS_FILE =
-    path.join(DATA_DIR, "chats.json");
-
-const UPLOAD_DIR =
-    path.join(DATA_DIR, "uploads");
-
-
-if (!fs.existsSync(DATA_DIR)) {
-
-    fs.mkdirSync(
-        DATA_DIR,
-        { recursive: true }
-    );
-
+for (const dir of [DATA_DIR, UPLOAD_DIR]) {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
 }
-
-
-if (!fs.existsSync(UPLOAD_DIR)) {
-
-    fs.mkdirSync(
-        UPLOAD_DIR,
-        { recursive: true }
-    );
-
-}
-
 
 if (!fs.existsSync(CHATS_FILE)) {
-
-    fs.writeFileSync(
-        CHATS_FILE,
-        "[]",
-        "utf8"
-    );
-
+    fs.writeFileSync(CHATS_FILE, "[]", "utf8");
 }
-
 
 /* =========================================
    MIDDLEWARE
 ========================================= */
 
-app.use(
-    express.json({
-        limit: "35mb"
-    })
-);
-
+app.use(express.json({ limit: "50mb" }));
 
 app.use(
     express.urlencoded({
         extended: true,
-        limit: "35mb"
+        limit: "50mb"
     })
 );
 
-
-/* =========================================
-   SESSION
-========================================= */
-
 app.use(
     session({
-
         secret:
             process.env.SESSION_SECRET ||
-            "bimalai-session-secret-change-this",
+            "bimalai-change-this-secret",
 
         resave: false,
 
         saveUninitialized: false,
 
         cookie: {
-
             httpOnly: true,
 
             secure:
-                process.env.NODE_ENV ===
-                "production",
+                process.env.NODE_ENV === "production",
 
             sameSite: "lax",
 
@@ -114,189 +67,123 @@ app.use(
                 60 *
                 24 *
                 30
-
         }
-
     })
 );
-
 
 /* =========================================
    AUTH
 ========================================= */
 
 const LOGIN_USERNAME =
-    process.env.BIMALAI_USERNAME ||
-    "Simran";
-
+    process.env.BIMALAI_USERNAME || "Simran";
 
 const LOGIN_PASSWORD =
-    process.env.BIMALAI_PASSWORD ||
-    "Bimal";
-
+    process.env.BIMALAI_PASSWORD || "Bimal";
 
 let PASSWORD_HASH = null;
 
+function requireLogin(req, res, next) {
 
-function requireLogin(
-    req,
-    res,
-    next
-){
-
-    if(
+    if (
         req.session &&
         req.session.authenticated === true
-    ){
-
+    ) {
         return next();
-
     }
 
-
     return res.status(401).json({
-
-        error:
-            "Authentication required"
-
+        error: "Authentication required"
     });
-
 }
-
 
 /* =========================================
    LOGIN
 ========================================= */
 
-app.post(
-    "/api/login",
-    async (req, res) => {
+app.post("/api/login", async (req, res) => {
 
-        try {
+    try {
 
-            const {
-                username,
-                password
-            } =
-                req.body || {};
+        const username =
+            String(req.body?.username || "").trim();
 
+        const password =
+            String(req.body?.password || "");
 
-            if(
-                !username ||
-                !password
-            ){
+        if (!username || !password) {
 
-                return res.status(400).json({
-
-                    error:
-                        "Username and password are required"
-
-                });
-
-            }
-
-
-            if(!PASSWORD_HASH){
-
-                return res.status(503).json({
-
-                    error:
-                        "Authentication system is starting. Please try again."
-
-                });
-
-            }
-
-
-            const usernameCorrect =
-                username.trim() ===
-                LOGIN_USERNAME;
-
-
-            const passwordCorrect =
-                await bcrypt.compare(
-                    password,
-                    PASSWORD_HASH
-                );
-
-
-            if(
-                !usernameCorrect ||
-                !passwordCorrect
-            ){
-
-                return res.status(401).json({
-
-                    error:
-                        "Incorrect username or password"
-
-                });
-
-            }
-
-
-            req.session.authenticated =
-                true;
-
-
-            req.session.username =
-                LOGIN_USERNAME;
-
-
-            req.session.save(
-                error => {
-
-                    if(error){
-
-                        console.error(
-                            "SESSION SAVE ERROR:",
-                            error
-                        );
-
-
-                        return res.status(500).json({
-
-                            error:
-                                "Could not create login session"
-
-                        });
-
-                    }
-
-
-                    return res.json({
-
-                        success: true,
-
-                        username:
-                            LOGIN_USERNAME
-
-                    });
-
-                }
-            );
-
-
-        } catch(error){
-
-            console.error(
-                "LOGIN ERROR:",
-                error
-            );
-
-
-            return res.status(500).json({
-
+            return res.status(400).json({
                 error:
-                    "Login failed"
-
+                    "Username and password are required"
             });
-
         }
 
-    }
-);
+        if (!PASSWORD_HASH) {
 
+            return res.status(503).json({
+                error:
+                    "Authentication system is starting. Try again."
+            });
+        }
+
+        const usernameCorrect =
+            username === LOGIN_USERNAME;
+
+        const passwordCorrect =
+            await bcrypt.compare(
+                password,
+                PASSWORD_HASH
+            );
+
+        if (
+            !usernameCorrect ||
+            !passwordCorrect
+        ) {
+
+            return res.status(401).json({
+                error:
+                    "Incorrect username or password"
+            });
+        }
+
+        req.session.authenticated = true;
+        req.session.username = LOGIN_USERNAME;
+
+        req.session.save((error) => {
+
+            if (error) {
+
+                console.error(
+                    "SESSION SAVE ERROR:",
+                    error
+                );
+
+                return res.status(500).json({
+                    error:
+                        "Could not create login session"
+                });
+            }
+
+            return res.json({
+                success: true,
+                username: LOGIN_USERNAME
+            });
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "LOGIN ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            error: "Login failed"
+        });
+    }
+});
 
 /* =========================================
    LOGOUT
@@ -307,283 +194,280 @@ app.post(
     requireLogin,
     (req, res) => {
 
-        req.session.destroy(
-            error => {
+        req.session.destroy((error) => {
 
-                if(error){
+            if (error) {
 
-                    console.error(
-                        "LOGOUT ERROR:",
-                        error
-                    );
-
-
-                    return res.status(500).json({
-
-                        error:
-                            "Logout failed"
-
-                    });
-
-                }
-
-
-                res.clearCookie(
-                    "connect.sid"
-                );
-
-
-                return res.json({
-
-                    success: true
-
+                return res.status(500).json({
+                    error:
+                        "Logout failed"
                 });
-
             }
-        );
+
+            res.clearCookie("connect.sid");
+
+            res.json({
+                success: true
+            });
+
+        });
 
     }
 );
-
 
 /* =========================================
    AUTH STATUS
 ========================================= */
 
-app.get(
-    "/api/auth",
-    (req, res) => {
+app.get("/api/auth", (req, res) => {
 
-        return res.json({
+    res.json({
 
-            authenticated:
-                !!(
-                    req.session &&
-                    req.session.authenticated === true
-                ),
+        authenticated:
+            !!(
+                req.session &&
+                req.session.authenticated === true
+            ),
 
-            username:
-                req.session?.username ||
-                null
+        username:
+            req.session?.username || null
 
-        });
+    });
 
-    }
-);
-
+});
 
 /* =========================================
    HEALTH
 ========================================= */
 
-app.get(
-    "/health",
-    (req, res) => {
+app.get("/health", (req, res) => {
 
-        res.json({
+    res.json({
+        status: true,
+        name: "BimalAI",
+        version: "3.0.0"
+    });
 
-            status: "ok",
+});
 
-            name: "BimalAI",
+/* =========================================
+   FILE UPLOAD
+========================================= */
 
-            version: "3.0"
+const upload = multer({
 
-        });
+    storage: multer.memoryStorage(),
 
+    limits: {
+        fileSize:
+            25 * 1024 * 1024,
+
+        files: 10
     }
-);
 
+});
 
 /* =========================================
-   STATIC FILES
+   FILE TEXT EXTRACTION
 ========================================= */
 
-app.use(
-    express.static(
-        path.join(
-            __dirname,
-            "public"
-        )
-    )
-);
+async function extractFileContent(file) {
 
+    const filename =
+        file.originalname || "file";
+
+    const extension =
+        path.extname(filename)
+            .toLowerCase();
+
+    const mime =
+        file.mimetype || "";
+
+    /* TXT / CSV / JSON / MD */
+
+    if (
+        extension === ".txt" ||
+        extension === ".csv" ||
+        extension === ".json" ||
+        extension === ".md"
+    ) {
+
+        return {
+            type: "text",
+            name: filename,
+            content:
+                file.buffer.toString("utf8")
+        };
+    }
+
+    /* PDF */
+
+    if (
+        extension === ".pdf" ||
+        mime === "application/pdf"
+    ) {
+
+        try {
+
+            const result =
+                await pdfParse(file.buffer);
+
+            return {
+                type: "text",
+                name: filename,
+                content:
+                    result.text || ""
+            };
+
+        } catch (error) {
+
+            console.error(
+                "PDF PARSE ERROR:",
+                error
+            );
+
+            return {
+                type: "error",
+                name: filename,
+                content:
+                    "Could not read this PDF."
+            };
+        }
+    }
+
+    /* DOCX */
+
+    if (
+        extension === ".docx" ||
+        mime ===
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+
+        try {
+
+            const result =
+                await mammoth.extractRawText({
+                    buffer: file.buffer
+                });
+
+            return {
+                type: "text",
+                name: filename,
+                content:
+                    result.value || ""
+            };
+
+        } catch (error) {
+
+            console.error(
+                "DOCX PARSE ERROR:",
+                error
+            );
+
+            return {
+                type: "error",
+                name: filename,
+                content:
+                    "Could not read this DOCX file."
+            };
+        }
+    }
+
+    /* IMAGE */
+
+    if (
+        mime.startsWith("image/") ||
+        [
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".gif"
+        ].includes(extension)
+    ) {
+
+        return {
+            type: "image",
+            name: filename,
+
+            mime:
+                mime ||
+                "image/jpeg",
+
+            data:
+                file.buffer.toString("base64")
+        };
+    }
+
+    return {
+        type: "unsupported",
+        name: filename,
+        content:
+            "This file type is not currently supported."
+    };
+}
 
 /* =========================================
-   UPLOADS
-========================================= */
-
-app.use(
-    "/uploads",
-    requireLogin,
-    express.static(
-        UPLOAD_DIR
-    )
-);
-
-
-/* =========================================
-   FILE SAVE API
+   UPLOAD API
 ========================================= */
 
 app.post(
     "/api/upload",
     requireLogin,
+    upload.array("files", 10),
     async (req, res) => {
 
         try {
 
-            const {
-                name,
-                type,
-                data
-            } =
-                req.body || {};
-
-
-            if(
-                !name ||
-                !data
-            ){
+            if (
+                !req.files ||
+                req.files.length === 0
+            ) {
 
                 return res.status(400).json({
-
                     error:
-                        "File name and data are required"
-
+                        "No files uploaded"
                 });
-
             }
 
+            const results = [];
 
-            /*
-             * Expected format:
-             * data:image/png;base64,.....
-             */
+            for (
+                const file
+                of req.files
+            ) {
 
-            const match =
-                String(data).match(
-                    /^data:([^;]+);base64,(.+)$/
-                );
-
-
-            if(!match){
-
-                return res.status(400).json({
-
-                    error:
-                        "Invalid file data"
-
-                });
-
-            }
-
-
-            const base64 =
-                match[2];
-
-
-            const buffer =
-                Buffer.from(
-                    base64,
-                    "base64"
-                );
-
-
-            /*
-             * Prevent very large uploads.
-             */
-
-            if(
-                buffer.length >
-                20 * 1024 * 1024
-            ){
-
-                return res.status(413).json({
-
-                    error:
-                        "File too large"
-
-                });
-
-            }
-
-
-            const safeName =
-                path.basename(name)
-                    .replace(
-                        /[^a-zA-Z0-9._-]/g,
-                        "_"
+                const result =
+                    await extractFileContent(
+                        file
                     );
 
+                results.push(result);
+            }
 
-            const filename =
-                Date.now() +
-                "-" +
-                Math.random()
-                    .toString(36)
-                    .slice(2) +
-                "-" +
-                safeName;
-
-
-            const filePath =
-                path.join(
-                    UPLOAD_DIR,
-                    filename
-                );
-
-
-            fs.writeFileSync(
-                filePath,
-                buffer
-            );
-
-
-            return res.json({
-
+            res.json({
                 success: true,
-
-                name: safeName,
-
-                type:
-                    type ||
-                    match[1],
-
-                size:
-                    buffer.length,
-
-                url:
-                    "/uploads/" +
-                    encodeURIComponent(
-                        filename
-                    )
-
+                files: results
             });
 
-
-        } catch(error){
+        } catch (error) {
 
             console.error(
                 "UPLOAD ERROR:",
                 error
             );
 
-
-            return res.status(500).json({
-
+            res.status(500).json({
                 error:
-                    "Upload failed"
-
+                    "Could not process uploaded files"
             });
-
         }
 
     }
 );
 
-
 /* =========================================
-   MODELS
+   OPENROUTER MODELS
 ========================================= */
 
 app.get(
@@ -593,135 +477,114 @@ app.get(
 
         try {
 
-            if(
-                !process.env.OPENROUTER_API_KEY
-            ){
-
-                return res.json([]);
-
-            }
-
-
             const response =
                 await fetch(
                     "https://openrouter.ai/api/v1/models"
                 );
 
-
-            if(!response.ok){
+            if (!response.ok) {
 
                 throw new Error(
                     `Models request failed: ${response.status}`
                 );
-
             }
-
 
             const data =
                 await response.json();
 
-
-            const freeModels =
+            const models =
                 (data.data || [])
+                    .map(model => {
 
-                    .filter(
-                        model => {
-
-                            const prompt =
-                                String(
-                                    model.pricing?.prompt ??
-                                    ""
-                                );
-
-                            const completion =
-                                String(
-                                    model.pricing?.completion ??
-                                    ""
-                                );
-
-
-                            return (
-                                prompt === "0" &&
-                                completion === "0"
+                        const prompt =
+                            Number(
+                                model.pricing?.prompt
                             );
 
-                        }
-                    )
+                        const completion =
+                            Number(
+                                model.pricing?.completion
+                            );
 
-                    .map(
-                        model => ({
+                        const isFree =
+                            prompt === 0 &&
+                            completion === 0;
+
+                        return {
 
                             id:
                                 model.id,
 
                             name:
-                                model.name,
+                                model.name ||
+                                model.id,
 
                             context_length:
-                                model.context_length
+                                model.context_length ||
+                                null,
 
-                        })
+                            free:
+                                isFree
+
+                        };
+
+                    })
+                    .filter(model =>
+                        model.free
                     )
-
                     .sort(
-                        (a,b)=>
+                        (a, b) =>
                             a.name.localeCompare(
                                 b.name
                             )
                     );
 
+            res.json(models);
 
-            res.json(
-                freeModels
-            );
-
-
-        } catch(error){
+        } catch (error) {
 
             console.error(
                 "MODEL ERROR:",
                 error
             );
 
-
             res.status(500).json({
-
                 error:
                     "Could not load models"
-
             });
-
         }
 
     }
 );
 
-
 /* =========================================
    CHAT STORAGE
 ========================================= */
 
-function loadChats(){
+function loadChats() {
 
     try {
 
-        return JSON.parse(
+        const data =
             fs.readFileSync(
                 CHATS_FILE,
                 "utf8"
-            )
-        );
+            );
+
+        const parsed =
+            JSON.parse(data);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
 
     } catch {
 
         return [];
-
     }
-
 }
 
-
-function saveChats(chats){
+function saveChats(chats) {
 
     fs.writeFileSync(
         CHATS_FILE,
@@ -732,9 +595,7 @@ function saveChats(chats){
         ),
         "utf8"
     );
-
 }
-
 
 /* =========================================
    GET CHATS
@@ -745,13 +606,22 @@ app.get(
     requireLogin,
     (req, res) => {
 
-        res.json(
-            loadChats()
+        const chats =
+            loadChats();
+
+        chats.sort(
+            (a, b) =>
+                new Date(
+                    b.updatedAt || 0
+                ) -
+                new Date(
+                    a.updatedAt || 0
+                )
         );
 
+        res.json(chats);
     }
 );
-
 
 /* =========================================
    SAVE CHAT
@@ -762,95 +632,126 @@ app.post(
     requireLogin,
     (req, res) => {
 
-        try {
+        const chat =
+            req.body?.chat;
 
-            const {
-                chat
-            } =
-                req.body || {};
+        if (!chat) {
 
-
-            if(!chat){
-
-                return res.status(400).json({
-
-                    error:
-                        "Chat is required"
-
-                });
-
-            }
-
-
-            const chats =
-                loadChats();
-
-
-            const index =
-                chats.findIndex(
-                    item =>
-                        String(item.id) ===
-                        String(chat.id)
-                );
-
-
-            if(index >= 0){
-
-                chats[index] =
-                    chat;
-
-            }else{
-
-                chats.unshift(
-                    chat
-                );
-
-            }
-
-
-            /*
-             * Keep latest 100 conversations.
-             */
-
-            const limited =
-                chats.slice(
-                    0,
-                    100
-                );
-
-
-            saveChats(
-                limited
-            );
-
-
-            res.json({
-
-                success: true
-
-            });
-
-
-        } catch(error){
-
-            console.error(
-                "SAVE CHAT ERROR:",
-                error
-            );
-
-
-            res.status(500).json({
-
+            return res.status(400).json({
                 error:
-                    "Could not save chat"
-
+                    "Chat is required"
             });
-
         }
+
+        const chats =
+            loadChats();
+
+        const index =
+            chats.findIndex(
+                item =>
+                    String(item.id) ===
+                    String(chat.id)
+            );
+
+        const cleanChat = {
+
+            id:
+                String(
+                    chat.id ||
+                    Date.now()
+                ),
+
+            title:
+                String(
+                    chat.title ||
+                    "New conversation"
+                ).slice(0, 200),
+
+            messages:
+                Array.isArray(
+                    chat.messages
+                )
+                    ? chat.messages
+                    : [],
+
+            updatedAt:
+                chat.updatedAt ||
+                new Date().toISOString()
+
+        };
+
+        if (index >= 0) {
+
+            chats[index] =
+                cleanChat;
+
+        } else {
+
+            chats.unshift(
+                cleanChat
+            );
+        }
+
+        saveChats(chats);
+
+        res.json({
+            success: true,
+            chat: cleanChat
+        });
 
     }
 );
 
+/* =========================================
+   RENAME CHAT
+========================================= */
+
+app.patch(
+    "/api/chats/:id",
+    requireLogin,
+    (req, res) => {
+
+        const chats =
+            loadChats();
+
+        const chat =
+            chats.find(
+                item =>
+                    String(item.id) ===
+                    String(req.params.id)
+            );
+
+        if (!chat) {
+
+            return res.status(404).json({
+                error:
+                    "Chat not found"
+            });
+        }
+
+        if (
+            typeof req.body?.title ===
+            "string"
+        ) {
+
+            chat.title =
+                req.body.title
+                    .trim()
+                    .slice(0, 200);
+        }
+
+        chat.updatedAt =
+            new Date().toISOString();
+
+        saveChats(chats);
+
+        res.json({
+            success: true,
+            chat
+        });
+
+    }
+);
 
 /* =========================================
    DELETE CHAT
@@ -861,52 +762,193 @@ app.delete(
     requireLogin,
     (req, res) => {
 
-        try {
+        const chats =
+            loadChats();
 
-            const chats =
-                loadChats();
-
-
-            const filtered =
-                chats.filter(
-                    item =>
-                        String(item.id) !==
-                        String(req.params.id)
-                );
-
-
-            saveChats(
-                filtered
+        const filtered =
+            chats.filter(
+                item =>
+                    String(item.id) !==
+                    String(req.params.id)
             );
 
+        saveChats(filtered);
 
-            res.json({
-
-                success: true
-
-            });
-
-
-        } catch(error){
-
-            console.error(
-                "DELETE CHAT ERROR:",
-                error
-            );
-
-
-            res.status(500).json({
-
-                error:
-                    "Could not delete chat"
-
-            });
-
-        }
+        res.json({
+            success: true
+        });
 
     }
 );
 
+/* =========================================
+   EXPORT CHAT
+========================================= */
+
+app.get(
+    "/api/chats/:id/export",
+    requireLogin,
+    (req, res) => {
+
+        const chats =
+            loadChats();
+
+        const chat =
+            chats.find(
+                item =>
+                    String(item.id) ===
+                    String(req.params.id)
+            );
+
+        if (!chat) {
+
+            return res.status(404).json({
+                error:
+                    "Chat not found"
+            });
+        }
+
+        let output =
+            `# ${chat.title}\n\n`;
+
+        for (
+            const message
+            of chat.messages || []
+        ) {
+
+            const role =
+                message.role === "user"
+                    ? "Bimal"
+                    : "BimalAI";
+
+            output +=
+                `## ${role}\n\n`;
+
+            output +=
+                `${message.content || ""}\n\n`;
+        }
+
+        res.setHeader(
+            "Content-Type",
+            "text/markdown; charset=utf-8"
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="BimalAI-${chat.id}.md"`
+        );
+
+        res.send(output);
+
+    }
+);
+
+/* =========================================
+   SYSTEM PROMPT
+========================================= */
+
+function buildSystemPrompt(mode) {
+
+    const base = `You are BimalAI, Bimal and Simran's personal AI assistant.
+
+Be intelligent, useful, accurate, practical and clear.
+
+Remember the conversation context.
+
+Do not invent facts. If something is uncertain, say so.
+
+Use Markdown when it improves readability.
+
+When the user provides files or images, carefully analyze them.
+
+For study questions, explain concepts clearly and use examples when useful.
+
+For coding questions, provide working code and explain important parts.
+
+For writing tasks, produce polished, ready-to-use writing.
+
+For planning tasks, create practical structured plans.
+
+Keep responses reasonably concise unless the user asks for detail.`;
+
+    const modes = {
+
+        study:
+            `You are currently in Study Mode.
+Focus on teaching, explanations, examples, formulas, revision and exam preparation.`,
+
+        coding:
+            `You are currently in Coding Mode.
+Focus on debugging, architecture, code quality and complete working solutions.`,
+
+        writing:
+            `You are currently in Writing Mode.
+Focus on polished, natural and professional writing.`,
+
+        planning:
+            `You are currently in Planning Mode.
+Create realistic step-by-step plans, schedules and actionable checklists.`,
+
+        explain:
+            `You are currently in Explain Mode.
+Explain difficult concepts in simple language and progressively increase depth.`
+
+    };
+
+    return (
+        base +
+        "\n\n" +
+        (
+            modes[mode] ||
+            ""
+        )
+    );
+}
+
+/* =========================================
+   NORMALIZE MESSAGES
+========================================= */
+
+function normalizeMessages(messages) {
+
+    return messages
+        .filter(
+            message =>
+                message &&
+                (
+                    message.role === "user" ||
+                    message.role === "assistant"
+                )
+        )
+        .slice(-50)
+        .map(message => {
+
+            const role =
+                message.role;
+
+            const content =
+                message.content;
+
+            if (
+                Array.isArray(content)
+            ) {
+
+                return {
+                    role,
+                    content
+                };
+            }
+
+            return {
+                role,
+                content:
+                    String(
+                        content || ""
+                    ).slice(0, 100000)
+            };
+
+        });
+}
 
 /* =========================================
    AI CHAT
@@ -917,126 +959,57 @@ app.post(
     requireLogin,
     async (req, res) => {
 
+        let streamStarted = false;
+
         try {
 
             const {
                 messages,
-                model
-            } =
-                req.body || {};
+                model,
+                mode
+            } = req.body || {};
 
-
-            if(
+            if (
                 !Array.isArray(messages) ||
                 messages.length === 0
-            ){
+            ) {
 
                 return res.status(400).json({
-
                     error:
                         "Messages are required"
-
                 });
-
             }
 
-
-            if(
+            if (
                 !process.env.OPENROUTER_API_KEY
-            ){
+            ) {
 
                 return res.status(500).json({
-
                     error:
                         "OpenRouter API key is not configured"
-
                 });
-
             }
-
-
-            /*
-             * Protect server from accidentally
-             * receiving an enormous request.
-             */
-
-            const requestSize =
-                Buffer.byteLength(
-                    JSON.stringify(messages),
-                    "utf8"
-                );
-
-
-            if(
-                requestSize >
-                30 * 1024 * 1024
-            ){
-
-                return res.status(413).json({
-
-                    error:
-                        "Conversation or attachment is too large"
-
-                });
-
-            }
-
 
             const selectedModel =
                 model ||
                 "openrouter/free";
 
+            const safeMessages =
+                normalizeMessages(
+                    messages
+                );
 
-            const systemPrompt = {
-
-                role:
-                    "system",
-
-                content:
-`You are BimalAI, Bimal's personal AI assistant.
-
-You are shared by Bimal and Simran.
-
-Be intelligent, helpful, accurate, clear and friendly.
-
-You can help with:
-- study and exam preparation
-- mathematics
-- physics
-- civil engineering
-- thermodynamics
-- hydraulics
-- hydropower
-- coding
-- programming
-- planning
-- writing
-- documents
-- images
-- everyday tasks
-
-When an image is attached, analyze what is actually visible.
-Do not invent details that cannot be seen.
-
-When files are provided as text, use their contents carefully.
-
-Use Markdown when useful.
-
-For calculations, show the important steps.
-
-If information is uncertain, say so instead of inventing facts.
-
-Keep answers practical and easy to understand.`
-            };
-
+            const systemPrompt =
+                buildSystemPrompt(
+                    mode
+                );
 
             const response =
                 await fetch(
                     "https://openrouter.ai/api/v1/chat/completions",
                     {
 
-                        method:
-                            "POST",
+                        method: "POST",
 
                         headers: {
 
@@ -1062,8 +1035,17 @@ Keep answers practical and easy to understand.`
                                     selectedModel,
 
                                 messages: [
-                                    systemPrompt,
-                                    ...messages
+
+                                    {
+                                        role:
+                                            "system",
+
+                                        content:
+                                            systemPrompt
+                                    },
+
+                                    ...safeMessages
+
                                 ],
 
                                 stream:
@@ -1074,108 +1056,99 @@ Keep answers practical and easy to understand.`
                     }
                 );
 
-
-            if(!response.ok){
+            if (!response.ok) {
 
                 const errorText =
                     await response.text();
-
 
                 console.error(
                     "OPENROUTER ERROR:",
                     errorText
                 );
 
+                let message =
+                    errorText ||
+                    "OpenRouter request failed";
+
+                try {
+
+                    const parsed =
+                        JSON.parse(
+                            errorText
+                        );
+
+                    message =
+                        parsed.error?.message ||
+                        parsed.error ||
+                        message;
+
+                } catch {}
 
                 return res.status(
                     response.status
                 ).json({
-
                     error:
-                        errorText ||
-                        "OpenRouter request failed"
-
+                        String(message)
                 });
-
             }
 
-
-            if(!response.body){
+            if (!response.body) {
 
                 return res.status(500).json({
-
                     error:
-                        "No response body"
-
+                        "No response body received"
                 });
-
             }
-
-
-            /*
-             * Streaming response
-             */
 
             res.setHeader(
                 "Content-Type",
                 "text/event-stream; charset=utf-8"
             );
 
-
             res.setHeader(
                 "Cache-Control",
                 "no-cache, no-transform"
             );
-
 
             res.setHeader(
                 "Connection",
                 "keep-alive"
             );
 
-
             res.setHeader(
                 "X-Accel-Buffering",
                 "no"
             );
 
-
-            if(
+            if (
                 typeof res.flushHeaders ===
                 "function"
-            ){
+            ) {
 
                 res.flushHeaders();
-
             }
 
+            streamStarted = true;
 
             try {
 
-                for await(
+                for await (
                     const chunk
                     of response.body
-                ){
+                ) {
 
-                    if(
+                    if (
                         res.writableEnded
-                    ){
-
+                    ) {
                         break;
-
                     }
 
-
                     res.write(
-                        Buffer.from(
-                            chunk
-                        )
+                        Buffer.from(chunk)
                     );
-
                 }
 
-
-            } catch(streamError){
+            } catch (streamError) {
 
                 console.error(
                     "STREAM ERROR:",
@@ -1184,49 +1157,51 @@ Keep answers practical and easy to understand.`
 
             }
 
-
-            if(
+            if (
                 !res.writableEnded
-            ){
+            ) {
 
                 res.end();
-
             }
 
-
-        } catch(error){
+        } catch (error) {
 
             console.error(
                 "AI ERROR:",
                 error
             );
 
-
-            if(
+            if (
+                !streamStarted &&
                 !res.headersSent
-            ){
+            ) {
 
-                res.status(500).json({
-
+                return res.status(500).json({
                     error:
                         error.message ||
                         "Internal server error"
-
                 });
-
-            }else if(
-                !res.writableEnded
-            ){
-
-                res.end();
-
             }
 
-        }
+            if (
+                !res.writableEnded
+            ) {
 
+                res.end();
+            }
+        }
     }
 );
 
+/* =========================================
+   STATIC FRONTEND
+========================================= */
+
+app.use(
+    express.static(
+        PUBLIC_DIR
+    )
+);
 
 /* =========================================
    FRONTEND FALLBACK
@@ -1237,8 +1212,7 @@ app.use(
 
         res.sendFile(
             path.join(
-                __dirname,
-                "public",
+                PUBLIC_DIR,
                 "index.html"
             )
         );
@@ -1246,12 +1220,11 @@ app.use(
     }
 );
 
-
 /* =========================================
-   START
+   START SERVER
 ========================================= */
 
-async function startServer(){
+async function startServer() {
 
     try {
 
@@ -1261,7 +1234,6 @@ async function startServer(){
                 12
             );
 
-
         app.listen(
             PORT,
             "0.0.0.0",
@@ -1269,29 +1241,28 @@ async function startServer(){
 
                 console.log(`
 ========================================
-              BimalAI 3.0
+             BimalAI 3.0
 ========================================
 
-Running on port:
+Port:
 ${PORT}
 
 Login:
-Username: ${LOGIN_USERNAME}
-
-Password:
-Protected
+${LOGIN_USERNAME}
 
 Features:
-✓ Persistent login
-✓ OpenRouter AI
-✓ Streaming responses
-✓ Free model list
+✓ Persistent authentication
+✓ OpenRouter
+✓ Streaming chat
+✓ Model selection
 ✓ Chat history
-✓ File upload
+✓ Rename/delete/export
+✓ PDF extraction
+✓ DOCX extraction
+✓ TXT/CSV/JSON/MD extraction
 ✓ Image upload
-✓ Image analysis
-✓ Browser photo editor
-✓ Mobile responsive
+✓ Vision-ready messages
+✓ Study/Coding/Writing/Planning modes
 
 ========================================
                 `);
@@ -1299,20 +1270,15 @@ Features:
             }
         );
 
-
-    } catch(error){
+    } catch (error) {
 
         console.error(
             "STARTUP ERROR:",
             error
         );
 
-
         process.exit(1);
-
     }
-
 }
-
 
 startServer();
