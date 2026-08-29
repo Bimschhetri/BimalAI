@@ -1,35 +1,45 @@
+````html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#0d0d0f">
+
 <title>BimalAI ❤️</title>
 
 <style>
 *{box-sizing:border-box}
 
 :root{
- --bg:#f7f7f5;
- --panel:#fff;
- --side:#f0efeb;
- --text:#252422;
- --muted:#77736c;
- --border:#dedbd4;
- --accent:#c96f4d;
- --bubble:#ebe9e4;
- --hover:rgba(128,128,128,.09);
- --danger:#c0392b;
+ --bg:#f6f6f3;
+ --panel:#ffffff;
+ --panel2:#f0f0ec;
+ --side:#ededE9;
+ --text:#191918;
+ --muted:#77756f;
+ --border:#dddcd6;
+ --accent:#c86d4b;
+ --accent2:#a95135;
+ --bubble:#e8e7e2;
+ --hover:rgba(0,0,0,.055);
+ --danger:#d9534f;
+ --shadow:0 15px 50px rgba(0,0,0,.08);
 }
 
 body.dark{
- --bg:#191918;
- --panel:#242422;
- --side:#121211;
- --text:#f3f1ed;
- --muted:#aaa69e;
- --border:#3a3935;
- --bubble:#2d2d29;
+ --bg:#111113;
+ --panel:#19191c;
+ --panel2:#222226;
+ --side:#0c0c0e;
+ --text:#f5f4f1;
+ --muted:#aaa8a2;
+ --border:#343438;
+ --accent:#df805c;
+ --accent2:#ef9876;
+ --bubble:#29292d;
  --hover:rgba(255,255,255,.07);
+ --shadow:0 20px 70px rgba(0,0,0,.35);
 }
 
 html,body{
@@ -46,65 +56,79 @@ button,input,textarea,select{font:inherit}
 button{color:inherit}
 .hidden{display:none!important}
 
-/* LOGIN */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible{
+ outline:2px solid var(--accent);
+ outline-offset:2px;
+}
+
+/* =========================
+   LOGIN
+========================= */
 
 .loginScreen{
  position:fixed;
  inset:0;
- z-index:9999;
+ z-index:99999;
  display:flex;
  align-items:center;
  justify-content:center;
- background:var(--bg);
  padding:20px;
+ background:
+ radial-gradient(circle at 50% 25%,rgba(200,109,75,.13),transparent 35%),
+ var(--bg);
 }
 
 .loginBox{
  width:100%;
- max-width:400px;
- background:var(--panel);
+ max-width:410px;
+ padding:38px;
  border:1px solid var(--border);
- border-radius:25px;
- padding:35px;
- box-shadow:0 20px 70px rgba(0,0,0,.12);
+ border-radius:30px;
+ background:var(--panel);
+ box-shadow:var(--shadow);
  text-align:center;
 }
 
 .loginLogo{
- width:72px;
- height:72px;
- margin:0 auto 18px;
- border-radius:23px;
+ width:78px;
+ height:78px;
+ margin:0 auto 19px;
  display:grid;
  place-items:center;
- background:var(--accent);
- color:white;
- font-size:32px;
- box-shadow:0 14px 40px rgba(201,111,77,.25);
+ border-radius:25px;
+ background:linear-gradient(135deg,var(--accent),var(--accent2));
+ color:#fff;
+ font-size:35px;
+ box-shadow:0 18px 45px rgba(200,109,75,.25);
 }
 
 .loginBox h1{
  margin:0;
- font-size:30px;
+ font-size:31px;
+ letter-spacing:-1.4px;
 }
 
 .loginBox h1 span{color:var(--accent)}
 
 .loginSubtitle{
+ margin:8px 0 26px;
  color:var(--muted);
- margin:8px 0 25px;
  font-size:13px;
 }
 
 .loginInput{
  width:100%;
- padding:13px 14px;
+ height:48px;
  margin:6px 0;
+ padding:0 15px;
  border:1px solid var(--border);
- border-radius:12px;
+ border-radius:14px;
+ outline:none;
  background:var(--bg);
  color:var(--text);
- outline:none;
 }
 
 .loginInput:focus{
@@ -113,35 +137,44 @@ button{color:inherit}
 
 .loginButton{
  width:100%;
+ height:48px;
  margin-top:12px;
- padding:13px;
  border:0;
- border-radius:12px;
+ border-radius:14px;
  background:var(--accent);
- color:white;
+ color:#fff;
+ font-weight:750;
  cursor:pointer;
- font-weight:700;
+ transition:.18s;
+}
+
+.loginButton:hover{
+ transform:translateY(-1px);
+ filter:brightness(1.04);
 }
 
 .loginButton:disabled{
  opacity:.55;
  cursor:not-allowed;
+ transform:none;
 }
 
 .loginError{
- color:var(--danger);
- font-size:12px;
- margin-top:12px;
  min-height:18px;
+ margin-top:12px;
+ color:#d14b43;
+ font-size:12px;
 }
 
 .loginLove{
- margin-top:24px;
+ margin-top:25px;
  color:var(--muted);
  font-size:11px;
 }
 
-/* APP */
+/* =========================
+   APP
+========================= */
 
 .app{
  width:100%;
@@ -149,71 +182,98 @@ button{color:inherit}
  display:flex;
 }
 
-/* SIDEBAR */
+/* =========================
+   SIDEBAR
+========================= */
 
 .sidebar{
- width:275px;
- background:var(--side);
- border-right:1px solid var(--border);
+ width:285px;
+ flex-shrink:0;
  display:flex;
  flex-direction:column;
- padding:17px 13px;
- flex-shrink:0;
+ padding:16px 13px;
+ background:var(--side);
+ border-right:1px solid var(--border);
 }
 
 .brand{
  display:flex;
  align-items:center;
  gap:11px;
- padding:7px 9px 23px;
+ padding:6px 9px 21px;
  font-size:20px;
- font-weight:750;
+ font-weight:800;
+ letter-spacing:-.6px;
 }
 
 .brandIcon{
- width:37px;
- height:37px;
- border-radius:12px;
- background:var(--accent);
- color:#fff;
+ width:38px;
+ height:38px;
  display:grid;
  place-items:center;
- font-size:19px;
+ border-radius:13px;
+ background:linear-gradient(135deg,var(--accent),var(--accent2));
+ color:white;
+ box-shadow:0 8px 25px rgba(200,109,75,.22);
 }
 
 .newChat{
  width:100%;
- padding:11px 13px;
- border-radius:11px;
+ height:43px;
+ padding:0 13px;
  border:1px solid var(--border);
+ border-radius:12px;
  background:var(--panel);
- cursor:pointer;
  text-align:left;
+ cursor:pointer;
+ transition:.15s;
 }
 
-.newChat:hover{background:var(--hover)}
+.newChat:hover{
+ background:var(--hover);
+}
+
+.sidebarTools{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:7px;
+ margin-top:9px;
+}
+
+.sideTool{
+ height:37px;
+ border:1px solid var(--border);
+ border-radius:10px;
+ background:transparent;
+ cursor:pointer;
+ font-size:12px;
+}
+
+.sideTool:hover{
+ background:var(--hover);
+}
 
 .historyTitle{
- margin:24px 9px 9px;
+ margin:23px 9px 8px;
  color:var(--muted);
  font-size:10px;
- font-weight:750;
+ font-weight:800;
  letter-spacing:1px;
 }
 
 .history{
  flex:1;
  overflow-y:auto;
+ min-height:0;
 }
 
 .historyItem{
  display:flex;
  align-items:center;
- gap:8px;
- padding:10px;
+ gap:7px;
  margin:2px 0;
- border-radius:9px;
- font-size:13px;
+ padding:9px;
+ border-radius:10px;
  cursor:pointer;
 }
 
@@ -221,45 +281,63 @@ button{color:inherit}
  background:var(--hover);
 }
 
+.historyItem.active{
+ background:var(--hover);
+}
+
 .historyText{
+ min-width:0;
+ flex:1;
  white-space:nowrap;
  overflow:hidden;
  text-overflow:ellipsis;
- flex:1;
+ font-size:13px;
 }
 
-.deleteChat{
+.historyMenu{
  opacity:0;
  border:0;
  background:transparent;
  cursor:pointer;
- font-size:15px;
- padding:3px;
+ font-size:16px;
 }
 
-.historyItem:hover .deleteChat{
+.historyItem:hover .historyMenu{
  opacity:.7;
 }
 
-/* MAIN */
+.sidebarFooter{
+ padding:15px 8px 5px;
+ border-top:1px solid var(--border);
+ color:var(--muted);
+ font-size:11px;
+ line-height:1.7;
+}
+
+.loveText{color:var(--accent)}
+
+/* =========================
+   MAIN
+========================= */
 
 .main{
+ position:relative;
  flex:1;
  min-width:0;
  height:100%;
- position:relative;
  display:flex;
  flex-direction:column;
 }
 
 .topbar{
- height:62px;
- border-bottom:1px solid var(--border);
+ height:65px;
+ flex-shrink:0;
  display:flex;
  align-items:center;
  justify-content:space-between;
- padding:0 21px;
- flex-shrink:0;
+ padding:0 20px;
+ border-bottom:1px solid var(--border);
+ background:var(--bg);
 }
 
 .topLeft{
@@ -269,21 +347,27 @@ button{color:inherit}
  min-width:0;
 }
 
+.mobileMenu{
+ display:none;
+}
+
 .topTitle{
- font-weight:700;
+ font-weight:750;
  font-size:15px;
 }
 
 .topSubtitle{
  color:var(--muted);
  font-size:10px;
+ margin-top:2px;
 }
 
 .modelSelect{
  max-width:300px;
- padding:8px 12px;
+ height:38px;
+ padding:0 11px;
  border:1px solid var(--border);
- border-radius:10px;
+ border-radius:11px;
  background:var(--panel);
  color:var(--text);
  outline:none;
@@ -293,12 +377,14 @@ button{color:inherit}
 
 .topActions{
  display:flex;
- gap:4px;
+ gap:3px;
 }
 
 .iconButton{
- width:37px;
- height:37px;
+ width:38px;
+ height:38px;
+ display:grid;
+ place-items:center;
  border:0;
  border-radius:10px;
  background:transparent;
@@ -310,12 +396,15 @@ button{color:inherit}
  background:var(--hover);
 }
 
-/* CHAT */
+/* =========================
+   CHAT
+========================= */
 
 .chat{
  flex:1;
+ min-height:0;
  overflow-y:auto;
- padding:30px 20px 190px;
+ padding:28px 20px 180px;
  scroll-behavior:smooth;
 }
 
@@ -325,7 +414,9 @@ button{color:inherit}
  margin:auto;
 }
 
-/* WELCOME */
+/* =========================
+   WELCOME
+========================= */
 
 .welcome{
  min-height:65vh;
@@ -337,66 +428,64 @@ button{color:inherit}
 }
 
 .welcomeIcon{
- width:76px;
- height:76px;
- border-radius:26px;
- background:var(--accent);
- color:#fff;
+ width:80px;
+ height:80px;
  display:grid;
  place-items:center;
- font-size:36px;
  margin-bottom:21px;
- box-shadow:0 16px 48px rgba(201,111,77,.18);
+ border-radius:27px;
+ background:linear-gradient(135deg,var(--accent),var(--accent2));
+ color:#fff;
+ font-size:38px;
+ box-shadow:0 20px 55px rgba(200,109,75,.2);
 }
 
 .welcome h1{
  margin:0;
- font-size:39px;
- letter-spacing:-1.8px;
+ font-size:42px;
+ letter-spacing:-2px;
 }
 
-.welcome h1 span{
- color:var(--accent);
-}
+.welcome h1 span{color:var(--accent)}
 
 .welcome p{
- margin:10px 0 20px;
+ margin:10px 0 5px;
  color:var(--muted);
 }
 
 .loveWelcome{
+ margin:0 0 27px;
  color:var(--accent);
  font-size:12px;
- margin-bottom:25px;
 }
 
 .suggestions{
  width:100%;
- max-width:700px;
+ max-width:720px;
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:10px;
 }
 
 .suggestion{
+ padding:16px;
  border:1px solid var(--border);
+ border-radius:16px;
  background:var(--panel);
- border-radius:15px;
- padding:15px;
  text-align:left;
  cursor:pointer;
- transition:.15s;
+ transition:.18s;
 }
 
 .suggestion:hover{
  transform:translateY(-2px);
- box-shadow:0 8px 25px rgba(0,0,0,.06);
+ box-shadow:var(--shadow);
 }
 
 .suggestionTitle{
- font-size:13px;
- font-weight:700;
  margin-bottom:5px;
+ font-size:13px;
+ font-weight:750;
 }
 
 .suggestionText{
@@ -404,29 +493,37 @@ button{color:inherit}
  font-size:12px;
 }
 
-/* MESSAGE */
+/* =========================
+   MESSAGE
+========================= */
 
 .message{
  display:flex;
  gap:13px;
- margin:31px 0;
+ margin:29px 0;
  animation:appear .18s ease;
 }
 
 @keyframes appear{
- from{opacity:0;transform:translateY(4px)}
- to{opacity:1;transform:none}
+ from{
+  opacity:0;
+  transform:translateY(5px);
+ }
+ to{
+  opacity:1;
+  transform:none;
+ }
 }
 
 .avatar{
  width:34px;
  height:34px;
  min-width:34px;
- border-radius:10px;
  display:grid;
  place-items:center;
+ border-radius:11px;
  font-size:9px;
- font-weight:750;
+ font-weight:800;
 }
 
 .userAvatar{
@@ -434,9 +531,9 @@ button{color:inherit}
 }
 
 .aiAvatar{
- background:var(--accent);
+ background:linear-gradient(135deg,var(--accent),var(--accent2));
  color:#fff;
- font-size:15px;
+ font-size:16px;
 }
 
 .messageBody{
@@ -452,36 +549,12 @@ button{color:inherit}
 
 .user .messageText{
  display:inline-block;
- max-width:85%;
- background:var(--bubble);
+ max-width:82%;
  padding:10px 15px;
- border-radius:15px;
+ border-radius:16px;
+ background:var(--bubble);
  white-space:pre-wrap;
 }
-
-.attachmentPreview{
- display:flex;
- flex-wrap:wrap;
- gap:8px;
- margin-top:8px;
-}
-
-.attachmentThumb{
- width:100px;
- height:75px;
- border-radius:10px;
- object-fit:cover;
- border:1px solid var(--border);
-}
-
-.fileBadge{
- padding:8px 10px;
- background:var(--bubble);
- border-radius:9px;
- font-size:11px;
-}
-
-/* MARKDOWN */
 
 .ai .messageText p{
  margin:0 0 12px;
@@ -491,10 +564,6 @@ button{color:inherit}
  margin-bottom:0;
 }
 
-.ai .messageText strong{
- font-weight:750;
-}
-
 .ai .messageText h1,
 .ai .messageText h2,
 .ai .messageText h3{
@@ -502,7 +571,7 @@ button{color:inherit}
  line-height:1.3;
 }
 
-.ai .messageText h1{font-size:25px}
+.ai .messageText h1{font-size:26px}
 .ai .messageText h2{font-size:21px}
 .ai .messageText h3{font-size:18px}
 
@@ -516,27 +585,27 @@ button{color:inherit}
 }
 
 .inlineCode{
- background:var(--bubble);
  padding:2px 5px;
  border-radius:5px;
- font-family:ui-monospace,Consolas,monospace;
+ background:var(--bubble);
+ font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
  font-size:.9em;
 }
 
 .codeBlock{
  margin:13px 0;
- border:1px solid var(--border);
- border-radius:12px;
  overflow:hidden;
+ border:1px solid var(--border);
+ border-radius:13px;
  background:var(--panel);
 }
 
 .codeHeader{
- height:34px;
+ height:35px;
  display:flex;
- justify-content:space-between;
  align-items:center;
- padding:0 10px;
+ justify-content:space-between;
+ padding:0 11px;
  border-bottom:1px solid var(--border);
  color:var(--muted);
  font-size:11px;
@@ -545,26 +614,25 @@ button{color:inherit}
 .copyCode{
  border:0;
  background:transparent;
- cursor:pointer;
  color:var(--muted);
+ cursor:pointer;
 }
 
 .codeBlock pre{
  margin:0;
  padding:14px;
  overflow-x:auto;
- font-family:ui-monospace,Consolas,monospace;
+ font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
  font-size:13px;
  line-height:1.55;
 }
-
-/* ACTIONS */
 
 .messageActions{
  display:flex;
  gap:3px;
  margin-top:7px;
  opacity:0;
+ transition:.15s;
 }
 
 .message:hover .messageActions{
@@ -572,12 +640,12 @@ button{color:inherit}
 }
 
 .actionButton{
+ padding:5px 7px;
  border:0;
+ border-radius:7px;
  background:transparent;
  color:var(--muted);
  cursor:pointer;
- padding:5px 7px;
- border-radius:7px;
  font-size:11px;
 }
 
@@ -586,54 +654,127 @@ button{color:inherit}
  color:var(--text);
 }
 
-/* COMPOSER */
+/* =========================
+   ATTACHMENTS
+========================= */
+
+.attachments{
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px;
+ margin-bottom:8px;
+}
+
+.attachment{
+ position:relative;
+ display:flex;
+ align-items:center;
+ gap:7px;
+ max-width:230px;
+ padding:7px 10px;
+ border:1px solid var(--border);
+ border-radius:10px;
+ background:var(--panel2);
+ font-size:11px;
+}
+
+.attachmentThumb{
+ width:32px;
+ height:32px;
+ object-fit:cover;
+ border-radius:7px;
+}
+
+.removeAttachment{
+ border:0;
+ background:transparent;
+ cursor:pointer;
+ color:var(--muted);
+}
+
+/* =========================
+   DROP ZONE
+========================= */
+
+.dropOverlay{
+ position:absolute;
+ inset:65px 0 0;
+ z-index:20;
+ display:none;
+ place-items:center;
+ background:rgba(0,0,0,.18);
+ backdrop-filter:blur(4px);
+}
+
+.dropOverlay.show{
+ display:grid;
+}
+
+.dropBox{
+ width:min(480px,90%);
+ padding:40px;
+ border:2px dashed var(--accent);
+ border-radius:25px;
+ background:var(--panel);
+ text-align:center;
+ box-shadow:var(--shadow);
+}
+
+.dropIcon{
+ font-size:40px;
+ margin-bottom:10px;
+}
+
+/* =========================
+   COMPOSER
+========================= */
 
 .inputContainer{
  position:absolute;
- bottom:0;
  left:0;
  right:0;
+ bottom:0;
+ z-index:10;
  padding:20px;
- background:linear-gradient(transparent,var(--bg) 30%);
+ background:
+ linear-gradient(
+  transparent,
+  var(--bg) 30%
+ );
+}
+
+.composerWrap{
+ width:100%;
+ max-width:900px;
+ margin:auto;
+}
+
+.attachPreview{
+ display:none;
+ flex-wrap:wrap;
+ gap:7px;
+ margin-bottom:8px;
+}
+
+.attachPreview.show{
+ display:flex;
 }
 
 .composer{
- max-width:900px;
- margin:auto;
- border:1px solid var(--border);
- background:var(--panel);
- border-radius:19px;
- padding:9px 9px 9px 10px;
- box-shadow:0 8px 35px rgba(0,0,0,.06);
-}
-
-.composerTop{
  display:flex;
  align-items:flex-end;
- gap:8px;
-}
-
-textarea{
- flex:1;
- min-height:42px;
- max-height:150px;
- resize:none;
- border:0;
- outline:0;
- background:transparent;
- color:var(--text);
- padding:8px 3px;
- line-height:1.5;
-}
-
-textarea::placeholder{
- color:var(--muted);
+ gap:7px;
+ padding:9px 9px 9px 10px;
+ border:1px solid var(--border);
+ border-radius:19px;
+ background:var(--panel);
+ box-shadow:0 10px 40px rgba(0,0,0,.07);
 }
 
 .composerTools{
  display:flex;
- gap:4px;
- align-items:center;
+ align-items:flex-end;
+ gap:3px;
 }
 
 .toolButton{
@@ -650,14 +791,33 @@ textarea::placeholder{
  background:var(--hover);
 }
 
+textarea{
+ flex:1;
+ min-width:0;
+ min-height:42px;
+ max-height:155px;
+ resize:none;
+ border:0;
+ outline:0;
+ background:transparent;
+ color:var(--text);
+ padding:9px 3px;
+ line-height:1.5;
+}
+
+textarea::placeholder{
+ color:var(--muted);
+}
+
 .sendButton,
 .stopButton{
  width:42px;
  height:42px;
+ flex-shrink:0;
  border:0;
  border-radius:12px;
  cursor:pointer;
- font-size:19px;
+ font-size:18px;
 }
 
 .sendButton{
@@ -667,149 +827,164 @@ textarea::placeholder{
 
 .sendButton:disabled{
  opacity:.45;
+ cursor:not-allowed;
 }
 
 .stopButton{
+ display:none;
  background:var(--text);
  color:var(--bg);
- display:none;
 }
 
-.attachments{
+.composerInfo{
  display:flex;
- flex-wrap:wrap;
- gap:7px;
- padding:4px 4px 7px;
-}
-
-.attachmentChip{
- display:flex;
- align-items:center;
- gap:6px;
- padding:6px 9px;
- border:1px solid var(--border);
- border-radius:9px;
- background:var(--bg);
- font-size:11px;
-}
-
-.removeAttachment{
- border:0;
- background:transparent;
- cursor:pointer;
- color:var(--muted);
-}
-
-.disclaimer{
- max-width:900px;
- margin:7px auto 0;
- text-align:center;
+ justify-content:space-between;
+ margin:7px 4px 0;
  color:var(--muted);
  font-size:10px;
 }
 
-/* IMAGE EDITOR */
+.modeSelect{
+ height:28px;
+ padding:0 8px;
+ border:1px solid var(--border);
+ border-radius:8px;
+ background:var(--panel);
+ color:var(--muted);
+ font-size:10px;
+ outline:none;
+}
 
-.editorModal{
+.disclaimer{
+ text-align:center;
+ color:var(--muted);
+ font-size:9px;
+}
+
+/* =========================
+   SETTINGS MODAL
+========================= */
+
+.modal{
  position:fixed;
  inset:0;
- z-index:5000;
- background:rgba(0,0,0,.62);
+ z-index:100000;
  display:none;
- align-items:center;
- justify-content:center;
+ place-items:center;
  padding:20px;
+ background:rgba(0,0,0,.35);
+ backdrop-filter:blur(5px);
 }
 
-.editorModal.open{
- display:flex;
+.modal.show{
+ display:grid;
 }
 
-.editorBox{
- width:min(900px,100%);
- max-height:90vh;
+.modalBox{
+ width:min(500px,100%);
+ max-height:85vh;
  overflow:auto;
+ padding:24px;
+ border:1px solid var(--border);
+ border-radius:22px;
  background:var(--panel);
- border:1px solid var(--border);
- border-radius:20px;
- padding:20px;
+ box-shadow:var(--shadow);
 }
 
-.editorCanvasWrap{
+.modalHeader{
  display:flex;
- justify-content:center;
+ justify-content:space-between;
  align-items:center;
- background:#111;
- border-radius:14px;
- min-height:300px;
- padding:15px;
+ margin-bottom:20px;
 }
 
-#editorCanvas{
- max-width:100%;
- max-height:55vh;
- object-fit:contain;
-}
-
-.editorControls{
- display:flex;
- flex-wrap:wrap;
- gap:7px;
- margin-top:15px;
-}
-
-.editorControls button{
- border:1px solid var(--border);
- background:var(--bg);
- border-radius:9px;
- padding:9px 12px;
- cursor:pointer;
-}
-
-.editorControls button:hover{
- background:var(--hover);
-}
-
-.editorClose{
- float:right;
- border:0;
- background:transparent;
- cursor:pointer;
+.modalHeader h2{
+ margin:0;
  font-size:20px;
 }
 
-/* MOBILE */
+.closeModal{
+ width:34px;
+ height:34px;
+ border:0;
+ border-radius:9px;
+ background:transparent;
+ cursor:pointer;
+}
 
-@media(max-width:720px){
+.closeModal:hover{
+ background:var(--hover);
+}
+
+.setting{
+ padding:14px 0;
+ border-bottom:1px solid var(--border);
+}
+
+.setting:last-child{
+ border-bottom:0;
+}
+
+.settingTitle{
+ font-weight:700;
+ font-size:13px;
+}
+
+.settingDesc{
+ margin-top:4px;
+ color:var(--muted);
+ font-size:11px;
+ line-height:1.5;
+}
+
+.settingButton{
+ margin-top:9px;
+ padding:8px 11px;
+ border:1px solid var(--border);
+ border-radius:9px;
+ background:var(--panel2);
+ cursor:pointer;
+ font-size:11px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:760px){
 
  .sidebar{
   display:none;
  }
 
- .topbar{
-  padding:0 12px;
+ .mobileMenu{
+  display:grid;
  }
 
- .topTitle,
- .topSubtitle{
+ .topbar{
+  height:59px;
+  padding:0 10px;
+ }
+
+ .topTitle{
   display:none;
  }
 
  .modelSelect{
-  max-width:190px;
+  max-width:175px;
  }
 
  .chat{
-  padding:20px 13px 165px;
+  padding:18px 12px 160px;
  }
 
  .welcome h1{
-  font-size:29px;
+  font-size:30px;
  }
 
  .welcomeIcon{
-  width:64px;
-  height:64px;
+  width:65px;
+  height:65px;
   border-radius:21px;
   font-size:30px;
  }
@@ -818,8 +993,13 @@ textarea::placeholder{
   grid-template-columns:1fr;
  }
 
+ .message{
+  gap:9px;
+  margin:23px 0;
+ }
+
  .user .messageText{
-  max-width:92%;
+  max-width:91%;
  }
 
  .messageActions{
@@ -834,14 +1014,23 @@ textarea::placeholder{
   border-radius:17px;
  }
 
- .editorBox{
-  padding:14px;
+ .composerInfo{
+  display:none;
+ }
+
+ .disclaimer{
+  margin-top:5px;
  }
 
 }
 
+/* =========================
+   SCROLLBAR
+========================= */
+
 ::-webkit-scrollbar{
  width:7px;
+ height:7px;
 }
 
 ::-webkit-scrollbar-thumb{
@@ -853,7 +1042,9 @@ textarea::placeholder{
 
 <body>
 
-<!-- LOGIN -->
+<!-- =========================
+     LOGIN
+========================= -->
 
 <div class="loginScreen" id="loginScreen">
 
@@ -864,49 +1055,57 @@ textarea::placeholder{
   <h1>Bimal<span>AI</span></h1>
 
   <div class="loginSubtitle">
-   Bimal ❤️ Simran's personal AI
+   Bimal ❤️ Simran's personal AI assistant
   </div>
 
-  <form id="loginForm">
+  <input
+   id="loginUsername"
+   class="loginInput"
+   type="text"
+   placeholder="Username"
+   autocomplete="username"
+  >
 
-   <input
-    class="loginInput"
-    id="loginUsername"
-    type="text"
-    placeholder="Username"
-    autocomplete="username"
-    required>
+  <input
+   id="loginPassword"
+   class="loginInput"
+   type="password"
+   placeholder="Password"
+   autocomplete="current-password"
+  >
 
-   <input
-    class="loginInput"
-    id="loginPassword"
-    type="password"
-    placeholder="Password"
-    autocomplete="current-password"
-    required>
+  <button
+   id="loginButton"
+   class="loginButton"
+   onclick="login()"
+  >
+   Login
+  </button>
 
-   <button
-    class="loginButton"
-    id="loginButton"
-    type="submit">
-    Login
-   </button>
-
-  </form>
-
-  <div class="loginError" id="loginError"></div>
+  <div
+   id="loginError"
+   class="loginError">
+  </div>
 
   <div class="loginLove">
    Made with ❤️ for Bimal & Simran
   </div>
 
  </div>
+
 </div>
 
 
-<!-- APP -->
+<!-- =========================
+     APP
+========================= -->
 
-<div class="app hidden" id="app">
+<div
+ id="app"
+ class="app hidden"
+>
+
+ <!-- SIDEBAR -->
 
  <aside class="sidebar">
 
@@ -915,57 +1114,124 @@ textarea::placeholder{
    BimalAI
   </div>
 
-  <button class="newChat" id="newChat">
+  <button
+   class="newChat"
+   onclick="newChat()"
+  >
    ＋ New conversation
   </button>
+
+  <div class="sidebarTools">
+
+   <button
+    class="sideTool"
+    onclick="openFilePicker()"
+   >
+    📎 Files
+   </button>
+
+   <button
+    class="sideTool"
+    onclick="openSettings()"
+   >
+    ⚙ Settings
+   </button>
+
+  </div>
 
   <div class="historyTitle">
    RECENT CONVERSATIONS
   </div>
 
-  <div class="history" id="history"></div>
+  <div
+   id="history"
+   class="history"
+  ></div>
 
-  <div style="border-top:1px solid var(--border);padding:15px 8px 5px;color:var(--muted);font-size:11px;line-height:1.6">
+  <div class="sidebarFooter">
+
    <strong>BimalAI</strong><br>
-   Bimal <span style="color:var(--accent)">❤️</span> Simran<br>
+
+   Bimal
+   <span class="loveText">❤️</span>
+   Simran
+
+   <br>
+
    Your personal AI assistant
+
   </div>
 
  </aside>
 
 
+ <!-- MAIN -->
+
  <main class="main">
+
+  <!-- TOPBAR -->
 
   <header class="topbar">
 
    <div class="topLeft">
 
+    <button
+     class="iconButton mobileMenu"
+     onclick="toggleMobileInfo()"
+     title="Menu"
+    >
+     ☰
+    </button>
+
     <div>
-     <div class="topTitle">Bimal ❤️ Simran</div>
-     <div class="topSubtitle">Personal AI Assistant</div>
+
+     <div class="topTitle">
+      Bimal ❤️ Simran
+     </div>
+
+     <div class="topSubtitle">
+      Personal AI Assistant
+     </div>
+
     </div>
 
-    <select class="modelSelect" id="modelSelector">
+    <select
+     id="modelSelector"
+     class="modelSelect"
+    >
+
      <option value="openrouter/free">
       ✦ Auto · Free
      </option>
+
     </select>
 
    </div>
+
 
    <div class="topActions">
 
     <button
      class="iconButton"
-     id="themeButton"
-     title="Toggle theme">
+     onclick="toggleTheme()"
+     title="Theme"
+    >
      ◐
     </button>
 
     <button
      class="iconButton"
-     id="logoutButton"
-     title="Logout">
+     onclick="openSettings()"
+     title="Settings"
+    >
+     ⚙
+    </button>
+
+    <button
+     class="iconButton"
+     onclick="logout()"
+     title="Logout"
+    >
      ⇥
     </button>
 
@@ -974,13 +1240,26 @@ textarea::placeholder{
   </header>
 
 
-  <section class="chat" id="chat">
+  <!-- CHAT -->
 
-   <div class="chatInner" id="chatInner">
+  <section
+   id="chat"
+   class="chat"
+  >
 
-    <div class="welcome" id="welcome">
+   <div
+    id="chatInner"
+    class="chatInner"
+   >
 
-     <div class="welcomeIcon">✦</div>
+    <div
+     id="welcome"
+     class="welcome"
+    >
+
+     <div class="welcomeIcon">
+      ✦
+     </div>
 
      <h1>
       Hello, <span>Bimal.</span>
@@ -998,26 +1277,35 @@ textarea::placeholder{
 
       <div
        class="suggestion"
-       data-suggestion="Explain thermodynamics in simple terms">
-       <div class="suggestionTitle">📚 Study</div>
+       onclick="useSuggestion('Explain thermodynamics in simple terms with examples')"
+      >
+       <div class="suggestionTitle">
+        📚 Study
+       </div>
        <div class="suggestionText">
-        Understand a difficult topic
+        Understand difficult topics
        </div>
       </div>
 
       <div
        class="suggestion"
-       data-suggestion="Create a productive study plan for me">
-       <div class="suggestionTitle">🎯 Planning</div>
+       onclick="useSuggestion('Create a productive study plan for me')"
+      >
+       <div class="suggestionTitle">
+        🎯 Planning
+       </div>
        <div class="suggestionText">
-        Build a better study routine
+        Build a better routine
        </div>
       </div>
 
       <div
        class="suggestion"
-       data-suggestion="Help me write a professional email">
-       <div class="suggestionTitle">✍️ Writing</div>
+       onclick="useSuggestion('Help me write a professional email')"
+      >
+       <div class="suggestionTitle">
+        ✍️ Writing
+       </div>
        <div class="suggestionText">
         Write or improve something
        </div>
@@ -1025,8 +1313,11 @@ textarea::placeholder{
 
       <div
        class="suggestion"
-       data-suggestion="Explain artificial intelligence in simple language">
-       <div class="suggestionTitle">🧠 Learn</div>
+       onclick="useSuggestion('Explain artificial intelligence in simple language')"
+      >
+       <div class="suggestionTitle">
+        🧠 Learn
+       </div>
        <div class="suggestionText">
         Explore something new
        </div>
@@ -1041,51 +1332,112 @@ textarea::placeholder{
   </section>
 
 
+  <!-- DROP OVERLAY -->
+
+  <div
+   id="dropOverlay"
+   class="dropOverlay"
+  >
+
+   <div class="dropBox">
+
+    <div class="dropIcon">
+     📎
+    </div>
+
+    <strong>
+     Drop files here
+    </strong>
+
+    <div
+     style="
+      margin-top:7px;
+      color:var(--muted);
+      font-size:12px;
+     "
+    >
+     PDF, DOCX, TXT, CSV, JSON,
+     Markdown and images
+    </div>
+
+   </div>
+
+  </div>
+
+
+  <!-- INPUT -->
+
   <div class="inputContainer">
 
-   <div class="composer">
+   <div class="composerWrap">
 
-    <div class="attachments" id="attachments"></div>
+    <div
+     id="attachPreview"
+     class="attachPreview"
+    ></div>
 
-    <div class="composerTop">
+    <div class="composer">
 
-     <button
-      class="toolButton"
-      id="attachButton"
-      title="Attach file">
-      📎
-     </button>
+     <div class="composerTools">
 
-     <input
-      id="fileInput"
-      type="file"
-      hidden
-      multiple
-      accept=".txt,.md,.csv,.json,.pdf,.jpg,.jpeg,.png,.webp,.gif">
+      <button
+       class="toolButton"
+       onclick="openFilePicker()"
+       title="Attach files"
+      >
+       ＋
+      </button>
+
+     </div>
 
      <textarea
       id="message"
       rows="1"
-      placeholder="Message BimalAI..."></textarea>
+      placeholder="Message BimalAI..."
+     ></textarea>
 
      <button
+      id="send"
       class="sendButton"
-      id="send">
+      onclick="sendMessage()"
+     >
       ↑
      </button>
 
      <button
+      id="stop"
       class="stopButton"
-      id="stop">
+      onclick="stopGeneration()"
+     >
       ■
      </button>
 
     </div>
 
-   </div>
+    <div class="composerInfo">
 
-   <div class="disclaimer">
-    BimalAI can make mistakes. Check important information.
+     <select
+      id="modeSelector"
+      class="modeSelect"
+     >
+      <option value="">Normal Mode</option>
+      <option value="study">📚 Study Mode</option>
+      <option value="coding">💻 Coding Mode</option>
+      <option value="writing">✍️ Writing Mode</option>
+      <option value="planning">🎯 Planning Mode</option>
+      <option value="explain">🧠 Explain Mode</option>
+     </select>
+
+     <div class="disclaimer">
+      BimalAI can make mistakes. Check important information.
+     </div>
+
+     <div id="charCount">
+      0
+     </div>
+
+    </div>
+
    </div>
 
   </div>
@@ -1095,36 +1447,123 @@ textarea::placeholder{
 </div>
 
 
-<!-- IMAGE EDITOR -->
+<!-- =========================
+     HIDDEN FILE INPUT
+========================= -->
 
-<div class="editorModal" id="editorModal">
+<input
+ id="fileInput"
+ type="file"
+ multiple
+ hidden
+ accept="
+ .pdf,
+ .docx,
+ .txt,
+ .csv,
+ .json,
+ .md,
+ image/png,
+ image/jpeg,
+ image/webp,
+ image/gif
+"
+>
 
- <div class="editorBox">
 
-  <button class="editorClose" id="editorClose">
-   ✕
-  </button>
+<!-- =========================
+     SETTINGS
+========================= -->
 
-  <h3>🖼️ Photo Editor</h3>
+<div
+ id="settingsModal"
+ class="modal"
+ onclick="closeSettingsOutside(event)"
+>
 
-  <div class="editorCanvasWrap">
-   <canvas id="editorCanvas"></canvas>
+ <div class="modalBox">
+
+  <div class="modalHeader">
+
+   <h2>
+    BimalAI Settings
+   </h2>
+
+   <button
+    class="closeModal"
+    onclick="closeSettings()"
+   >
+    ×
+   </button>
+
   </div>
 
-  <div class="editorControls">
+  <div class="setting">
 
-   <button id="rotateLeft">↶ Rotate</button>
-   <button id="rotateRight">↷ Rotate</button>
-   <button id="flipX">↔ Flip</button>
-   <button id="flipY">↕ Flip</button>
+   <div class="settingTitle">
+    🎨 Appearance
+   </div>
 
-   <button id="downloadImage">
-    ⬇ Save image
+   <div class="settingDesc">
+    Switch between light and dark mode.
+   </div>
+
+   <button
+    class="settingButton"
+    onclick="toggleTheme()"
+   >
+    Toggle theme
    </button>
 
-   <button id="analyzeImage">
-    🤖 Analyze with AI
+  </div>
+
+  <div class="setting">
+
+   <div class="settingTitle">
+    🧹 Clear current conversation
+   </div>
+
+   <div class="settingDesc">
+    Start a completely new conversation.
+   </div>
+
+   <button
+    class="settingButton"
+    onclick="newChat();closeSettings()"
+   >
+    New conversation
    </button>
+
+  </div>
+
+  <div class="setting">
+
+   <div class="settingTitle">
+    📥 Export conversation
+   </div>
+
+   <div class="settingDesc">
+    Export the current conversation as Markdown.
+   </div>
+
+   <button
+    class="settingButton"
+    onclick="exportCurrentChat()"
+   >
+    Export
+   </button>
+
+  </div>
+
+  <div class="setting">
+
+   <div class="settingTitle">
+    ℹ️ About
+   </div>
+
+   <div class="settingDesc">
+    BimalAI 3.0 · OpenRouter powered personal AI.
+   </div>
 
   </div>
 
@@ -1135,8 +1574,6 @@ textarea::placeholder{
 
 <script>
 
-"use strict";
-
 /* =========================================
    STATE
 ========================================= */
@@ -1144,39 +1581,14 @@ textarea::placeholder{
 let messages = [];
 let currentChatId = null;
 let currentController = null;
-let lastUserMessage = "";
-let attachments = [];
-
-let editorImage = null;
-let editorRotation = 0;
-let editorFlipX = 1;
-let editorFlipY = 1;
+let lastUserMessage = null;
+let attachedFiles = [];
+let isGenerating = false;
 
 
 /* =========================================
    ELEMENTS
 ========================================= */
-
-const loginScreen =
- document.getElementById("loginScreen");
-
-const app =
- document.getElementById("app");
-
-const loginForm =
- document.getElementById("loginForm");
-
-const loginUsername =
- document.getElementById("loginUsername");
-
-const loginPassword =
- document.getElementById("loginPassword");
-
-const loginButton =
- document.getElementById("loginButton");
-
-const loginError =
- document.getElementById("loginError");
 
 const input =
  document.getElementById("message");
@@ -1199,20 +1611,20 @@ const history =
 const modelSelector =
  document.getElementById("modelSelector");
 
+const modeSelector =
+ document.getElementById("modeSelector");
+
 const fileInput =
  document.getElementById("fileInput");
 
-const attachmentsBox =
- document.getElementById("attachments");
+const attachPreview =
+ document.getElementById("attachPreview");
 
-const editorModal =
- document.getElementById("editorModal");
+const dropOverlay =
+ document.getElementById("dropOverlay");
 
-const editorCanvas =
- document.getElementById("editorCanvas");
-
-const editorContext =
- editorCanvas.getContext("2d");
+const charCount =
+ document.getElementById("charCount");
 
 
 /* =========================================
@@ -1237,7 +1649,7 @@ function escapeHtml(text){
 
 function markdown(text){
 
- let codeBlocks = [];
+ let codeBlocks=[];
 
  text = String(text || "");
 
@@ -1245,11 +1657,12 @@ function markdown(text){
   /```([\w+-]*)\n?([\s\S]*?)```/g,
   function(_,lang,code){
 
-   const index = codeBlocks.length;
+   const index =
+    codeBlocks.length;
 
    codeBlocks.push({
-    lang: lang || "code",
-    code: code.trim()
+    lang:lang || "code",
+    code:code.trim()
    });
 
    return `@@CODE${index}@@`;
@@ -1312,18 +1725,18 @@ function markdown(text){
    const safe =
     escapeHtml(block.code);
 
-   const html = `
+   const html=`
     <div class="codeBlock">
      <div class="codeHeader">
       <span>${escapeHtml(block.lang)}</span>
-
       <button
        class="copyCode"
-       data-copy="${encodeURIComponent(block.code)}">
+       onclick="copyText(this)"
+       data-copy="${encodeURIComponent(block.code)}"
+      >
        Copy
       </button>
      </div>
-
      <pre><code>${safe}</code></pre>
     </div>
    `;
@@ -1338,7 +1751,6 @@ function markdown(text){
  );
 
  return text;
-
 }
 
 
@@ -1371,9 +1783,8 @@ async function checkAuth(){
 
   }
 
- }catch(error){
+ }catch{
 
-  console.error(error);
   showLogin();
 
  }
@@ -1383,47 +1794,72 @@ async function checkAuth(){
 
 function showLogin(){
 
- loginScreen.classList.remove(
-  "hidden"
- );
+ document
+  .getElementById("loginScreen")
+  .classList.remove("hidden");
 
- app.classList.add(
-  "hidden"
- );
-
- setTimeout(
-  ()=>loginUsername.focus(),
-  100
- );
+ document
+  .getElementById("app")
+  .classList.add("hidden");
 
 }
 
 
-async function login(event){
+function showApp(){
 
- if(event)
-  event.preventDefault();
+ document
+  .getElementById("loginScreen")
+  .classList.add("hidden");
+
+ document
+  .getElementById("app")
+  .classList.remove("hidden");
+
+ loadModels();
+ loadChats();
+
+ input.focus();
+
+}
+
+
+/* =========================================
+   LOGIN
+========================================= */
+
+async function login(){
 
  const username =
-  loginUsername.value.trim();
+  document
+   .getElementById("loginUsername")
+   .value
+   .trim();
 
  const password =
-  loginPassword.value;
+  document
+   .getElementById("loginPassword")
+   .value;
 
- loginError.textContent = "";
+ const error =
+  document
+   .getElementById("loginError");
+
+ const button =
+  document
+   .getElementById("loginButton");
+
+ error.textContent="";
 
  if(!username || !password){
 
-  loginError.textContent =
+  error.textContent =
    "Please enter username and password.";
 
   return;
-
  }
 
- loginButton.disabled = true;
- loginButton.textContent =
-  "Logging in...";
+ button.disabled=true;
+ button.textContent="Logging in...";
 
  try{
 
@@ -1433,12 +1869,10 @@ async function login(event){
     {
      method:"POST",
      credentials:"same-origin",
-
      headers:{
       "Content-Type":
        "application/json"
      },
-
      body:JSON.stringify({
       username,
       password
@@ -1446,11 +1880,8 @@ async function login(event){
     }
    );
 
-  let data = {};
-
-  try{
-   data = await response.json();
-  }catch{}
+  const data =
+   await response.json();
 
   if(!response.ok){
 
@@ -1458,46 +1889,38 @@ async function login(event){
     data.error ||
     "Login failed"
    );
-
   }
-
-  loginPassword.value = "";
 
   showApp();
 
- }catch(error){
+ }catch(err){
 
-  loginError.textContent =
-   error.message ||
-   "Login failed.";
+  error.textContent =
+   err.message;
 
  }finally{
 
-  loginButton.disabled = false;
-  loginButton.textContent =
-   "Login";
+  button.disabled=false;
+  button.textContent="Login";
 
  }
-
 }
 
 
-function showApp(){
+/* ENTER LOGIN */
 
- loginScreen.classList.add(
-  "hidden"
+document
+ .getElementById("loginPassword")
+ .addEventListener(
+  "keydown",
+  event=>{
+
+   if(event.key==="Enter"){
+    login();
+   }
+
+  }
  );
-
- app.classList.remove(
-  "hidden"
- );
-
- loadModels();
- loadChats();
-
- input.focus();
-
-}
 
 
 /* =========================================
@@ -1518,11 +1941,8 @@ async function logout(){
 
  }catch{}
 
- messages = [];
- attachments = [];
- currentChatId = null;
-
- renderAttachments();
+ messages=[];
+ currentChatId=null;
 
  showLogin();
 
@@ -1557,29 +1977,89 @@ function addMessage(
  avatar.className =
   "avatar "+
   (
-   type === "user"
-    ? "userAvatar"
-    : "aiAvatar"
+   type==="user"
+    ?"userAvatar"
+    :"aiAvatar"
   );
 
  avatar.textContent =
-  type === "user"
-   ? "YOU"
-   : "✦";
+  type==="user"
+   ?"YOU"
+   :"✦";
 
  const body =
   document.createElement("div");
 
- body.className =
-  "messageBody";
+ body.className="messageBody";
+
+
+ if(
+  type==="user" &&
+  files.length
+ ){
+
+  const fileWrap =
+   document.createElement("div");
+
+  fileWrap.className=
+   "attachments";
+
+  files.forEach(
+   file=>{
+
+    const item =
+     document.createElement("div");
+
+    item.className=
+     "attachment";
+
+    if(
+     file.preview
+    ){
+
+     const img =
+      document.createElement("img");
+
+     img.className=
+      "attachmentThumb";
+
+     img.src=
+      file.preview;
+
+     item.appendChild(img);
+
+    }else{
+
+     item.innerHTML=
+      "📄";
+
+    }
+
+    const name =
+     document.createElement("span");
+
+    name.textContent =
+     file.name;
+
+    item.appendChild(name);
+
+    fileWrap.appendChild(item);
+
+   }
+  );
+
+  body.appendChild(fileWrap);
+
+ }
+
 
  const content =
   document.createElement("div");
 
- content.className =
+ content.className=
   "messageText";
 
- if(type === "assistant"){
+ if(type==="assistant"){
 
   content.innerHTML =
    markdown(text);
@@ -1594,69 +2074,27 @@ function addMessage(
  body.appendChild(content);
 
 
- if(files.length){
-
-  const preview =
-   document.createElement("div");
-
-  preview.className =
-   "attachmentPreview";
-
-  files.forEach(file=>{
-
-   if(
-    file.type &&
-    file.type.startsWith("image/")
-   ){
-
-    const img =
-     document.createElement("img");
-
-    img.className =
-     "attachmentThumb";
-
-    img.src =
-     file.data;
-
-    preview.appendChild(img);
-
-   }else{
-
-    const badge =
-     document.createElement("div");
-
-    badge.className =
-     "fileBadge";
-
-    badge.textContent =
-     "📎 "+file.name;
-
-    preview.appendChild(badge);
-
-   }
-
-  });
-
-  body.appendChild(preview);
-
- }
-
-
- if(type === "assistant"){
+ if(type==="assistant"){
 
   const actions =
    document.createElement("div");
 
-  actions.className =
+  actions.className=
    "messageActions";
 
-  actions.innerHTML = `
+  actions.innerHTML=`
 
-   <button class="actionButton copyMessage">
+   <button
+    class="actionButton"
+    onclick="copyMessage(this)"
+   >
     Copy
    </button>
 
-   <button class="actionButton regenerate">
+   <button
+    class="actionButton"
+    onclick="regenerate()"
+   >
     Regenerate
    </button>
 
@@ -1665,6 +2103,7 @@ function addMessage(
   body.appendChild(actions);
 
  }
+
 
  message.appendChild(avatar);
  message.appendChild(body);
@@ -1675,164 +2114,166 @@ function addMessage(
   chat.scrollHeight;
 
  return content;
-
 }
 
 
 /* =========================================
-   FILE HANDLING
+   FILE PICKER
 ========================================= */
 
-document.getElementById(
- "attachButton"
-).addEventListener(
- "click",
- ()=>{
-  fileInput.click();
- }
-);
+function openFilePicker(){
 
+ fileInput.click();
+
+}
 
 fileInput.addEventListener(
  "change",
- async ()=>{
-  const files =
-   Array.from(fileInput.files || []);
+ async event=>{
 
-  for(const file of files){
+  await handleFiles(
+   Array.from(
+    event.target.files
+   )
+  );
 
-   await addAttachment(file);
-
-  }
-
-  fileInput.value = "";
+  fileInput.value="";
 
  }
 );
 
 
-async function addAttachment(file){
+/* =========================================
+   FILE PROCESSING
+========================================= */
 
- if(file.size > 15 * 1024 * 1024){
+async function handleFiles(files){
 
-  alert(
-   `${file.name} is larger than 15 MB.`
-  );
-
+ if(!files.length)
   return;
 
- }
-
- try{
-
-  const data =
-   await readFile(file);
-
-  attachments.push({
-   id:
-    Date.now()+"-"+Math.random(),
-
-   name:file.name,
-
-   type:file.type ||
-    "application/octet-stream",
-
-   size:file.size,
-
-   data:data,
-
-   text:null
-  });
+ for(const file of files){
 
   if(
-   file.type.startsWith("text/") ||
-   /\.(txt|md|csv|json)$/i.test(file.name)
+   file.size >
+   25 * 1024 * 1024
   ){
 
-   attachments[
-    attachments.length-1
-   ].text =
-    await file.text();
+   alert(
+    `${file.name} is larger than 25 MB.`
+   );
 
+   continue;
   }
 
-  renderAttachments();
+  const item={
+   file,
+   name:file.name,
+   preview:null,
+   processed:null
+  };
 
- }catch(error){
+  if(
+   file.type.startsWith("image/")
+  ){
 
-  console.error(error);
+   item.preview =
+    URL.createObjectURL(file);
+  }
 
-  alert(
-   "Could not read "+file.name
-  );
-
+  attachedFiles.push(item);
  }
 
-}
-
-
-function readFile(file){
-
- return new Promise(
-  (resolve,reject)=>{
-
-   const reader =
-    new FileReader();
-
-   reader.onload =
-    ()=>resolve(
-     reader.result
-    );
-
-   reader.onerror =
-    ()=>reject(
-     reader.error
-    );
-
-   reader.readAsDataURL(file);
-
-  }
- );
+ renderAttachments();
 
 }
 
+
+/* =========================================
+   ATTACHMENT PREVIEW
+========================================= */
 
 function renderAttachments(){
 
- attachmentsBox.innerHTML = "";
+ attachPreview.innerHTML="";
 
- attachments.forEach(
-  (file,index)=>{
+ if(!attachedFiles.length){
 
-   const chip =
+  attachPreview.classList.remove("show");
+
+  return;
+ }
+
+ attachPreview.classList.add("show");
+
+ attachedFiles.forEach(
+  (item,index)=>{
+
+   const el =
     document.createElement("div");
 
-   chip.className =
-    "attachmentChip";
+   el.className=
+    "attachment";
 
-   let icon = "📎";
+   if(item.preview){
 
-   if(
-    file.type.startsWith("image/")
-   )
-    icon = "🖼️";
+    const img =
+     document.createElement("img");
 
-   else if(
-    file.name.toLowerCase().endsWith(".pdf")
-   )
-    icon = "📄";
+    img.className=
+     "attachmentThumb";
 
-   chip.innerHTML = `
-    <span>${icon} ${escapeHtml(file.name)}</span>
+    img.src=
+     item.preview;
 
-    <button
-     class="removeAttachment"
-     data-index="${index}">
-     ×
-    </button>
-   `;
+    el.appendChild(img);
 
-   attachmentsBox.appendChild(chip);
+   }else{
+
+    const icon =
+     document.createElement("span");
+
+    icon.textContent="📄";
+
+    el.appendChild(icon);
+
+   }
+
+   const name =
+    document.createElement("span");
+
+   name.textContent =
+    item.name;
+
+   el.appendChild(name);
+
+   const remove =
+    document.createElement("button");
+
+   remove.className=
+    "removeAttachment";
+
+   remove.textContent="×";
+
+   remove.onclick=()=>{
+
+    if(item.preview)
+     URL.revokeObjectURL(
+      item.preview
+     );
+
+    attachedFiles.splice(
+     index,
+     1
+    );
+
+    renderAttachments();
+
+   };
+
+   el.appendChild(remove);
+
+   attachPreview.appendChild(el);
 
   }
  );
@@ -1841,7 +2282,117 @@ function renderAttachments(){
 
 
 /* =========================================
-   SEND
+   UPLOAD TO SERVER
+========================================= */
+
+async function uploadAttachments(){
+
+ if(!attachedFiles.length)
+  return [];
+
+ const form =
+  new FormData();
+
+ attachedFiles.forEach(
+  item=>{
+   form.append(
+    "files",
+    item.file
+   );
+  }
+ );
+
+ const response =
+  await fetch(
+   "/api/upload",
+   {
+    method:"POST",
+    credentials:"same-origin",
+    body:form
+   }
+  );
+
+ const data =
+  await response.json();
+
+ if(!response.ok){
+
+  throw new Error(
+   data.error ||
+   "File upload failed"
+  );
+ }
+
+ return data.files || [];
+}
+
+
+/* =========================================
+   BUILD USER CONTENT
+========================================= */
+
+function buildUserContent(
+ text,
+ uploaded
+){
+
+ if(!uploaded.length)
+  return text;
+
+ const parts=[];
+
+ parts.push({
+  type:"text",
+  text:
+   text ||
+   "Please analyze the attached file(s)."
+ });
+
+ for(
+  const file
+  of uploaded
+ ){
+
+  if(
+   file.type==="image" &&
+   file.data
+  ){
+
+   parts.push({
+    type:"image_url",
+    image_url:{
+     url:
+      `data:${file.mime};base64,${file.data}`
+    }
+   });
+
+  }
+
+  if(
+   file.type==="text" &&
+   file.content
+  ){
+
+   parts.push({
+    type:"text",
+    text:
+     `\n\n--- ${file.name} ---\n`+
+     file.content.slice(
+      0,
+      100000
+     )
+   });
+
+  }
+
+ }
+
+ return parts;
+}
+
+
+/* =========================================
+   SEND MESSAGE
 ========================================= */
 
 async function sendMessage(){
@@ -1850,133 +2401,75 @@ async function sendMessage(){
   input.value.trim();
 
  if(
-  (!text && !attachments.length) ||
-  send.disabled
- )
+  (!text && !attachedFiles.length) ||
+  isGenerating
+ ){
   return;
+ }
 
  lastUserMessage =
   text ||
-  "Please analyze the attached file.";
+  "Analyze the attached files.";
 
- const currentAttachments =
-  attachments.map(
-   file=>({...file})
-  );
+ isGenerating=true;
 
- addMessage(
-  text ||
-  "Please analyze the attached file.",
-  "user",
-  currentAttachments
- );
+ send.disabled=true;
+ send.style.display="none";
+ stop.style.display="block";
 
 
- /*
-  Build OpenRouter message.
+ let uploaded=[];
 
-  Text files are added as text.
-  Images are sent as multimodal image_url.
- */
+ try{
 
- let userContent = [];
+  if(attachedFiles.length){
 
- if(text){
-
-  userContent.push({
-   type:"text",
-   text:text
-  });
-
- }else{
-
-  userContent.push({
-   type:"text",
-   text:
-    "Please analyze the attached file(s) and help me."
-  });
-
- }
-
-
- for(
-  const file of currentAttachments
- ){
-
-  if(
-   file.type.startsWith("image/")
-  ){
-
-   userContent.push({
-
-    type:"image_url",
-
-    image_url:{
-     url:file.data
-    }
-
-   });
-
-  }else if(file.text){
-
-   userContent.push({
-
-    type:"text",
-
-    text:
-     `\n\n--- FILE: ${file.name} ---\n`+
-     file.text+
-     "\n--- END FILE ---\n"
-
-   });
-
-  }else{
-
-   userContent.push({
-
-    type:"text",
-
-    text:
-     `\n\nI attached a file named "${file.name}". `+
-     `Please tell me if you need its contents in a readable format.`
-
-   });
+   uploaded =
+    await uploadAttachments();
 
   }
 
- }
+  const userContent =
+   buildUserContent(
+    text,
+    uploaded
+   );
 
+  const displayFiles =
+   attachedFiles.map(
+    item=>({
+     name:item.name,
+     preview:item.preview
+    })
+   );
 
- messages.push({
-  role:"user",
-  content:
-   userContent.length === 1 &&
-   userContent[0].type === "text"
-    ? userContent[0].text
-    : userContent
- });
-
-
- attachments = [];
- renderAttachments();
-
- input.value = "";
- input.style.height = "auto";
-
- send.disabled = true;
- send.style.display = "none";
- stop.style.display = "block";
-
- const answer =
   addMessage(
-   "Thinking…",
-   "assistant"
+   text ||
+   "Please analyze the attached file(s).",
+   "user",
+   displayFiles
   );
 
- currentController =
-  new AbortController();
+  messages.push({
+   role:"user",
+   content:userContent
+  });
 
- try{
+  attachedFiles=[];
+
+  renderAttachments();
+
+  input.value="";
+  input.style.height="auto";
+
+  const answer =
+   addMessage(
+    "Thinking…",
+    "assistant"
+   );
+
+  currentController =
+   new AbortController();
 
   const response =
    await fetch(
@@ -1995,7 +2488,10 @@ async function sendMessage(){
       messages,
 
       model:
-       modelSelector.value
+       modelSelector.value,
+
+      mode:
+       modeSelector.value
 
      }),
 
@@ -2003,7 +2499,6 @@ async function sendMessage(){
       currentController.signal
     }
    );
-
 
   if(!response.ok){
 
@@ -2022,15 +2517,14 @@ async function sendMessage(){
    }catch{}
 
    throw new Error(error);
-
   }
 
+  if(!response.body){
 
-  if(!response.body)
    throw new Error(
     "Streaming unavailable"
    );
-
+  }
 
   const reader =
    response.body.getReader();
@@ -2038,9 +2532,8 @@ async function sendMessage(){
   const decoder =
    new TextDecoder();
 
-  let buffer = "";
-  let fullAnswer = "";
-
+  let buffer="";
+  let fullAnswer="";
 
   while(true){
 
@@ -2053,13 +2546,11 @@ async function sendMessage(){
    if(done)
     break;
 
-
    buffer +=
     decoder.decode(
      value,
      {stream:true}
     );
-
 
    const lines =
     buffer.split("\n");
@@ -2067,9 +2558,9 @@ async function sendMessage(){
    buffer =
     lines.pop() || "";
 
-
    for(
-    const line of lines
+    const line
+    of lines
    ){
 
     const trimmed =
@@ -2077,20 +2568,18 @@ async function sendMessage(){
 
     if(
      !trimmed ||
-     !trimmed.startsWith("data:")
-    )
+     !trimmed.startsWith(
+      "data:"
+     )
+    ){
      continue;
-
+    }
 
     const data =
-     trimmed
-      .slice(5)
-      .trim();
+     trimmed.slice(5).trim();
 
-
-    if(data === "[DONE]")
+    if(data==="[DONE]")
      continue;
-
 
     try{
 
@@ -2108,11 +2597,12 @@ async function sendMessage(){
        token;
 
       answer.innerHTML =
-       markdown(fullAnswer);
+       markdown(
+        fullAnswer
+       );
 
       chat.scrollTop =
        chat.scrollHeight;
-
      }
 
     }catch{}
@@ -2121,7 +2611,6 @@ async function sendMessage(){
 
   }
 
-
   if(!fullAnswer){
 
    fullAnswer =
@@ -2129,25 +2618,20 @@ async function sendMessage(){
 
    answer.textContent =
     fullAnswer;
-
   }
-
 
   messages.push({
    role:"assistant",
    content:fullAnswer
   });
 
-
   await saveChat();
   await loadChats();
-
 
  }catch(error){
 
   if(
-   error.name ===
-   "AbortError"
+   error.name==="AbortError"
   ){
 
    answer.innerHTML =
@@ -2162,14 +2646,14 @@ async function sendMessage(){
 
   }
 
-
  }finally{
 
-  currentController = null;
+  currentController=null;
+  isGenerating=false;
 
-  send.disabled = false;
-  send.style.display = "block";
-  stop.style.display = "none";
+  send.disabled=false;
+  send.style.display="block";
+  stop.style.display="none";
 
   input.focus();
 
@@ -2182,126 +2666,84 @@ async function sendMessage(){
    STOP
 ========================================= */
 
-stop.addEventListener(
- "click",
- ()=>{
+function stopGeneration(){
 
-  if(currentController){
+ if(currentController){
 
-   currentController.abort();
+  currentController.abort();
 
-   currentController = null;
-
-  }
-
+  currentController=null;
  }
-);
+
+}
 
 
 /* =========================================
-   COPY / REGENERATE
+   COPY
 ========================================= */
 
-document.addEventListener(
- "click",
- async event=>{
+async function copyMessage(button){
 
-  const copy =
-   event.target.closest(
-    ".copyMessage"
+ const message =
+  button
+   .closest(".message")
+   .querySelector(
+    ".messageText"
    );
 
-  if(copy){
+ try{
 
-   const message =
-    copy
-     .closest(".message")
-     .querySelector(".messageText");
+  await navigator.clipboard.writeText(
+   message.innerText
+  );
 
-   await navigator.clipboard.writeText(
-    message.innerText
-   );
+  const old =
+   button.textContent;
 
-   const old =
-    copy.textContent;
+  button.textContent =
+   "Copied!";
 
-   copy.textContent =
-    "Copied!";
+  setTimeout(
+   ()=>{
+    button.textContent=old;
+   },
+   1200
+  );
 
-   setTimeout(
-    ()=>copy.textContent=old,
-    1200
-   );
+ }catch{}
 
-   return;
-
-  }
+}
 
 
-  const codeCopy =
-   event.target.closest(
-    ".copyCode"
-   );
+async function copyText(button){
 
-  if(codeCopy){
+ const text =
+  decodeURIComponent(
+   button.dataset.copy
+  );
 
-   const text =
-    decodeURIComponent(
-     codeCopy.dataset.copy
-    );
+ try{
 
-   await navigator.clipboard.writeText(
-    text
-   );
+  await navigator.clipboard.writeText(
+   text
+  );
 
-   codeCopy.textContent =
-    "Copied!";
+  const old =
+   button.textContent;
 
-   setTimeout(
-    ()=>codeCopy.textContent="Copy",
-    1200
-   );
+  button.textContent =
+   "Copied!";
 
-   return;
+  setTimeout(
+   ()=>{
+    button.textContent=old;
+   },
+   1200
+  );
 
-  }
+ }catch{}
 
-
-  const regenerateButton =
-   event.target.closest(
-    ".regenerate"
-   );
-
-  if(regenerateButton){
-
-   regenerate();
-
-   return;
-
-  }
-
-
-  const remove =
-   event.target.closest(
-    ".removeAttachment"
-   );
-
-  if(remove){
-
-   const index =
-    Number(remove.dataset.index);
-
-   attachments.splice(
-    index,
-    1
-   );
-
-   renderAttachments();
-
-  }
-
- }
-);
+}
 
 
 /* =========================================
@@ -2310,25 +2752,27 @@ document.addEventListener(
 
 async function regenerate(){
 
- if(!lastUserMessage)
+ if(
+  !lastUserMessage ||
+  isGenerating
+ )
   return;
 
  if(
   messages.length &&
-  messages[messages.length-1].role ===
-   "assistant"
+  messages[
+   messages.length-1
+  ].role==="assistant"
  ){
 
   messages.pop();
 
  }
 
-
  const assistantMessages =
   document.querySelectorAll(
    ".message.assistant"
   );
-
 
  if(assistantMessages.length){
 
@@ -2337,7 +2781,6 @@ async function regenerate(){
   ].remove();
 
  }
-
 
  input.value =
   lastUserMessage;
@@ -2348,7 +2791,7 @@ async function regenerate(){
 
 
 /* =========================================
-   CHAT STORAGE
+   SAVE CHAT
 ========================================= */
 
 async function saveChat(){
@@ -2363,24 +2806,32 @@ async function saveChat(){
 
  }
 
-
  const first =
   messages.find(
-   m=>m.role === "user"
+   m=>m.role==="user"
   );
 
+ let title =
+  "New conversation";
 
- const title =
-  first
-   ? (
-      typeof first.content === "string"
-       ? first.content
-       : "Image / file conversation"
-     ).slice(0,55)
-   : "New conversation";
+ if(first){
 
+  if(typeof first.content==="string"){
 
- const chatData = {
+   title =
+    first.content
+     .slice(0,55);
+
+  }else{
+
+   title =
+    "📎 File conversation";
+
+  }
+
+ }
+
+ const chatData={
 
   id:
    currentChatId,
@@ -2394,7 +2845,6 @@ async function saveChat(){
 
  };
 
-
  try{
 
   await fetch(
@@ -2402,22 +2852,19 @@ async function saveChat(){
    {
     method:"POST",
     credentials:"same-origin",
-
     headers:{
      "Content-Type":
       "application/json"
     },
-
-    body:
-     JSON.stringify({
-      chat:chatData
-     })
+    body:JSON.stringify({
+     chat:chatData
+    })
    }
   );
 
  }catch(error){
 
-  console.error(
+  console.log(
    "Save failed",
    error
   );
@@ -2426,6 +2873,10 @@ async function saveChat(){
 
 }
 
+
+/* =========================================
+   LOAD CHATS
+========================================= */
 
 async function loadChats(){
 
@@ -2439,26 +2890,19 @@ async function loadChats(){
     }
    );
 
-
-  if(
-   response.status === 401
-  ){
+  if(response.status===401){
 
    showLogin();
    return;
-
   }
-
 
   if(!response.ok)
    return;
 
-
   const chats =
    await response.json();
 
-  history.innerHTML = "";
-
+  history.innerHTML="";
 
   chats.forEach(
    saved=>{
@@ -2469,6 +2913,15 @@ async function loadChats(){
     item.className =
      "historyItem";
 
+    if(
+     String(saved.id) ===
+     String(currentChatId)
+    ){
+
+     item.classList.add(
+      "active"
+     );
+    }
 
     const text =
      document.createElement("div");
@@ -2480,45 +2933,40 @@ async function loadChats(){
      saved.title ||
      "Conversation";
 
-
     text.onclick =
      ()=>loadChat(saved);
 
-
-    const del =
+    const menu =
      document.createElement("button");
 
-    del.className =
-     "deleteChat";
+    menu.className =
+     "historyMenu";
 
-    del.textContent =
-     "×";
+    menu.textContent =
+     "⋯";
 
-
-    del.onclick =
+    menu.onclick =
      event=>{
 
       event.stopPropagation();
 
-      deleteChat(
-       saved.id
+      showChatMenu(
+       saved
       );
 
-     };
-
+    };
 
     item.appendChild(text);
-    item.appendChild(del);
+    item.appendChild(menu);
 
     history.appendChild(item);
 
    }
   );
 
-
  }catch(error){
 
-  console.error(
+  console.log(
    "History unavailable",
    error
   );
@@ -2528,18 +2976,120 @@ async function loadChats(){
 }
 
 
+/* =========================================
+   CHAT MENU
+========================================= */
+
+function showChatMenu(chatData){
+
+ const choice =
+  prompt(
+   "Type:\nrename = rename chat\nexport = export chat\ndelete = delete chat"
+  );
+
+ if(!choice)
+  return;
+
+ const action =
+  choice
+   .trim()
+   .toLowerCase();
+
+ if(action==="rename"){
+
+  const title =
+   prompt(
+    "New conversation name:",
+    chatData.title
+   );
+
+  if(title)
+   renameChat(
+    chatData.id,
+    title
+   );
+
+ }else if(action==="export"){
+
+  window.open(
+   `/api/chats/${encodeURIComponent(chatData.id)}/export`,
+   "_blank"
+  );
+
+ }else if(action==="delete"){
+
+  deleteChat(
+   chatData.id
+  );
+
+ }
+
+}
+
+
+/* =========================================
+   RENAME CHAT
+========================================= */
+
+async function renameChat(
+ id,
+ title
+){
+
+ try{
+
+  const response =
+   await fetch(
+    `/api/chats/${encodeURIComponent(id)}`,
+    {
+     method:"PATCH",
+     credentials:"same-origin",
+     headers:{
+      "Content-Type":
+       "application/json"
+     },
+     body:JSON.stringify({
+      title
+     })
+    }
+   );
+
+  if(!response.ok)
+   throw new Error(
+    "Rename failed"
+   );
+
+  await loadChats();
+
+ }catch(error){
+
+  alert(
+   error.message
+  );
+
+ }
+
+}
+
+
+/* =========================================
+   LOAD CHAT
+========================================= */
+
 function loadChat(saved){
 
  currentChatId =
   saved.id;
 
  messages =
-  Array.isArray(saved.messages)
-   ? [...saved.messages]
+  Array.isArray(
+   saved.messages
+  )
+   ? saved.messages
    : [];
 
- lastUserMessage = "";
-
+ lastUserMessage =
+  "";
 
  for(
   let i=messages.length-1;
@@ -2548,63 +3098,83 @@ function loadChat(saved){
  ){
 
   if(
-   messages[i].role ===
-   "user"
+   messages[i].role==="user"
   ){
 
-   lastUserMessage =
-    typeof messages[i].content ===
+   const content =
+    messages[i].content;
+
+   if(
+    typeof content ===
     "string"
-     ? messages[i].content
-     : "";
+   ){
+
+    lastUserMessage =
+     content;
+
+   }else if(
+    Array.isArray(content)
+   ){
+
+    const text =
+     content.find(
+      item =>
+       item.type==="text"
+     );
+
+    lastUserMessage =
+     text?.text ||
+     "Analyze the attached files.";
+
+   }
 
    break;
-
   }
-
  }
 
-
- chatInner.innerHTML = "";
-
+ chatInner.innerHTML="";
 
  messages.forEach(
   message=>{
 
-   let text = "";
+   let display="";
 
    if(
     typeof message.content ===
     "string"
    ){
 
-    text =
+    display =
      message.content;
 
-   }else{
+   }else if(
+    Array.isArray(message.content)
+   ){
 
-    const textPart =
-     message.content?.find?.(
-      x=>x.type==="text"
-     );
-
-    text =
-     textPart?.text ||
-     "Attached content";
+    display =
+     message.content
+      .filter(
+       item =>
+        item.type==="text"
+      )
+      .map(
+       item=>item.text
+      )
+      .join("\n");
 
    }
 
-
    addMessage(
-    text,
-    message.role === "user"
-     ? "user"
-     : "assistant"
+    display,
+    message.role==="user"
+     ?"user"
+     :"assistant"
    );
 
   }
  );
 
+ loadChats();
 
  chat.scrollTop =
   chat.scrollHeight;
@@ -2612,47 +3182,49 @@ function loadChat(saved){
 }
 
 
+/* =========================================
+   DELETE CHAT
+========================================= */
+
 async function deleteChat(id){
+
+ if(
+  !confirm(
+   "Delete this conversation?"
+  )
+ )
+  return;
 
  try{
 
   const response =
    await fetch(
-    "/api/chats/"+encodeURIComponent(id),
+    `/api/chats/${encodeURIComponent(id)}`,
     {
      method:"DELETE",
      credentials:"same-origin"
     }
    );
 
-
-  if(
-   response.status === 401
-  ){
+  if(response.status===401){
 
    showLogin();
    return;
-
   }
-
 
   if(
    currentChatId === id
   ){
 
    newChat();
-
   }
-
 
   await loadChats();
 
-
  }catch(error){
 
-  console.error(
-   "Delete failed",
-   error
+  alert(
+   "Delete failed"
   );
 
  }
@@ -2664,29 +3236,25 @@ async function deleteChat(id){
    NEW CHAT
 ========================================= */
 
-document.getElementById(
- "newChat"
-).addEventListener(
- "click",
- newChat
-);
-
-
 function newChat(){
 
- messages = [];
- attachments = [];
-
- currentChatId = null;
- lastUserMessage = "";
+ messages=[];
+ currentChatId=null;
+ lastUserMessage=null;
+ attachedFiles=[];
 
  renderAttachments();
 
- chatInner.innerHTML = `
+ chatInner.innerHTML=`
 
-  <div class="welcome" id="welcome">
+  <div
+   class="welcome"
+   id="welcome"
+  >
 
-   <div class="welcomeIcon">✦</div>
+   <div class="welcomeIcon">
+    ✦
+   </div>
 
    <h1>
     Hello, <span>Bimal.</span>
@@ -2704,61 +3272,50 @@ function newChat(){
 
     <div
      class="suggestion"
-     data-suggestion="Explain thermodynamics in simple terms">
-
+     onclick="useSuggestion('Explain thermodynamics in simple terms with examples')"
+    >
      <div class="suggestionTitle">
       📚 Study
      </div>
-
      <div class="suggestionText">
-      Understand a difficult topic
+      Understand difficult topics
      </div>
-
     </div>
-
 
     <div
      class="suggestion"
-     data-suggestion="Create a productive study plan for me">
-
+     onclick="useSuggestion('Create a productive study plan for me')"
+    >
      <div class="suggestionTitle">
       🎯 Planning
      </div>
-
      <div class="suggestionText">
-      Build a better study routine
+      Build a better routine
      </div>
-
     </div>
-
 
     <div
      class="suggestion"
-     data-suggestion="Help me write a professional email">
-
+     onclick="useSuggestion('Help me write a professional email')"
+    >
      <div class="suggestionTitle">
       ✍️ Writing
      </div>
-
      <div class="suggestionText">
       Write or improve something
      </div>
-
     </div>
-
 
     <div
      class="suggestion"
-     data-suggestion="Explain artificial intelligence in simple language">
-
+     onclick="useSuggestion('Explain artificial intelligence in simple language')"
+    >
      <div class="suggestionTitle">
       🧠 Learn
      </div>
-
      <div class="suggestionText">
       Explore something new
      </div>
-
     </div>
 
    </div>
@@ -2769,63 +3326,55 @@ function newChat(){
 
  input.focus();
 
+ loadChats();
+
 }
 
 
 /* =========================================
-   SUGGESTIONS
+   SUGGESTION
 ========================================= */
 
-document.addEventListener(
- "click",
- event=>{
+function useSuggestion(text){
 
-  const suggestion =
-   event.target.closest(
-    ".suggestion"
-   );
+ input.value =
+  text;
 
-  if(!suggestion)
-   return;
+ input.focus();
 
-  input.value =
-   suggestion.dataset.suggestion;
+ autoResize();
 
-  input.focus();
-
- }
-);
+}
 
 
 /* =========================================
    THEME
 ========================================= */
 
-document.getElementById(
- "themeButton"
-).addEventListener(
- "click",
- ()=>{
+function toggleTheme(){
 
-  document.body.classList.toggle(
+ document.body.classList.toggle(
+  "dark"
+ );
+
+ localStorage.setItem(
+  "bimalai-theme",
+  document.body.classList.contains(
    "dark"
-  );
+  )
+   ? "dark"
+   : "light"
+ );
 
-  localStorage.setItem(
-   "bimalai-theme",
-   document.body.classList.contains("dark")
-    ? "dark"
-    : "light"
-  );
+}
 
- }
-);
 
+/* RESTORE THEME */
 
 if(
  localStorage.getItem(
   "bimalai-theme"
- ) === "dark"
+ )==="dark"
 ){
 
  document.body.classList.add(
@@ -2836,15 +3385,40 @@ if(
 
 
 /* =========================================
-   INPUT
+   TEXTAREA
 ========================================= */
+
+function autoResize(){
+
+ input.style.height =
+  "auto";
+
+ input.style.height =
+  Math.min(
+   input.scrollHeight,
+   155
+  )+"px";
+
+}
+
+input.addEventListener(
+ "input",
+ ()=>{
+
+  autoResize();
+
+  charCount.textContent =
+   input.value.length;
+
+ }
+);
 
 input.addEventListener(
  "keydown",
  event=>{
 
   if(
-   event.key === "Enter" &&
+   event.key==="Enter" &&
    !event.shiftKey
   ){
 
@@ -2858,26 +3432,122 @@ input.addEventListener(
 );
 
 
-input.addEventListener(
- "input",
- function(){
+/* =========================================
+   DRAG & DROP
+========================================= */
 
-  this.style.height =
-   "auto";
+let dragCounter=0;
 
-  this.style.height =
-   Math.min(
-    this.scrollHeight,
-    150
-   )+"px";
+document.addEventListener(
+ "dragenter",
+ event=>{
+
+  event.preventDefault();
+
+  dragCounter++;
+
+  dropOverlay.classList.add(
+   "show"
+  );
+
+ }
+);
+
+document.addEventListener(
+ "dragover",
+ event=>{
+
+  event.preventDefault();
+
+ }
+);
+
+document.addEventListener(
+ "dragleave",
+ event=>{
+
+  event.preventDefault();
+
+  dragCounter--;
+
+  if(dragCounter<=0){
+
+   dragCounter=0;
+
+   dropOverlay.classList.remove(
+    "show"
+   );
+
+  }
+
+ }
+);
+
+document.addEventListener(
+ "drop",
+ async event=>{
+
+  event.preventDefault();
+
+  dragCounter=0;
+
+  dropOverlay.classList.remove(
+   "show"
+  );
+
+  const files =
+   Array.from(
+    event.dataTransfer.files
+   );
+
+  await handleFiles(files);
 
  }
 );
 
 
-send.addEventListener(
- "click",
- sendMessage
+/* =========================================
+   PASTE IMAGE
+========================================= */
+
+input.addEventListener(
+ "paste",
+ async event=>{
+
+  const items =
+   Array.from(
+    event.clipboardData?.items ||
+    []
+   );
+
+  const files=[];
+
+  for(
+   const item
+   of items
+  ){
+
+   if(
+    item.type.startsWith(
+     "image/"
+    )
+   ){
+
+    const file =
+     item.getAsFile();
+
+    if(file)
+     files.push(file);
+   }
+  }
+
+  if(files.length){
+
+   await handleFiles(files);
+
+  }
+
+ }
 );
 
 
@@ -2897,38 +3567,33 @@ async function loadModels(){
     }
    );
 
-
-  if(
-   response.status === 401
-  ){
+  if(response.status===401){
 
    showLogin();
    return;
-
   }
-
 
   if(!response.ok)
    return;
 
-
   const models =
    await response.json();
-
 
   models.forEach(
    model=>{
 
     if(
-     [...modelSelector.options]
-      .some(
-       option =>
-        option.value ===
-        model.id
-      )
-    )
-     return;
+     Array.from(
+      modelSelector.options
+     ).some(
+      option =>
+       option.value===
+       model.id
+     )
+    ){
 
+     return;
+    }
 
     const option =
      document.createElement(
@@ -2939,7 +3604,7 @@ async function loadModels(){
      model.id;
 
     option.textContent =
-     model.name;
+     "✦ "+model.name;
 
     modelSelector.appendChild(
      option
@@ -2948,12 +3613,10 @@ async function loadModels(){
    }
   );
 
-
  }catch(error){
 
-  console.error(
-   "Models unavailable",
-   error
+  console.log(
+   "Models unavailable"
   );
 
  }
@@ -2962,267 +3625,83 @@ async function loadModels(){
 
 
 /* =========================================
-   IMAGE EDITOR
+   SETTINGS
 ========================================= */
 
-function openEditor(dataUrl){
+function openSettings(){
 
- editorImage =
-  new Image();
+ document
+  .getElementById(
+   "settingsModal"
+  )
+  .classList.add(
+   "show"
+  );
 
- editorImage.onload =
-  ()=>{
+}
 
-   editorRotation = 0;
-   editorFlipX = 1;
-   editorFlipY = 1;
+function closeSettings(){
 
-   drawEditor();
+ document
+  .getElementById(
+   "settingsModal"
+  )
+  .classList.remove(
+   "show"
+  );
 
-   editorModal.classList.add(
-    "open"
-   );
+}
 
-  };
+function closeSettingsOutside(
+ event
+){
 
- editorImage.src =
-  dataUrl;
+ if(
+  event.target.id===
+  "settingsModal"
+ ){
+
+  closeSettings();
+
+ }
 
 }
 
 
-function drawEditor(){
+/* =========================================
+   EXPORT
+========================================= */
 
- if(!editorImage)
+function exportCurrentChat(){
+
+ if(!currentChatId){
+
+  alert(
+   "There is no saved conversation to export yet."
+  );
+
   return;
+ }
 
-
- const angle =
-  editorRotation *
-  Math.PI / 180;
-
- const swap =
-  Math.abs(editorRotation) % 180 === 90;
-
-
- editorCanvas.width =
-  swap
-   ? editorImage.height
-   : editorImage.width;
-
- editorCanvas.height =
-  swap
-   ? editorImage.width
-   : editorImage.height;
-
-
- editorContext.save();
-
- editorContext.translate(
-  editorCanvas.width/2,
-  editorCanvas.height/2
+ window.open(
+  `/api/chats/${encodeURIComponent(currentChatId)}/export`,
+  "_blank"
  );
-
- editorContext.rotate(angle);
-
- editorContext.scale(
-  editorFlipX,
-  editorFlipY
- );
-
- editorContext.drawImage(
-  editorImage,
-  -editorImage.width/2,
-  -editorImage.height/2
- );
-
- editorContext.restore();
 
 }
 
 
-document.getElementById(
- "editorClose"
-).addEventListener(
- "click",
- ()=>{
-  editorModal.classList.remove(
-   "open"
-  );
- }
-);
-
-
-document.getElementById(
- "rotateLeft"
-).addEventListener(
- "click",
- ()=>{
-  editorRotation =
-   (editorRotation-90+360)%360;
-
-  drawEditor();
- }
-);
-
-
-document.getElementById(
- "rotateRight"
-).addEventListener(
- "click",
- ()=>{
-  editorRotation =
-   (editorRotation+90)%360;
-
-  drawEditor();
- }
-);
-
-
-document.getElementById(
- "flipX"
-).addEventListener(
- "click",
- ()=>{
-  editorFlipX *= -1;
-  drawEditor();
- }
-);
-
-
-document.getElementById(
- "flipY"
-).addEventListener(
- "click",
- ()=>{
-  editorFlipY *= -1;
-  drawEditor();
- }
-);
-
-
-document.getElementById(
- "downloadImage"
-).addEventListener(
- "click",
- ()=>{
-
-  const link =
-   document.createElement("a");
-
-  link.download =
-   "bimalai-edited-image.png";
-
-  link.href =
-   editorCanvas.toDataURL(
-    "image/png"
-   );
-
-  link.click();
-
- }
-);
-
-
-document.getElementById(
- "analyzeImage"
-).addEventListener(
- "click",
- ()=>{
-
-  if(!editorCanvas.width)
-   return;
-
-  const data =
-   editorCanvas.toDataURL(
-    "image/jpeg",
-    .85
-   );
-
-  attachments.push({
-
-   id:
-    Date.now()+"-"+Math.random(),
-
-   name:
-    "edited-image.jpg",
-
-   type:
-    "image/jpeg",
-
-   size:
-    data.length,
-
-   data,
-
-   text:null
-
-  });
-
-  renderAttachments();
-
-  editorModal.classList.remove(
-   "open"
-  );
-
-  input.value =
-   "Analyze this edited image in detail.";
-
-  input.focus();
-
- }
-);
-
-
 /* =========================================
-   OPEN IMAGE EDITOR FROM ATTACHMENTS
+   MOBILE
 ========================================= */
 
-attachmentsBox.addEventListener(
- "dblclick",
- event=>{
+function toggleMobileInfo(){
 
-  const chip =
-   event.target.closest(
-    ".attachmentChip"
-   );
+ alert(
+  "Use the + button to attach files and ⚙ for settings."
+ );
 
-  if(!chip)
-   return;
-
-  const index =
-   Number(
-    chip.querySelector(
-     ".removeAttachment"
-    )?.dataset.index
-   );
-
-  const file =
-   attachments[index];
-
-  if(
-   file &&
-   file.type.startsWith("image/")
-  ){
-
-   openEditor(
-    file.data
-   );
-
-  }
-
- }
-);
-
-
-/* =========================================
-   LOGIN FORM
-========================================= */
-
-loginForm.addEventListener(
- "submit",
- login
-);
+}
 
 
 /* =========================================
@@ -3235,3 +3714,4 @@ checkAuth();
 
 </body>
 </html>
+````
