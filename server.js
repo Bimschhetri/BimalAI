@@ -1,18 +1,13 @@
 require("dotenv").config();
 
 const express = require("express");
+const session = require("express-session");
+const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
-
-// Render provides PORT automatically.
-// Locally it will use 3000.
 const PORT = process.env.PORT || 3000;
-
-// ================================
-// DIRECTORIES
-// ================================
 
 const DATA_DIR = path.join(__dirname, "data");
 const CHATS_FILE = path.join(DATA_DIR, "chats.json");
@@ -25,11 +20,165 @@ if (!fs.existsSync(CHATS_FILE)) {
     fs.writeFileSync(CHATS_FILE, "[]", "utf8");
 }
 
-// ================================
-// MIDDLEWARE
-// ================================
-
 app.use(express.json({ limit: "20mb" }));
+
+app.use(
+    session({
+        secret:
+            process.env.SESSION_SECRET ||
+            "change-this-secret",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 1000 * 60 * 60 * 24 * 30
+        }
+    })
+);
+
+// =================================
+// AUTH
+// =================================
+
+const LOGIN_USERNAME =
+    process.env.BIMALAI_USERNAME || "Simran";
+
+const LOGIN_PASSWORD =
+    process.env.BIMALAI_PASSWORD || "Bimal";
+
+let PASSWORD_HASH;
+
+async function setupAuth() {
+    PASSWORD_HASH =
+        await bcrypt.hash(
+            LOGIN_PASSWORD,
+            12
+        );
+}
+
+function requireLogin(req, res, next) {
+    if (req.session.authenticated) {
+        return next();
+    }
+
+    res.status(401).json({
+        error: "Authentication required"
+    });
+}
+
+// =================================
+// LOGIN
+// =================================
+
+app.post("/api/login", async (req, res) => {
+
+    try {
+
+        const {
+            username,
+            password
+        } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({
+                error: "Username and password are required"
+            });
+        }
+
+        const usernameCorrect =
+            username === LOGIN_USERNAME;
+
+        const passwordCorrect =
+            await bcrypt.compare(
+                password,
+                PASSWORD_HASH
+            );
+
+        if (
+            !usernameCorrect ||
+            !passwordCorrect
+        ) {
+            return res.status(401).json({
+                error: "Incorrect username or password"
+            });
+        }
+
+        req.session.authenticated = true;
+        req.session.username = LOGIN_USERNAME;
+
+        res.json({
+            success: true,
+            username: LOGIN_USERNAME
+        });
+
+    } catch (error) {
+
+        console.error(
+            "LOGIN ERROR:",
+            error
+        );
+
+        res.status(500).json({
+            error: "Login failed"
+        });
+    }
+});
+
+// =================================
+// LOGOUT
+// =================================
+
+app.post(
+    "/api/logout",
+    requireLogin,
+    (req, res) => {
+
+        req.session.destroy(() => {
+
+            res.json({
+                success: true
+            });
+
+        });
+
+    }
+);
+
+// =================================
+// AUTH STATUS
+// =================================
+
+app.get("/api/auth", (req, res) => {
+
+    res.json({
+        authenticated:
+            !!req.session.authenticated,
+
+        username:
+            req.session.username || null
+    });
+
+});
+
+// =================================
+// HEALTH
+// =================================
+
+app.get("/health", (req, res) => {
+
+    res.json({
+        status: "ok",
+        name: "BimalAI",
+        version: "2.0"
+    });
+
+});
+
+// =================================
+// STATIC FRONTEND
+// =================================
 
 app.use(
     express.static(
@@ -37,386 +186,456 @@ app.use(
     )
 );
 
-// ================================
+// =================================
+// MODELS
+// =================================
+
+app.get(
+    "/api/models",
+    requireLogin,
+    async (req, res) => {
+
+        try {
+
+            const response =
+                await fetch(
+                    "https://openrouter.ai/api/v1/models"
+                );
+
+            if (!response.ok) {
+                throw new Error(
+                    `Models request failed: ${response.status}`
+                );
+            }
+
+            const data =
+                await response.json();
+
+            const freeModels =
+                (data.data || [])
+                    .filter(model =>
+                        model.pricing?.prompt === "0" &&
+                        model.pricing?.completion === "0"
+                    )
+                    .map(model => ({
+                        id: model.id,
+                        name: model.name,
+                        context_length:
+                            model.context_length
+                    }))
+                    .sort((a, b) =>
+                        a.name.localeCompare(b.name)
+                    );
+
+            res.json(freeModels);
+
+        } catch (error) {
+
+            console.error(
+                "MODEL ERROR:",
+                error
+            );
+
+            res.status(500).json({
+                error:
+                    "Could not load models"
+            });
+        }
+    }
+);
+
+// =================================
 // CHAT STORAGE
-// ================================
+// =================================
 
 function loadChats() {
+
     try {
+
         return JSON.parse(
-            fs.readFileSync(CHATS_FILE, "utf8")
+            fs.readFileSync(
+                CHATS_FILE,
+                "utf8"
+            )
         );
-    } catch (error) {
-        console.error("Chat load error:", error);
+
+    } catch {
+
         return [];
+
     }
 }
 
 function saveChats(chats) {
-    try {
-        fs.writeFileSync(
-            CHATS_FILE,
-            JSON.stringify(chats, null, 2),
-            "utf8"
-        );
-    } catch (error) {
-        console.error("Chat save error:", error);
-    }
+
+    fs.writeFileSync(
+        CHATS_FILE,
+        JSON.stringify(
+            chats,
+            null,
+            2
+        ),
+        "utf8"
+    );
+
 }
 
-// ================================
-// HEALTH CHECK
-// ================================
-
-app.get("/health", (req, res) => {
-    res.json({
-        status: "ok",
-        name: "BimalAI",
-        version: "2.0"
-    });
-});
-
-// ================================
-// MODELS
-// ================================
-
-app.get("/api/models", async (req, res) => {
-    try {
-        const response = await fetch(
-            "https://openrouter.ai/api/v1/models"
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                `OpenRouter models request failed: ${response.status}`
-            );
-        }
-
-        const data = await response.json();
-
-        const freeModels = (data.data || [])
-            .filter(model =>
-                model.pricing?.prompt === "0" &&
-                model.pricing?.completion === "0"
-            )
-            .map(model => ({
-                id: model.id,
-                name: model.name,
-                context_length:
-                    model.context_length
-            }))
-            .sort((a, b) =>
-                a.name.localeCompare(b.name)
-            );
-
-        res.json(freeModels);
-
-    } catch (error) {
-        console.error(
-            "MODEL ERROR:",
-            error
-        );
-
-        res.status(500).json({
-            error: "Could not load models"
-        });
-    }
-});
-
-// ================================
+// =================================
 // GET CHATS
-// ================================
+// =================================
 
-app.get("/api/chats", (req, res) => {
-    res.json(loadChats());
-});
+app.get(
+    "/api/chats",
+    requireLogin,
+    (req, res) => {
 
-// ================================
+        res.json(
+            loadChats()
+        );
+
+    }
+);
+
+// =================================
 // SAVE CHAT
-// ================================
+// =================================
 
-app.post("/api/chats", (req, res) => {
-
-    const { chat } = req.body;
-
-    if (!chat) {
-        return res.status(400).json({
-            error: "Chat is required"
-        });
-    }
-
-    const chats = loadChats();
-
-    const index = chats.findIndex(
-        item => item.id === chat.id
-    );
-
-    if (index >= 0) {
-        chats[index] = chat;
-    } else {
-        chats.unshift(chat);
-    }
-
-    saveChats(chats);
-
-    res.json({
-        success: true
-    });
-});
-
-// ================================
-// DELETE CHAT
-// ================================
-
-app.delete("/api/chats/:id", (req, res) => {
-
-    const chats = loadChats();
-
-    const filtered = chats.filter(
-        item => item.id !== req.params.id
-    );
-
-    saveChats(filtered);
-
-    res.json({
-        success: true
-    });
-});
-
-// ================================
-// AI CHAT
-// ================================
-
-app.post("/api/chat", async (req, res) => {
-
-    try {
+app.post(
+    "/api/chats",
+    requireLogin,
+    (req, res) => {
 
         const {
-            messages,
-            model
+            chat
         } = req.body;
 
-        if (
-            !Array.isArray(messages) ||
-            messages.length === 0
-        ) {
+        if (!chat) {
+
             return res.status(400).json({
-                error: "Messages are required"
+                error: "Chat is required"
             });
+
         }
 
-        // Check API key
-        if (!process.env.OPENROUTER_API_KEY) {
-            return res.status(500).json({
-                error:
-                    "OPENROUTER_API_KEY is not configured."
-            });
-        }
+        const chats =
+            loadChats();
 
-        const selectedModel =
-            model || "openrouter/free";
-
-        const response = await fetch(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-                method: "POST",
-
-                headers: {
-                    "Authorization":
-                        `Bearer ${process.env.OPENROUTER_API_KEY}`,
-
-                    "Content-Type":
-                        "application/json",
-
-                    "HTTP-Referer":
-                        process.env.APP_URL ||
-                        "http://localhost:3000",
-
-                    "X-Title":
-                        "BimalAI"
-                },
-
-                body: JSON.stringify({
-
-                    model: selectedModel,
-
-                    messages: [
-
-                        {
-                            role: "system",
-
-                            content:
-                                `You are BimalAI, Bimal's personal AI assistant.
-
-Your goals:
-- Be helpful, intelligent and accurate.
-- Understand conversation context.
-- Explain difficult topics clearly.
-- Help with studying, coding, planning and everyday tasks.
-- Use concise answers when the question is simple.
-- Give detailed explanations when needed.
-- Never pretend to know something you don't know.
-- Use Markdown when it improves readability.`
-                        },
-
-                        ...messages
-
-                    ],
-
-                    stream: true
-
-                })
-            }
-        );
-
-        // ================================
-        // OPENROUTER ERROR
-        // ================================
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            console.error(
-                "OPENROUTER ERROR:",
-                errorText
+        const index =
+            chats.findIndex(
+                item =>
+                    item.id === chat.id
             );
 
-            return res.status(
-                response.status
-            ).json({
-                error:
-                    errorText ||
-                    "OpenRouter request failed"
-            });
+        if (index >= 0) {
+
+            chats[index] = chat;
+
+        } else {
+
+            chats.unshift(chat);
+
         }
 
-        if (!response.body) {
+        saveChats(chats);
 
-            return res.status(500).json({
-                error:
-                    "OpenRouter returned no response body."
-            });
-        }
+        res.json({
+            success: true
+        });
 
-        // ================================
-        // STREAM RESPONSE
-        // ================================
+    }
+);
 
-        res.setHeader(
-            "Content-Type",
-            "text/event-stream; charset=utf-8"
-        );
+// =================================
+// DELETE CHAT
+// =================================
 
-        res.setHeader(
-            "Cache-Control",
-            "no-cache, no-transform"
-        );
+app.delete(
+    "/api/chats/:id",
+    requireLogin,
+    (req, res) => {
 
-        res.setHeader(
-            "Connection",
-            "keep-alive"
-        );
+        const chats =
+            loadChats();
 
-        res.setHeader(
-            "X-Accel-Buffering",
-            "no"
-        );
+        const filtered =
+            chats.filter(
+                item =>
+                    item.id !==
+                    req.params.id
+            );
 
-        // Send headers immediately
-        if (typeof res.flushHeaders === "function") {
-            res.flushHeaders();
-        }
+        saveChats(filtered);
+
+        res.json({
+            success: true
+        });
+
+    }
+);
+
+// =================================
+// AI CHAT
+// =================================
+
+app.post(
+    "/api/chat",
+    requireLogin,
+    async (req, res) => {
 
         try {
 
-            for await (
-                const chunk of response.body
+            const {
+                messages,
+                model
+            } = req.body;
+
+            if (
+                !Array.isArray(messages) ||
+                messages.length === 0
             ) {
 
-                if (res.writableEnded) {
-                    break;
-                }
+                return res.status(400).json({
+                    error:
+                        "Messages are required"
+                });
 
-                res.write(
-                    Buffer.from(chunk)
-                );
             }
 
-        } catch (streamError) {
+            if (
+                !process.env.OPENROUTER_API_KEY
+            ) {
 
-            console.error(
-                "STREAM ERROR:",
-                streamError
+                return res.status(500).json({
+                    error:
+                        "OpenRouter API key is not configured"
+                });
+
+            }
+
+            const selectedModel =
+                model ||
+                "openrouter/free";
+
+            const response =
+                await fetch(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Authorization":
+                                `Bearer ${process.env.OPENROUTER_API_KEY}`,
+
+                            "Content-Type":
+                                "application/json",
+
+                            "HTTP-Referer":
+                                process.env.APP_URL ||
+                                "https://bimalai.onrender.com",
+
+                            "X-Title":
+                                "BimalAI"
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                model:
+                                    selectedModel,
+
+                                messages: [
+
+                                    {
+                                        role:
+                                            "system",
+
+                                        content:
+                                            `You are BimalAI, Bimal's personal AI assistant.
+
+Be intelligent, helpful, accurate and clear.
+Remember the conversation context.
+Help with study, coding, planning, writing and everyday tasks.
+Use Markdown when useful.
+Do not invent facts.`
+                                    },
+
+                                    ...messages
+
+                                ],
+
+                                stream:
+                                    true
+
+                            })
+                    }
+                );
+
+            if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+                console.error(
+                    "OPENROUTER ERROR:",
+                    errorText
+                );
+
+                return res.status(
+                    response.status
+                ).json({
+                    error:
+                        errorText ||
+                        "OpenRouter request failed"
+                });
+
+            }
+
+            if (!response.body) {
+
+                return res.status(500).json({
+                    error:
+                        "No response body"
+                });
+
+            }
+
+            res.setHeader(
+                "Content-Type",
+                "text/event-stream; charset=utf-8"
             );
 
+            res.setHeader(
+                "Cache-Control",
+                "no-cache, no-transform"
+            );
+
+            res.setHeader(
+                "Connection",
+                "keep-alive"
+            );
+
+            res.setHeader(
+                "X-Accel-Buffering",
+                "no"
+            );
+
+            if (
+                typeof res.flushHeaders ===
+                "function"
+            ) {
+
+                res.flushHeaders();
+
+            }
+
+            try {
+
+                for await (
+                    const chunk
+                    of response.body
+                ) {
+
+                    if (
+                        res.writableEnded
+                    ) {
+                        break;
+                    }
+
+                    res.write(
+                        Buffer.from(chunk)
+                    );
+
+                }
+
+            } catch (streamError) {
+
+                console.error(
+                    "STREAM ERROR:",
+                    streamError
+                );
+
+            }
+
+            if (
+                !res.writableEnded
+            ) {
+
+                res.end();
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "AI ERROR:",
+                error
+            );
+
+            if (!res.headersSent) {
+
+                res.status(500).json({
+                    error:
+                        error.message ||
+                        "Internal server error"
+                });
+
+            } else if (
+                !res.writableEnded
+            ) {
+
+                res.end();
+
+            }
+
         }
 
-        if (!res.writableEnded) {
-            res.end();
-        }
+    }
+);
 
-    } catch (error) {
+// =================================
+// FRONTEND
+// =================================
 
-        console.error(
-            "AI ERROR:",
-            error
+app.use(
+    (req, res) => {
+
+        res.sendFile(
+            path.join(
+                __dirname,
+                "public",
+                "index.html"
+            )
         );
 
-        if (!res.headersSent) {
-
-            res.status(500).json({
-                error:
-                    error.message ||
-                    "Internal server error"
-            });
-
-        } else if (!res.writableEnded) {
-
-            res.end();
-
-        }
     }
-});
+);
 
-// ================================
-// FRONTEND FALLBACK
-// ================================
+// =================================
+// START
+// =================================
 
-app.use((req, res) => {
+setupAuth().then(() => {
 
-    res.sendFile(
-        path.join(
-            __dirname,
-            "public",
-            "index.html"
-        )
-    );
-});
+    app.listen(
+        PORT,
+        "0.0.0.0",
+        () => {
 
-// ================================
-// START SERVER
-// ================================
-
-app.listen(
-    PORT,
-    "0.0.0.0",
-    () => {
-
-        console.log(`
+            console.log(`
 =================================
         BimalAI 2.0
 =================================
 Running on port ${PORT}
 
-Features:
-- Free OpenRouter models
-- Streaming
-- Chat history
-- Persistent local storage
-- Cloud ready
+🔐 Login enabled
+👤 Username: ${LOGIN_USERNAME}
+🔒 Password: protected
+🤖 OpenRouter enabled
+☁️ Cloud ready
 =================================
-        `);
-    }
-);
+            `);
+
+        }
+    );
+
+});
