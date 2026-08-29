@@ -1,11 +1,11 @@
 {
   "name": "personalai",
-  "version": "4.0.0",
-  "description": "BimalAI personal AI assistant with document generation",
+  "version": "5.0.0",
+  "description": "BimalAI personal AI assistant",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\""
+    "dev": "node server.js"
   },
   "keywords": [
     "ai",
