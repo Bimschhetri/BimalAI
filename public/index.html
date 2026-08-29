@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -19,6 +18,7 @@
  --accent:#c96f4d;
  --bubble:#ebe9e4;
  --hover:rgba(128,128,128,.09);
+ --danger:#c0392b;
 }
 
 body.dark{
@@ -61,20 +61,20 @@ button{color:inherit}
 
 .loginBox{
  width:100%;
- max-width:390px;
+ max-width:400px;
  background:var(--panel);
  border:1px solid var(--border);
- border-radius:24px;
- padding:34px;
+ border-radius:25px;
+ padding:35px;
  box-shadow:0 20px 70px rgba(0,0,0,.12);
  text-align:center;
 }
 
 .loginLogo{
- width:70px;
- height:70px;
+ width:72px;
+ height:72px;
  margin:0 auto 18px;
- border-radius:22px;
+ border-radius:23px;
  display:grid;
  place-items:center;
  background:var(--accent);
@@ -85,8 +85,7 @@ button{color:inherit}
 
 .loginBox h1{
  margin:0;
- font-size:29px;
- letter-spacing:-1px;
+ font-size:30px;
 }
 
 .loginBox h1 span{color:var(--accent)}
@@ -108,7 +107,9 @@ button{color:inherit}
  outline:none;
 }
 
-.loginInput:focus{border-color:var(--accent)}
+.loginInput:focus{
+ border-color:var(--accent);
+}
 
 .loginButton{
  width:100%;
@@ -122,10 +123,13 @@ button{color:inherit}
  font-weight:700;
 }
 
-.loginButton:disabled{opacity:.5}
+.loginButton:disabled{
+ opacity:.55;
+ cursor:not-allowed;
+}
 
 .loginError{
- color:#c0392b;
+ color:var(--danger);
  font-size:12px;
  margin-top:12px;
  min-height:18px;
@@ -164,7 +168,6 @@ button{color:inherit}
  padding:7px 9px 23px;
  font-size:20px;
  font-weight:750;
- letter-spacing:-.5px;
 }
 
 .brandIcon{
@@ -176,7 +179,6 @@ button{color:inherit}
  display:grid;
  place-items:center;
  font-size:19px;
- box-shadow:0 7px 24px rgba(201,111,77,.2);
 }
 
 .newChat{
@@ -215,7 +217,9 @@ button{color:inherit}
  cursor:pointer;
 }
 
-.historyItem:hover{background:var(--hover)}
+.historyItem:hover{
+ background:var(--hover);
+}
 
 .historyText{
  white-space:nowrap;
@@ -229,21 +233,13 @@ button{color:inherit}
  border:0;
  background:transparent;
  cursor:pointer;
- font-size:14px;
+ font-size:15px;
  padding:3px;
 }
 
-.historyItem:hover .deleteChat{opacity:.7}
-
-.sidebarFooter{
- border-top:1px solid var(--border);
- padding:15px 8px 5px;
- color:var(--muted);
- font-size:11px;
- line-height:1.6;
+.historyItem:hover .deleteChat{
+ opacity:.7;
 }
-
-.loveText{color:var(--accent)}
 
 /* MAIN */
 
@@ -270,6 +266,7 @@ button{color:inherit}
  display:flex;
  align-items:center;
  gap:12px;
+ min-width:0;
 }
 
 .topTitle{
@@ -283,7 +280,7 @@ button{color:inherit}
 }
 
 .modelSelect{
- max-width:280px;
+ max-width:300px;
  padding:8px 12px;
  border:1px solid var(--border);
  border-radius:10px;
@@ -291,7 +288,7 @@ button{color:inherit}
  color:var(--text);
  outline:none;
  cursor:pointer;
- font-size:13px;
+ font-size:12px;
 }
 
 .topActions{
@@ -309,7 +306,9 @@ button{color:inherit}
  font-size:17px;
 }
 
-.iconButton:hover{background:var(--hover)}
+.iconButton:hover{
+ background:var(--hover);
+}
 
 /* CHAT */
 
@@ -322,7 +321,7 @@ button{color:inherit}
 
 .chatInner{
  width:100%;
- max-width:840px;
+ max-width:900px;
  margin:auto;
 }
 
@@ -356,23 +355,24 @@ button{color:inherit}
  letter-spacing:-1.8px;
 }
 
-.welcome h1 span{color:var(--accent)}
+.welcome h1 span{
+ color:var(--accent);
+}
 
 .welcome p{
- margin:10px 0 29px;
+ margin:10px 0 20px;
  color:var(--muted);
 }
 
 .loveWelcome{
  color:var(--accent);
  font-size:12px;
- margin-top:-18px;
- margin-bottom:20px;
+ margin-bottom:25px;
 }
 
 .suggestions{
  width:100%;
- max-width:680px;
+ max-width:700px;
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:10px;
@@ -419,9 +419,9 @@ button{color:inherit}
 }
 
 .avatar{
- width:33px;
- height:33px;
- min-width:33px;
+ width:34px;
+ height:34px;
+ min-width:34px;
  border-radius:10px;
  display:grid;
  place-items:center;
@@ -429,7 +429,9 @@ button{color:inherit}
  font-weight:750;
 }
 
-.userAvatar{background:var(--bubble)}
+.userAvatar{
+ background:var(--bubble);
+}
 
 .aiAvatar{
  background:var(--accent);
@@ -450,19 +452,48 @@ button{color:inherit}
 
 .user .messageText{
  display:inline-block;
- max-width:78%;
+ max-width:85%;
  background:var(--bubble);
  padding:10px 15px;
  border-radius:15px;
  white-space:pre-wrap;
 }
 
+.attachmentPreview{
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px;
+ margin-top:8px;
+}
+
+.attachmentThumb{
+ width:100px;
+ height:75px;
+ border-radius:10px;
+ object-fit:cover;
+ border:1px solid var(--border);
+}
+
+.fileBadge{
+ padding:8px 10px;
+ background:var(--bubble);
+ border-radius:9px;
+ font-size:11px;
+}
+
 /* MARKDOWN */
 
-.ai .messageText p{margin:0 0 12px}
-.ai .messageText p:last-child{margin-bottom:0}
+.ai .messageText p{
+ margin:0 0 12px;
+}
 
-.ai .messageText strong{font-weight:750}
+.ai .messageText p:last-child{
+ margin-bottom:0;
+}
+
+.ai .messageText strong{
+ font-weight:750;
+}
 
 .ai .messageText h1,
 .ai .messageText h2,
@@ -480,13 +511,15 @@ button{color:inherit}
  padding-left:24px;
 }
 
-.ai .messageText li{margin:5px 0}
+.ai .messageText li{
+ margin:5px 0;
+}
 
 .inlineCode{
  background:var(--bubble);
  padding:2px 5px;
  border-radius:5px;
- font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+ font-family:ui-monospace,Consolas,monospace;
  font-size:.9em;
 }
 
@@ -520,27 +553,9 @@ button{color:inherit}
  margin:0;
  padding:14px;
  overflow-x:auto;
- font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+ font-family:ui-monospace,Consolas,monospace;
  font-size:13px;
  line-height:1.55;
-}
-
-/* ATTACHMENTS IN MESSAGE */
-
-.messageFiles{
- display:flex;
- flex-wrap:wrap;
- gap:8px;
- margin-top:9px;
-}
-
-.messageFile{
- border:1px solid var(--border);
- background:var(--panel);
- border-radius:10px;
- padding:7px 10px;
- font-size:11px;
- color:var(--muted);
 }
 
 /* ACTIONS */
@@ -548,12 +563,13 @@ button{color:inherit}
 .messageActions{
  display:flex;
  gap:3px;
- margin-top:6px;
+ margin-top:7px;
  opacity:0;
- transition:.15s;
 }
 
-.message:hover .messageActions{opacity:1}
+.message:hover .messageActions{
+ opacity:1;
+}
 
 .actionButton{
  border:0;
@@ -570,7 +586,7 @@ button{color:inherit}
  color:var(--text);
 }
 
-/* INPUT */
+/* COMPOSER */
 
 .inputContainer{
  position:absolute;
@@ -578,66 +594,23 @@ button{color:inherit}
  left:0;
  right:0;
  padding:20px;
- background:linear-gradient(transparent,var(--bg) 31%);
-}
-
-.composerWrap{
- max-width:840px;
- margin:auto;
-}
-
-.filePreview{
- display:flex;
- flex-wrap:wrap;
- gap:7px;
- margin:0 0 8px;
-}
-
-.fileChip{
- display:flex;
- align-items:center;
- gap:7px;
- padding:7px 9px;
- border:1px solid var(--border);
- border-radius:10px;
- background:var(--panel);
- font-size:11px;
- max-width:230px;
-}
-
-.fileChipName{
- white-space:nowrap;
- overflow:hidden;
- text-overflow:ellipsis;
- max-width:180px;
-}
-
-.fileChip button{
- border:0;
- background:transparent;
- color:var(--muted);
- cursor:pointer;
- font-size:15px;
- padding:0 2px;
-}
-
-.imageThumb{
- width:38px;
- height:38px;
- object-fit:cover;
- border-radius:7px;
- border:1px solid var(--border);
+ background:linear-gradient(transparent,var(--bg) 30%);
 }
 
 .composer{
+ max-width:900px;
+ margin:auto;
  border:1px solid var(--border);
  background:var(--panel);
  border-radius:19px;
- padding:9px 9px 9px 9px;
+ padding:9px 9px 9px 10px;
+ box-shadow:0 8px 35px rgba(0,0,0,.06);
+}
+
+.composerTop{
  display:flex;
  align-items:flex-end;
- gap:6px;
- box-shadow:0 8px 35px rgba(0,0,0,.06);
+ gap:8px;
 }
 
 textarea{
@@ -653,23 +626,27 @@ textarea{
  line-height:1.5;
 }
 
-textarea::placeholder{color:var(--muted)}
-
-.toolButton{
- width:42px;
- height:42px;
- flex-shrink:0;
- border:0;
- border-radius:12px;
- background:transparent;
- cursor:pointer;
- font-size:18px;
+textarea::placeholder{
+ color:var(--muted);
 }
 
-.toolButton:hover{background:var(--hover)}
+.composerTools{
+ display:flex;
+ gap:4px;
+ align-items:center;
+}
 
-.toolButton.active{
- color:var(--accent);
+.toolButton{
+ width:39px;
+ height:39px;
+ border:0;
+ border-radius:11px;
+ background:transparent;
+ cursor:pointer;
+ font-size:17px;
+}
+
+.toolButton:hover{
  background:var(--hover);
 }
 
@@ -681,7 +658,6 @@ textarea::placeholder{color:var(--muted)}
  border-radius:12px;
  cursor:pointer;
  font-size:19px;
- flex-shrink:0;
 }
 
 .sendButton{
@@ -689,7 +665,9 @@ textarea::placeholder{color:var(--muted)}
  color:#fff;
 }
 
-.sendButton:disabled{opacity:.45}
+.sendButton:disabled{
+ opacity:.45;
+}
 
 .stopButton{
  background:var(--text);
@@ -697,65 +675,137 @@ textarea::placeholder{color:var(--muted)}
  display:none;
 }
 
+.attachments{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ padding:4px 4px 7px;
+}
+
+.attachmentChip{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ padding:6px 9px;
+ border:1px solid var(--border);
+ border-radius:9px;
+ background:var(--bg);
+ font-size:11px;
+}
+
+.removeAttachment{
+ border:0;
+ background:transparent;
+ cursor:pointer;
+ color:var(--muted);
+}
+
 .disclaimer{
- max-width:840px;
+ max-width:900px;
  margin:7px auto 0;
  text-align:center;
  color:var(--muted);
  font-size:10px;
 }
 
-.toolMenu{
+/* IMAGE EDITOR */
+
+.editorModal{
+ position:fixed;
+ inset:0;
+ z-index:5000;
+ background:rgba(0,0,0,.62);
  display:none;
- position:absolute;
- bottom:87px;
- left:20px;
- right:20px;
- max-width:840px;
- margin:auto;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+}
+
+.editorModal.open{
+ display:flex;
+}
+
+.editorBox{
+ width:min(900px,100%);
+ max-height:90vh;
+ overflow:auto;
  background:var(--panel);
  border:1px solid var(--border);
- border-radius:16px;
- padding:8px;
- box-shadow:0 15px 45px rgba(0,0,0,.12);
+ border-radius:20px;
+ padding:20px;
 }
 
-.toolMenu.show{display:grid}
+.editorCanvasWrap{
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ background:#111;
+ border-radius:14px;
+ min-height:300px;
+ padding:15px;
+}
 
-.toolOption{
+#editorCanvas{
+ max-width:100%;
+ max-height:55vh;
+ object-fit:contain;
+}
+
+.editorControls{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ margin-top:15px;
+}
+
+.editorControls button{
+ border:1px solid var(--border);
+ background:var(--bg);
+ border-radius:9px;
+ padding:9px 12px;
+ cursor:pointer;
+}
+
+.editorControls button:hover{
+ background:var(--hover);
+}
+
+.editorClose{
+ float:right;
  border:0;
  background:transparent;
- padding:11px;
- border-radius:10px;
  cursor:pointer;
- text-align:left;
- font-size:13px;
-}
-
-.toolOption:hover{background:var(--hover)}
-
-.toolOption small{
- display:block;
- color:var(--muted);
- margin-top:3px;
- font-size:10px;
+ font-size:20px;
 }
 
 /* MOBILE */
 
 @media(max-width:720px){
 
- .sidebar{display:none}
+ .sidebar{
+  display:none;
+ }
 
- .topbar{padding:0 12px}
+ .topbar{
+  padding:0 12px;
+ }
 
- .topTitle{display:none}
+ .topTitle,
+ .topSubtitle{
+  display:none;
+ }
 
- .modelSelect{max-width:180px}
+ .modelSelect{
+  max-width:190px;
+ }
 
- .chat{padding:20px 13px 170px}
+ .chat{
+  padding:20px 13px 165px;
+ }
 
- .welcome h1{font-size:29px}
+ .welcome h1{
+  font-size:29px;
+ }
 
  .welcomeIcon{
   width:64px;
@@ -764,45 +814,41 @@ textarea::placeholder{color:var(--muted)}
   font-size:30px;
  }
 
- .suggestions{grid-template-columns:1fr}
-
- .user .messageText{max-width:88%}
-
- .messageActions{opacity:1}
-
- .inputContainer{padding:12px}
-
- .composer{border-radius:17px}
-
- .toolButton{
-  width:38px;
-  height:38px;
+ .suggestions{
+  grid-template-columns:1fr;
  }
 
- .sendButton,
- .stopButton{
-  width:40px;
-  height:40px;
+ .user .messageText{
+  max-width:92%;
  }
 
- .fileChip{
-  max-width:190px;
+ .messageActions{
+  opacity:1;
  }
 
- .fileChipName{
-  max-width:140px;
+ .inputContainer{
+  padding:10px;
+ }
+
+ .composer{
+  border-radius:17px;
+ }
+
+ .editorBox{
+  padding:14px;
  }
 
 }
 
-::-webkit-scrollbar{width:7px}
+::-webkit-scrollbar{
+ width:7px;
+}
 
 ::-webkit-scrollbar-thumb{
  background:rgba(128,128,128,.25);
  border-radius:10px;
 }
 </style>
-
 </head>
 
 <body>
@@ -811,293 +857,367 @@ textarea::placeholder{color:var(--muted)}
 
 <div class="loginScreen" id="loginScreen">
 
-<div class="loginBox">
+ <div class="loginBox">
 
-<div class="loginLogo">✦</div>
+  <div class="loginLogo">✦</div>
 
-<h1>Bimal<span>AI</span></h1>
+  <h1>Bimal<span>AI</span></h1>
 
-<div class="loginSubtitle">
-Bimal ❤️ Simran's personal AI
+  <div class="loginSubtitle">
+   Bimal ❤️ Simran's personal AI
+  </div>
+
+  <form id="loginForm">
+
+   <input
+    class="loginInput"
+    id="loginUsername"
+    type="text"
+    placeholder="Username"
+    autocomplete="username"
+    required>
+
+   <input
+    class="loginInput"
+    id="loginPassword"
+    type="password"
+    placeholder="Password"
+    autocomplete="current-password"
+    required>
+
+   <button
+    class="loginButton"
+    id="loginButton"
+    type="submit">
+    Login
+   </button>
+
+  </form>
+
+  <div class="loginError" id="loginError"></div>
+
+  <div class="loginLove">
+   Made with ❤️ for Bimal & Simran
+  </div>
+
+ </div>
 </div>
 
-<input
-class="loginInput"
-id="loginUsername"
-type="text"
-placeholder="Username"
-autocomplete="username">
-
-<input
-class="loginInput"
-id="loginPassword"
-type="password"
-placeholder="Password"
-autocomplete="current-password">
-
-<button
-class="loginButton"
-id="loginButton"
-onclick="login()">
-Login </button>
-
-<div class="loginError" id="loginError"></div>
-
-<div class="loginLove">
-Made with ❤️ for Bimal & Simran
-</div>
-
-</div>
-</div>
 
 <!-- APP -->
 
 <div class="app hidden" id="app">
 
-<aside class="sidebar">
+ <aside class="sidebar">
 
-<div class="brand">
- <div class="brandIcon">✦</div>
- BimalAI
-</div>
+  <div class="brand">
+   <div class="brandIcon">✦</div>
+   BimalAI
+  </div>
 
-<button class="newChat" onclick="newChat()">
- ＋ New conversation
-</button>
+  <button class="newChat" id="newChat">
+   ＋ New conversation
+  </button>
 
-<div class="historyTitle">
- RECENT CONVERSATIONS
-</div>
+  <div class="historyTitle">
+   RECENT CONVERSATIONS
+  </div>
 
-<div class="history" id="history"></div>
+  <div class="history" id="history"></div>
 
-<div class="sidebarFooter">
- <strong>BimalAI</strong><br>
- Bimal <span class="loveText">❤️</span> Simran<br>
- Your personal AI assistant
-</div>
+  <div style="border-top:1px solid var(--border);padding:15px 8px 5px;color:var(--muted);font-size:11px;line-height:1.6">
+   <strong>BimalAI</strong><br>
+   Bimal <span style="color:var(--accent)">❤️</span> Simran<br>
+   Your personal AI assistant
+  </div>
 
-</aside>
+ </aside>
 
-<main class="main">
 
-<header class="topbar">
+ <main class="main">
 
-<div class="topLeft">
+  <header class="topbar">
 
-<div>
- <div class="topTitle">Bimal ❤️ Simran</div>
- <div class="topSubtitle">Personal AI Assistant</div>
-</div>
+   <div class="topLeft">
 
-<select class="modelSelect" id="modelSelector">
- <option value="openrouter/free">
-  ✦ Auto · Free
- </option>
-</select>
+    <div>
+     <div class="topTitle">Bimal ❤️ Simran</div>
+     <div class="topSubtitle">Personal AI Assistant</div>
+    </div>
 
-</div>
+    <select class="modelSelect" id="modelSelector">
+     <option value="openrouter/free">
+      ✦ Auto · Free
+     </option>
+    </select>
 
-<div class="topActions">
+   </div>
 
-<button
-class="iconButton"
-onclick="toggleTheme()"
-title="Toggle theme">
-◐ </button>
+   <div class="topActions">
 
-<button
-class="iconButton"
-onclick="logout()"
-title="Logout">
-⇥ </button>
+    <button
+     class="iconButton"
+     id="themeButton"
+     title="Toggle theme">
+     ◐
+    </button>
 
-</div>
+    <button
+     class="iconButton"
+     id="logoutButton"
+     title="Logout">
+     ⇥
+    </button>
 
-</header>
+   </div>
 
-<section class="chat" id="chat">
+  </header>
 
-<div class="chatInner" id="chatInner">
 
-<div class="welcome" id="welcome">
+  <section class="chat" id="chat">
 
-<div class="welcomeIcon">✦</div>
+   <div class="chatInner" id="chatInner">
 
-<h1>
- Hello, <span>Bimal.</span>
-</h1>
+    <div class="welcome" id="welcome">
 
-<p>
- What would you like to work on today?
-</p>
+     <div class="welcomeIcon">✦</div>
 
-<div class="loveWelcome">
- Bimal ❤️ Simran
-</div>
+     <h1>
+      Hello, <span>Bimal.</span>
+     </h1>
 
-<div class="suggestions">
+     <p>
+      What would you like to work on today?
+     </p>
 
-<div
- class="suggestion"
- onclick="useSuggestion('Explain thermodynamics in simple terms')">
+     <div class="loveWelcome">
+      Bimal ❤️ Simran
+     </div>
 
-<div class="suggestionTitle">📚 Study</div>
-<div class="suggestionText">Understand a difficult topic</div>
+     <div class="suggestions">
 
-</div>
+      <div
+       class="suggestion"
+       data-suggestion="Explain thermodynamics in simple terms">
+       <div class="suggestionTitle">📚 Study</div>
+       <div class="suggestionText">
+        Understand a difficult topic
+       </div>
+      </div>
 
-<div
- class="suggestion"
- onclick="useSuggestion('Create a productive study plan for me')">
+      <div
+       class="suggestion"
+       data-suggestion="Create a productive study plan for me">
+       <div class="suggestionTitle">🎯 Planning</div>
+       <div class="suggestionText">
+        Build a better study routine
+       </div>
+      </div>
 
-<div class="suggestionTitle">🎯 Planning</div>
-<div class="suggestionText">Build a better study routine</div>
+      <div
+       class="suggestion"
+       data-suggestion="Help me write a professional email">
+       <div class="suggestionTitle">✍️ Writing</div>
+       <div class="suggestionText">
+        Write or improve something
+       </div>
+      </div>
 
-</div>
+      <div
+       class="suggestion"
+       data-suggestion="Explain artificial intelligence in simple language">
+       <div class="suggestionTitle">🧠 Learn</div>
+       <div class="suggestionText">
+        Explore something new
+       </div>
+      </div>
 
-<div
- class="suggestion"
- onclick="useSuggestion('Help me write a professional email')">
+     </div>
 
-<div class="suggestionTitle">✍️ Writing</div>
-<div class="suggestionText">Write or improve something</div>
+    </div>
 
-</div>
+   </div>
 
-<div
- class="suggestion"
- onclick="useSuggestion('Explain artificial intelligence in simple language')">
+  </section>
 
-<div class="suggestionTitle">🧠 Learn</div>
-<div class="suggestionText">Explore something new</div>
 
-</div>
+  <div class="inputContainer">
 
-</div>
-</div>
+   <div class="composer">
 
-</div>
-</section>
+    <div class="attachments" id="attachments"></div>
 
-<div class="inputContainer">
+    <div class="composerTop">
 
-<div class="composerWrap">
+     <button
+      class="toolButton"
+      id="attachButton"
+      title="Attach file">
+      📎
+     </button>
 
-<div class="toolMenu" id="toolMenu">
+     <input
+      id="fileInput"
+      type="file"
+      hidden
+      multiple
+      accept=".txt,.md,.csv,.json,.pdf,.jpg,.jpeg,.png,.webp,.gif">
 
-<button
-class="toolOption"
-onclick="chooseTool('image')">
-🖼️ Analyze image <small>Upload an image and ask BimalAI about it</small> </button>
+     <textarea
+      id="message"
+      rows="1"
+      placeholder="Message BimalAI..."></textarea>
 
-<button
-class="toolOption"
-onclick="chooseTool('document')">
-📄 Analyze document <small>Upload a PDF or document</small> </button>
+     <button
+      class="sendButton"
+      id="send">
+      ↑
+     </button>
 
-<button
-class="toolOption"
-onclick="chooseTool('generate')">
-🎨 Generate image <small>Create an image from your prompt</small> </button>
+     <button
+      class="stopButton"
+      id="stop">
+      ■
+     </button>
 
-<button
-class="toolOption"
-onclick="chooseTool('study')">
-📚 Study mode <small>Use BimalAI for focused studying</small> </button>
+    </div>
 
-</div>
+   </div>
 
-<div class="filePreview" id="filePreview"></div>
+   <div class="disclaimer">
+    BimalAI can make mistakes. Check important information.
+   </div>
 
-<div class="composer">
+  </div>
 
-<input
-type="file"
-id="fileInput"
-hidden
-multiple
-accept=".pdf,.doc,.docx,.txt,.csv,.jpg,.jpeg,.png,.webp">
-
-<button
-class="toolButton"
-id="attachButton"
-type="button"
-title="Attach files"
-onclick="openFilePicker()">
-📎 </button>
-
-<button
-class="toolButton"
-id="toolsButton"
-type="button"
-title="AI tools"
-onclick="toggleTools()">
-✦ </button>
-
-<textarea
- id="message"
- rows="1"
- placeholder="Message BimalAI..."></textarea>
-
-<button
-class="toolButton"
-id="voiceButton"
-type="button"
-title="Voice input"
-onclick="startVoiceInput()">
-🎤 </button>
-
-<button
-class="sendButton"
-id="send"
-onclick="sendMessage()">
-↑ </button>
-
-<button
-class="stopButton"
-id="stop"
-onclick="stopGeneration()">
-■ </button>
+ </main>
 
 </div>
 
-<div class="disclaimer">
- BimalAI can make mistakes. Check important information.
-</div>
+
+<!-- IMAGE EDITOR -->
+
+<div class="editorModal" id="editorModal">
+
+ <div class="editorBox">
+
+  <button class="editorClose" id="editorClose">
+   ✕
+  </button>
+
+  <h3>🖼️ Photo Editor</h3>
+
+  <div class="editorCanvasWrap">
+   <canvas id="editorCanvas"></canvas>
+  </div>
+
+  <div class="editorControls">
+
+   <button id="rotateLeft">↶ Rotate</button>
+   <button id="rotateRight">↷ Rotate</button>
+   <button id="flipX">↔ Flip</button>
+   <button id="flipY">↕ Flip</button>
+
+   <button id="downloadImage">
+    ⬇ Save image
+   </button>
+
+   <button id="analyzeImage">
+    🤖 Analyze with AI
+   </button>
+
+  </div>
+
+ </div>
 
 </div>
-</div>
 
-</main>
-</div>
 
 <script>
 
-let messages=[];
-let currentChatId=null;
-let currentController=null;
-let lastUserMessage=null;
-let selectedFiles=[];
-let uploadedFiles=[];
+"use strict";
+
+/* =========================================
+   STATE
+========================================= */
+
+let messages = [];
+let currentChatId = null;
+let currentController = null;
+let lastUserMessage = "";
+let attachments = [];
+
+let editorImage = null;
+let editorRotation = 0;
+let editorFlipX = 1;
+let editorFlipY = 1;
 
 
-/* ELEMENTS */
+/* =========================================
+   ELEMENTS
+========================================= */
 
-const input=document.getElementById("message");
-const send=document.getElementById("send");
-const stop=document.getElementById("stop");
-const chat=document.getElementById("chat");
-const chatInner=document.getElementById("chatInner");
-const history=document.getElementById("history");
-const modelSelector=document.getElementById("modelSelector");
-const fileInput=document.getElementById("fileInput");
-const filePreview=document.getElementById("filePreview");
-const attachButton=document.getElementById("attachButton");
-const toolMenu=document.getElementById("toolMenu");
+const loginScreen =
+ document.getElementById("loginScreen");
+
+const app =
+ document.getElementById("app");
+
+const loginForm =
+ document.getElementById("loginForm");
+
+const loginUsername =
+ document.getElementById("loginUsername");
+
+const loginPassword =
+ document.getElementById("loginPassword");
+
+const loginButton =
+ document.getElementById("loginButton");
+
+const loginError =
+ document.getElementById("loginError");
+
+const input =
+ document.getElementById("message");
+
+const send =
+ document.getElementById("send");
+
+const stop =
+ document.getElementById("stop");
+
+const chat =
+ document.getElementById("chat");
+
+const chatInner =
+ document.getElementById("chatInner");
+
+const history =
+ document.getElementById("history");
+
+const modelSelector =
+ document.getElementById("modelSelector");
+
+const fileInput =
+ document.getElementById("fileInput");
+
+const attachmentsBox =
+ document.getElementById("attachments");
+
+const editorModal =
+ document.getElementById("editorModal");
+
+const editorCanvas =
+ document.getElementById("editorCanvas");
+
+const editorContext =
+ editorCanvas.getContext("2d");
 
 
-/* ESCAPE */
+/* =========================================
+   ESCAPE
+========================================= */
 
 function escapeHtml(text){
 
@@ -1111,21 +1231,25 @@ function escapeHtml(text){
 }
 
 
-/* MARKDOWN */
+/* =========================================
+   MARKDOWN
+========================================= */
 
 function markdown(text){
 
- let codeBlocks=[];
+ let codeBlocks = [];
 
- text=text.replace(
+ text = String(text || "");
+
+ text = text.replace(
   /```([\w+-]*)\n?([\s\S]*?)```/g,
   function(_,lang,code){
 
-   const index=codeBlocks.length;
+   const index = codeBlocks.length;
 
    codeBlocks.push({
-    lang:lang || "code",
-    code:code.trim()
+    lang: lang || "code",
+    code: code.trim()
    });
 
    return `@@CODE${index}@@`;
@@ -1133,1464 +1257,1977 @@ function markdown(text){
   }
  );
 
- text=escapeHtml(text);
+ text = escapeHtml(text);
 
- text=text.replace(
+ text = text.replace(
   /`([^`]+)`/g,
   '<span class="inlineCode">$1</span>'
  );
 
- text=text.replace(/^### (.*)$/gm,"<h3>$1</h3>");
- text=text.replace(/^## (.*)$/gm,"<h2>$1</h2>");
- text=text.replace(/^# (.*)$/gm,"<h1>$1</h1>");
+ text = text.replace(
+  /^### (.*)$/gm,
+  "<h3>$1</h3>"
+ );
 
- text=text.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
- text=text.replace(/\*([^*\n]+)\*/g,"<em>$1</em>");
+ text = text.replace(
+  /^## (.*)$/gm,
+  "<h2>$1</h2>"
+ );
 
- text=text.replace(/^[-•] (.*)$/gm,"• $1");
+ text = text.replace(
+  /^# (.*)$/gm,
+  "<h1>$1</h1>"
+ );
 
- text=text.replace(/\n\n+/g,"</p><p>");
- text=text.replace(/\n/g,"<br>");
+ text = text.replace(
+  /\*\*(.*?)\*\*/g,
+  "<strong>$1</strong>"
+ );
 
- text="<p>"+text+"</p>";
+ text = text.replace(
+  /\*([^*\n]+)\*/g,
+  "<em>$1</em>"
+ );
 
- codeBlocks.forEach((block,index)=>{
+ text = text.replace(
+  /^[-•] (.*)$/gm,
+  "• $1"
+ );
 
-  const safe=escapeHtml(block.code);
+ text = text.replace(
+  /\n\n+/g,
+  "</p><p>"
+ );
 
-  const html=`
-   <div class="codeBlock">
-    <div class="codeHeader">
-     <span>${escapeHtml(block.lang)}</span>
-     <button
-      class="copyCode"
-      onclick="copyText(this)"
-      data-copy="${encodeURIComponent(block.code)}">
-      Copy
-     </button>
+ text = text.replace(
+  /\n/g,
+  "<br>"
+ );
+
+ text = "<p>"+text+"</p>";
+
+ codeBlocks.forEach(
+  (block,index)=>{
+
+   const safe =
+    escapeHtml(block.code);
+
+   const html = `
+    <div class="codeBlock">
+     <div class="codeHeader">
+      <span>${escapeHtml(block.lang)}</span>
+
+      <button
+       class="copyCode"
+       data-copy="${encodeURIComponent(block.code)}">
+       Copy
+      </button>
+     </div>
+
+     <pre><code>${safe}</code></pre>
     </div>
-    <pre><code>${safe}</code></pre>
+   `;
 
-   </div>
-  `;
+   text =
+    text.replace(
+     `@@CODE${index}@@`,
+     html
+    );
 
-text=text.replace(`@@CODE${index}@@`,html);
+  }
+ );
 
-});
-
-return text;
+ return text;
 
 }
 
-/* AUTH CHECK */
+
+/* =========================================
+   AUTH
+========================================= */
 
 async function checkAuth(){
 
-try{
+ try{
 
-const response=await fetch(
-"/api/auth",
-{credentials:"same-origin"}
-);
+  const response =
+   await fetch(
+    "/api/auth",
+    {
+     credentials:"same-origin"
+    }
+   );
 
-const data=await response.json();
+  const data =
+   await response.json();
 
-if(data.authenticated)
-showApp();
-else
-showLogin();
+  if(data.authenticated){
 
-}catch(error){
+   showApp();
 
-showLogin();
+  }else{
 
-}
+   showLogin();
 
-}
+  }
 
-/* SHOW LOGIN */
+ }catch(error){
 
-function showLogin(){
-
-document.getElementById("loginScreen")
-.classList.remove("hidden");
-
-document.getElementById("app")
-.classList.add("hidden");
-
-}
-
-/* SHOW APP */
-
-function showApp(){
-
-document.getElementById("loginScreen")
-.classList.add("hidden");
-
-document.getElementById("app")
-.classList.remove("hidden");
-
-loadModels();
-loadChats();
-
-input.focus();
-
-}
-
-/* LOGIN */
-
-async function login(){
-
-const username=
-document.getElementById("loginUsername")
-.value.trim();
-
-const password=
-document.getElementById("loginPassword")
-.value;
-
-const error=
-document.getElementById("loginError");
-
-const button=
-document.getElementById("loginButton");
-
-error.textContent="";
-
-if(!username || !password){
-
-error.textContent=
-"Please enter username and password.";
-
-return;
-
-}
-
-button.disabled=true;
-button.textContent="Logging in...";
-
-try{
-
-const response=
-await fetch(
-"/api/login",
-{
-method:"POST",
-credentials:"same-origin",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-username,
-password
-})
-}
-);
-
-const data=
-await response.json();
-
-if(!response.ok)
-throw new Error(
-data.error || "Login failed"
-);
-
-showApp();
-
-}catch(error){
-
-document.getElementById("loginError")
-.textContent=error.message;
-
-}finally{
-
-button.disabled=false;
-button.textContent="Login";
-
-}
-
-}
-
-/* LOGOUT */
-
-async function logout(){
-
-try{
-
-await fetch(
-"/api/logout",
-{
-method:"POST",
-credentials:"same-origin"
-}
-);
-
-}catch{}
-
-messages=[];
-currentChatId=null;
-selectedFiles=[];
-uploadedFiles=[];
-
-renderFilePreview();
-
-showLogin();
-
-}
-
-/* ADD MESSAGE */
-
-function addMessage(text,type,files=[]){
-
-const welcome=
-document.getElementById("welcome");
-
-if(welcome)
-welcome.remove();
-
-const message=
-document.createElement("div");
-
-message.className=
-"message "+type;
-
-const avatar=
-document.createElement("div");
-
-avatar.className=
-"avatar "+
-(type==="user"
-?"userAvatar"
-:"aiAvatar");
-
-avatar.textContent=
-type==="user"
-?"YOU"
-:"✦";
-
-const body=
-document.createElement("div");
-
-body.className="messageBody";
-
-const content=
-document.createElement("div");
-
-content.className="messageText";
-
-if(type==="assistant")
-content.innerHTML=markdown(text);
-else
-content.textContent=text;
-
-body.appendChild(content);
-
-if(files && files.length){
-
-const fileBox=
-document.createElement("div");
-
-fileBox.className="messageFiles";
-
-files.forEach(file=>{
-
-const chip=
-document.createElement("div");
-
-chip.className="messageFile";
-
-chip.textContent=
-"📎 "+file.name;
-
-fileBox.appendChild(chip);
-
-});
-
-body.appendChild(fileBox);
-
-}
-
-if(type==="assistant"){
-
-const actions=
-document.createElement("div");
-
-actions.className=
-"messageActions";
-
-actions.innerHTML=`
-
-<button
- class="actionButton"
- onclick="copyMessage(this)">
-Copy </button>
-
-<button
- class="actionButton"
- onclick="regenerate()">
-Regenerate </button>
-
-`;
-
-body.appendChild(actions);
-
-}
-
-message.appendChild(avatar);
-message.appendChild(body);
-
-chatInner.appendChild(message);
-
-chat.scrollTop=chat.scrollHeight;
-
-return content;
-
-}
-
-/* FILE PICKER */
-
-function openFilePicker(){
-
-fileInput.click();
-
-}
-
-/* FILE SELECT */
-
-fileInput.addEventListener(
-"change",
-function(){
-
-const files=
-Array.from(this.files || []);
-
-if(!files.length)
-return;
-
-selectedFiles.push(...files);
-
-renderFilePreview();
-
-this.value="";
-
-}
-);
-
-/* RENDER FILES */
-
-function renderFilePreview(){
-
-filePreview.innerHTML="";
-
-selectedFiles.forEach(
-(file,index)=>{
-
-const chip=
-document.createElement("div");
-
-chip.className="fileChip";
-
-if(file.type.startsWith("image/")){
-
-```
-const img=
- document.createElement("img");
-
-img.className="imageThumb";
-
-img.src=
- URL.createObjectURL(file);
-
-chip.appendChild(img);
-```
-
-}else{
-
-```
-const icon=
- document.createElement("span");
-
-icon.textContent=
- file.type==="application/pdf"
-  ?"📄"
-  :"📎";
-
-chip.appendChild(icon);
-```
-
-}
-
-const name=
-document.createElement("span");
-
-name.className="fileChipName";
-
-name.textContent=file.name;
-
-chip.appendChild(name);
-
-const remove=
-document.createElement("button");
-
-remove.type="button";
-
-remove.textContent="×";
-
-remove.onclick=
-()=>removeSelectedFile(index);
-
-chip.appendChild(remove);
-
-filePreview.appendChild(chip);
-
-}
-);
-
-attachButton.classList.toggle(
-"active",
-selectedFiles.length>0
-);
-
-}
-
-/* REMOVE FILE */
-
-function removeSelectedFile(index){
-
-selectedFiles.splice(index,1);
-
-renderFilePreview();
-
-}
-
-/* UPLOAD FILES */
-
-async function uploadSelectedFiles(){
-
-if(!selectedFiles.length)
-return [];
-
-const uploaded=[];
-
-for(
-const file
-of selectedFiles
-){
-
-const formData=
-new FormData();
-
-formData.append(
-"file",
-file
-);
-
-const response=
-await fetch(
-"/api/upload",
-{
-method:"POST",
-credentials:"same-origin",
-body:formData
-}
-);
-
-const data=
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error ||
-"File upload failed"
-);
-
-}
-
-uploaded.push({
-...data.file,
-originalFile:file
-});
-
-}
-
-return uploaded;
-
-}
-
-/* SEND */
-
-async function sendMessage(){
-
-const text=
-input.value.trim();
-
-if(
-(!text && !selectedFiles.length) ||
-send.disabled
-)
-return;
-
-lastUserMessage=
-text ||
-"Please analyze the attached file.";
-
-let currentFiles=
-[...selectedFiles];
-
-let uploaded=[];
-
-try{
-
-if(currentFiles.length){
-
-send.disabled=true;
-
-uploaded=
-await uploadSelectedFiles();
-
-}
-
-}catch(error){
-
-alert(
-error.message ||
-"Could not upload file."
-);
-
-send.disabled=false;
-
-return;
-
-}
-
-const displayText=
-text ||
-"Please analyze the attached file.";
-
-addMessage(
-displayText,
-"user",
-currentFiles
-);
-
-messages.push({
-role:"user",
-content:displayText
-});
-
-input.value="";
-input.style.height="auto";
-
-selectedFiles=[];
-renderFilePreview();
-
-send.disabled=true;
-send.style.display="none";
-stop.style.display="block";
-
-const answer=
-addMessage(
-"Thinking…",
-"assistant"
-);
-
-currentController=
-new AbortController();
-
-try{
-
-/*
-NOTE:
-Current backend accepts normal text.
-Uploaded files are stored temporarily.
-Vision/document integration will be
-connected in the next backend upgrade.
-*/
-
-const response=
-await fetch(
-"/api/chat",
-{
-method:"POST",
-credentials:"same-origin",
-headers:{
-"Content-Type":
-"application/json"
-},
-
-```
- body:JSON.stringify({
-  messages,
-  model:modelSelector.value,
-
-  attachments:
-   uploaded.map(
-    file=>({
-     name:file.name,
-     type:file.type,
-     data:file.data || null
-    })
-   )
-
- }),
-
- signal:
-  currentController.signal
-}
-```
-
-);
-
-if(!response.ok){
-
-let error="Request failed";
-
-try{
-
-```
-const data=
- await response.json();
-
-error=
- data.error ||
- error;
-```
-
-}catch{}
-
-throw new Error(error);
-
-}
-
-if(!response.body)
-throw new Error(
-"Streaming unavailable"
-);
-
-const reader=
-response.body.getReader();
-
-const decoder=
-new TextDecoder();
-
-let buffer="";
-let fullAnswer="";
-
-while(true){
-
-const {
-value,
-done
-}=
-await reader.read();
-
-if(done)
-break;
-
-buffer+=
-decoder.decode(
-value,
-{stream:true}
-);
-
-const lines=
-buffer.split("\n");
-
-buffer=
-lines.pop() || "";
-
-for(const line of lines){
-
-```
-const trimmed=
- line.trim();
-
-if(
- !trimmed ||
- !trimmed.startsWith("data:")
-)
- continue;
-
-const data=
- trimmed.slice(5).trim();
-
-if(data==="[DONE]")
- continue;
-
-try{
-
- const json=
-  JSON.parse(data);
-
- const token=
-  json
-   .choices?.[0]
-   ?.delta?.content;
-
- if(token){
-
-  fullAnswer+=token;
-
-  answer.innerHTML=
-   markdown(fullAnswer);
-
-  chat.scrollTop=
-   chat.scrollHeight;
+  console.error(error);
+  showLogin();
 
  }
 
-}catch{}
-```
+}
+
+
+function showLogin(){
+
+ loginScreen.classList.remove(
+  "hidden"
+ );
+
+ app.classList.add(
+  "hidden"
+ );
+
+ setTimeout(
+  ()=>loginUsername.focus(),
+  100
+ );
 
 }
 
+
+async function login(event){
+
+ if(event)
+  event.preventDefault();
+
+ const username =
+  loginUsername.value.trim();
+
+ const password =
+  loginPassword.value;
+
+ loginError.textContent = "";
+
+ if(!username || !password){
+
+  loginError.textContent =
+   "Please enter username and password.";
+
+  return;
+
+ }
+
+ loginButton.disabled = true;
+ loginButton.textContent =
+  "Logging in...";
+
+ try{
+
+  const response =
+   await fetch(
+    "/api/login",
+    {
+     method:"POST",
+     credentials:"same-origin",
+
+     headers:{
+      "Content-Type":
+       "application/json"
+     },
+
+     body:JSON.stringify({
+      username,
+      password
+     })
+    }
+   );
+
+  let data = {};
+
+  try{
+   data = await response.json();
+  }catch{}
+
+  if(!response.ok){
+
+   throw new Error(
+    data.error ||
+    "Login failed"
+   );
+
+  }
+
+  loginPassword.value = "";
+
+  showApp();
+
+ }catch(error){
+
+  loginError.textContent =
+   error.message ||
+   "Login failed.";
+
+ }finally{
+
+  loginButton.disabled = false;
+  loginButton.textContent =
+   "Login";
+
+ }
+
 }
 
-if(!fullAnswer){
 
-fullAnswer=
-"No response received.";
+function showApp(){
 
-answer.textContent=
-fullAnswer;
+ loginScreen.classList.add(
+  "hidden"
+ );
+
+ app.classList.remove(
+  "hidden"
+ );
+
+ loadModels();
+ loadChats();
+
+ input.focus();
 
 }
 
-messages.push({
-role:"assistant",
-content:fullAnswer
-});
 
-await saveChat();
-await loadChats();
+/* =========================================
+   LOGOUT
+========================================= */
 
-}catch(error){
+async function logout(){
 
-if(error.name==="AbortError"){
+ try{
 
-answer.innerHTML=
-markdown(
-"Generation stopped."
+  await fetch(
+   "/api/logout",
+   {
+    method:"POST",
+    credentials:"same-origin"
+   }
+  );
+
+ }catch{}
+
+ messages = [];
+ attachments = [];
+ currentChatId = null;
+
+ renderAttachments();
+
+ showLogin();
+
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+function addMessage(
+ text,
+ type,
+ files=[]
+){
+
+ const welcome =
+  document.getElementById("welcome");
+
+ if(welcome)
+  welcome.remove();
+
+ const message =
+  document.createElement("div");
+
+ message.className =
+  "message "+type;
+
+ const avatar =
+  document.createElement("div");
+
+ avatar.className =
+  "avatar "+
+  (
+   type === "user"
+    ? "userAvatar"
+    : "aiAvatar"
+  );
+
+ avatar.textContent =
+  type === "user"
+   ? "YOU"
+   : "✦";
+
+ const body =
+  document.createElement("div");
+
+ body.className =
+  "messageBody";
+
+ const content =
+  document.createElement("div");
+
+ content.className =
+  "messageText";
+
+ if(type === "assistant"){
+
+  content.innerHTML =
+   markdown(text);
+
+ }else{
+
+  content.textContent =
+   text;
+
+ }
+
+ body.appendChild(content);
+
+
+ if(files.length){
+
+  const preview =
+   document.createElement("div");
+
+  preview.className =
+   "attachmentPreview";
+
+  files.forEach(file=>{
+
+   if(
+    file.type &&
+    file.type.startsWith("image/")
+   ){
+
+    const img =
+     document.createElement("img");
+
+    img.className =
+     "attachmentThumb";
+
+    img.src =
+     file.data;
+
+    preview.appendChild(img);
+
+   }else{
+
+    const badge =
+     document.createElement("div");
+
+    badge.className =
+     "fileBadge";
+
+    badge.textContent =
+     "📎 "+file.name;
+
+    preview.appendChild(badge);
+
+   }
+
+  });
+
+  body.appendChild(preview);
+
+ }
+
+
+ if(type === "assistant"){
+
+  const actions =
+   document.createElement("div");
+
+  actions.className =
+   "messageActions";
+
+  actions.innerHTML = `
+
+   <button class="actionButton copyMessage">
+    Copy
+   </button>
+
+   <button class="actionButton regenerate">
+    Regenerate
+   </button>
+
+  `;
+
+  body.appendChild(actions);
+
+ }
+
+ message.appendChild(avatar);
+ message.appendChild(body);
+
+ chatInner.appendChild(message);
+
+ chat.scrollTop =
+  chat.scrollHeight;
+
+ return content;
+
+}
+
+
+/* =========================================
+   FILE HANDLING
+========================================= */
+
+document.getElementById(
+ "attachButton"
+).addEventListener(
+ "click",
+ ()=>{
+  fileInput.click();
+ }
 );
 
-}else{
 
-answer.textContent=
-"❌ "+error.message;
+fileInput.addEventListener(
+ "change",
+ async ()=>{
+  const files =
+   Array.from(fileInput.files || []);
 
-}
+  for(const file of files){
 
-}finally{
+   await addAttachment(file);
 
-currentController=null;
+  }
 
-send.disabled=false;
-send.style.display="block";
-stop.style.display="none";
+  fileInput.value = "";
 
-input.focus();
-
-}
-
-}
-
-/* STOP */
-
-function stopGeneration(){
-
-if(currentController){
-
-currentController.abort();
-currentController=null;
-
-}
-
-}
-
-/* COPY */
-
-async function copyMessage(button){
-
-const message=
-button
-.closest(".message")
-.querySelector(".messageText");
-
-try{
-
-await navigator.clipboard.writeText(
-message.innerText
+ }
 );
 
-const old=button.textContent;
 
-button.textContent="Copied!";
+async function addAttachment(file){
 
-setTimeout(
-()=>button.textContent=old,
-1200
-);
+ if(file.size > 15 * 1024 * 1024){
 
-}catch{}
+  alert(
+   `${file.name} is larger than 15 MB.`
+  );
+
+  return;
+
+ }
+
+ try{
+
+  const data =
+   await readFile(file);
+
+  attachments.push({
+   id:
+    Date.now()+"-"+Math.random(),
+
+   name:file.name,
+
+   type:file.type ||
+    "application/octet-stream",
+
+   size:file.size,
+
+   data:data,
+
+   text:null
+  });
+
+  if(
+   file.type.startsWith("text/") ||
+   /\.(txt|md|csv|json)$/i.test(file.name)
+  ){
+
+   attachments[
+    attachments.length-1
+   ].text =
+    await file.text();
+
+  }
+
+  renderAttachments();
+
+ }catch(error){
+
+  console.error(error);
+
+  alert(
+   "Could not read "+file.name
+  );
+
+ }
 
 }
 
-async function copyText(button){
 
-const text=
-decodeURIComponent(
-button.dataset.copy
-);
+function readFile(file){
 
-try{
+ return new Promise(
+  (resolve,reject)=>{
 
-await navigator.clipboard.writeText(text);
+   const reader =
+    new FileReader();
 
-const old=button.textContent;
+   reader.onload =
+    ()=>resolve(
+     reader.result
+    );
 
-button.textContent="Copied!";
+   reader.onerror =
+    ()=>reject(
+     reader.error
+    );
 
-setTimeout(
-()=>button.textContent=old,
-1200
-);
+   reader.readAsDataURL(file);
 
-}catch{}
+  }
+ );
 
 }
 
-/* REGENERATE */
+
+function renderAttachments(){
+
+ attachmentsBox.innerHTML = "";
+
+ attachments.forEach(
+  (file,index)=>{
+
+   const chip =
+    document.createElement("div");
+
+   chip.className =
+    "attachmentChip";
+
+   let icon = "📎";
+
+   if(
+    file.type.startsWith("image/")
+   )
+    icon = "🖼️";
+
+   else if(
+    file.name.toLowerCase().endsWith(".pdf")
+   )
+    icon = "📄";
+
+   chip.innerHTML = `
+    <span>${icon} ${escapeHtml(file.name)}</span>
+
+    <button
+     class="removeAttachment"
+     data-index="${index}">
+     ×
+    </button>
+   `;
+
+   attachmentsBox.appendChild(chip);
+
+  }
+ );
+
+}
+
+
+/* =========================================
+   SEND
+========================================= */
+
+async function sendMessage(){
+
+ const text =
+  input.value.trim();
+
+ if(
+  (!text && !attachments.length) ||
+  send.disabled
+ )
+  return;
+
+ lastUserMessage =
+  text ||
+  "Please analyze the attached file.";
+
+ const currentAttachments =
+  attachments.map(
+   file=>({...file})
+  );
+
+ addMessage(
+  text ||
+  "Please analyze the attached file.",
+  "user",
+  currentAttachments
+ );
+
+
+ /*
+  Build OpenRouter message.
+
+  Text files are added as text.
+  Images are sent as multimodal image_url.
+ */
+
+ let userContent = [];
+
+ if(text){
+
+  userContent.push({
+   type:"text",
+   text:text
+  });
+
+ }else{
+
+  userContent.push({
+   type:"text",
+   text:
+    "Please analyze the attached file(s) and help me."
+  });
+
+ }
+
+
+ for(
+  const file of currentAttachments
+ ){
+
+  if(
+   file.type.startsWith("image/")
+  ){
+
+   userContent.push({
+
+    type:"image_url",
+
+    image_url:{
+     url:file.data
+    }
+
+   });
+
+  }else if(file.text){
+
+   userContent.push({
+
+    type:"text",
+
+    text:
+     `\n\n--- FILE: ${file.name} ---\n`+
+     file.text+
+     "\n--- END FILE ---\n"
+
+   });
+
+  }else{
+
+   userContent.push({
+
+    type:"text",
+
+    text:
+     `\n\nI attached a file named "${file.name}". `+
+     `Please tell me if you need its contents in a readable format.`
+
+   });
+
+  }
+
+ }
+
+
+ messages.push({
+  role:"user",
+  content:
+   userContent.length === 1 &&
+   userContent[0].type === "text"
+    ? userContent[0].text
+    : userContent
+ });
+
+
+ attachments = [];
+ renderAttachments();
+
+ input.value = "";
+ input.style.height = "auto";
+
+ send.disabled = true;
+ send.style.display = "none";
+ stop.style.display = "block";
+
+ const answer =
+  addMessage(
+   "Thinking…",
+   "assistant"
+  );
+
+ currentController =
+  new AbortController();
+
+ try{
+
+  const response =
+   await fetch(
+    "/api/chat",
+    {
+     method:"POST",
+     credentials:"same-origin",
+
+     headers:{
+      "Content-Type":
+       "application/json"
+     },
+
+     body:JSON.stringify({
+
+      messages,
+
+      model:
+       modelSelector.value
+
+     }),
+
+     signal:
+      currentController.signal
+    }
+   );
+
+
+  if(!response.ok){
+
+   let error =
+    "Request failed";
+
+   try{
+
+    const data =
+     await response.json();
+
+    error =
+     data.error ||
+     error;
+
+   }catch{}
+
+   throw new Error(error);
+
+  }
+
+
+  if(!response.body)
+   throw new Error(
+    "Streaming unavailable"
+   );
+
+
+  const reader =
+   response.body.getReader();
+
+  const decoder =
+   new TextDecoder();
+
+  let buffer = "";
+  let fullAnswer = "";
+
+
+  while(true){
+
+   const {
+    value,
+    done
+   } =
+    await reader.read();
+
+   if(done)
+    break;
+
+
+   buffer +=
+    decoder.decode(
+     value,
+     {stream:true}
+    );
+
+
+   const lines =
+    buffer.split("\n");
+
+   buffer =
+    lines.pop() || "";
+
+
+   for(
+    const line of lines
+   ){
+
+    const trimmed =
+     line.trim();
+
+    if(
+     !trimmed ||
+     !trimmed.startsWith("data:")
+    )
+     continue;
+
+
+    const data =
+     trimmed
+      .slice(5)
+      .trim();
+
+
+    if(data === "[DONE]")
+     continue;
+
+
+    try{
+
+     const json =
+      JSON.parse(data);
+
+     const token =
+      json
+       .choices?.[0]
+       ?.delta?.content;
+
+     if(token){
+
+      fullAnswer +=
+       token;
+
+      answer.innerHTML =
+       markdown(fullAnswer);
+
+      chat.scrollTop =
+       chat.scrollHeight;
+
+     }
+
+    }catch{}
+
+   }
+
+  }
+
+
+  if(!fullAnswer){
+
+   fullAnswer =
+    "No response received.";
+
+   answer.textContent =
+    fullAnswer;
+
+  }
+
+
+  messages.push({
+   role:"assistant",
+   content:fullAnswer
+  });
+
+
+  await saveChat();
+  await loadChats();
+
+
+ }catch(error){
+
+  if(
+   error.name ===
+   "AbortError"
+  ){
+
+   answer.innerHTML =
+    markdown(
+     "Generation stopped."
+    );
+
+  }else{
+
+   answer.textContent =
+    "❌ "+error.message;
+
+  }
+
+
+ }finally{
+
+  currentController = null;
+
+  send.disabled = false;
+  send.style.display = "block";
+  stop.style.display = "none";
+
+  input.focus();
+
+ }
+
+}
+
+
+/* =========================================
+   STOP
+========================================= */
+
+stop.addEventListener(
+ "click",
+ ()=>{
+
+  if(currentController){
+
+   currentController.abort();
+
+   currentController = null;
+
+  }
+
+ }
+);
+
+
+/* =========================================
+   COPY / REGENERATE
+========================================= */
+
+document.addEventListener(
+ "click",
+ async event=>{
+
+  const copy =
+   event.target.closest(
+    ".copyMessage"
+   );
+
+  if(copy){
+
+   const message =
+    copy
+     .closest(".message")
+     .querySelector(".messageText");
+
+   await navigator.clipboard.writeText(
+    message.innerText
+   );
+
+   const old =
+    copy.textContent;
+
+   copy.textContent =
+    "Copied!";
+
+   setTimeout(
+    ()=>copy.textContent=old,
+    1200
+   );
+
+   return;
+
+  }
+
+
+  const codeCopy =
+   event.target.closest(
+    ".copyCode"
+   );
+
+  if(codeCopy){
+
+   const text =
+    decodeURIComponent(
+     codeCopy.dataset.copy
+    );
+
+   await navigator.clipboard.writeText(
+    text
+   );
+
+   codeCopy.textContent =
+    "Copied!";
+
+   setTimeout(
+    ()=>codeCopy.textContent="Copy",
+    1200
+   );
+
+   return;
+
+  }
+
+
+  const regenerateButton =
+   event.target.closest(
+    ".regenerate"
+   );
+
+  if(regenerateButton){
+
+   regenerate();
+
+   return;
+
+  }
+
+
+  const remove =
+   event.target.closest(
+    ".removeAttachment"
+   );
+
+  if(remove){
+
+   const index =
+    Number(remove.dataset.index);
+
+   attachments.splice(
+    index,
+    1
+   );
+
+   renderAttachments();
+
+  }
+
+ }
+);
+
+
+/* =========================================
+   REGENERATE
+========================================= */
 
 async function regenerate(){
 
-if(!lastUserMessage)
-return;
+ if(!lastUserMessage)
+  return;
 
-if(
-messages.length &&
-messages[messages.length-1].role==="assistant"
-){
+ if(
+  messages.length &&
+  messages[messages.length-1].role ===
+   "assistant"
+ ){
 
-messages.pop();
+  messages.pop();
+
+ }
+
+
+ const assistantMessages =
+  document.querySelectorAll(
+   ".message.assistant"
+  );
+
+
+ if(assistantMessages.length){
+
+  assistantMessages[
+   assistantMessages.length-1
+  ].remove();
+
+ }
+
+
+ input.value =
+  lastUserMessage;
+
+ await sendMessage();
 
 }
 
-const assistantMessages=
-document.querySelectorAll(
-".message.assistant"
-);
 
-if(assistantMessages.length){
-
-assistantMessages[
-assistantMessages.length-1
-].remove();
-
-}
-
-input.value=lastUserMessage;
-
-await sendMessage();
-
-}
-
-/* SAVE CHAT */
+/* =========================================
+   CHAT STORAGE
+========================================= */
 
 async function saveChat(){
 
-if(!messages.length)
-return;
+ if(!messages.length)
+  return;
 
-if(!currentChatId){
+ if(!currentChatId){
 
-currentChatId=
-Date.now().toString();
+  currentChatId =
+   Date.now().toString();
+
+ }
+
+
+ const first =
+  messages.find(
+   m=>m.role === "user"
+  );
+
+
+ const title =
+  first
+   ? (
+      typeof first.content === "string"
+       ? first.content
+       : "Image / file conversation"
+     ).slice(0,55)
+   : "New conversation";
+
+
+ const chatData = {
+
+  id:
+   currentChatId,
+
+  title,
+
+  messages,
+
+  updatedAt:
+   new Date().toISOString()
+
+ };
+
+
+ try{
+
+  await fetch(
+   "/api/chats",
+   {
+    method:"POST",
+    credentials:"same-origin",
+
+    headers:{
+     "Content-Type":
+      "application/json"
+    },
+
+    body:
+     JSON.stringify({
+      chat:chatData
+     })
+   }
+  );
+
+ }catch(error){
+
+  console.error(
+   "Save failed",
+   error
+  );
+
+ }
 
 }
 
-const first=
-messages.find(
-m=>m.role==="user"
-);
-
-const chatData={
-
-id:currentChatId,
-
-title:
-first
-? first.content.slice(0,55)
-: "New conversation",
-
-messages,
-
-updatedAt:
-new Date().toISOString()
-
-};
-
-try{
-
-await fetch(
-"/api/chats",
-{
-method:"POST",
-credentials:"same-origin",
-
-```
-headers:{
- "Content-Type":
-  "application/json"
-},
-
-body:JSON.stringify({
- chat:chatData
-})
-```
-
-}
-);
-
-}catch(error){
-
-console.log(
-"Save failed",
-error
-);
-
-}
-
-}
-
-/* LOAD CHATS */
 
 async function loadChats(){
 
-try{
+ try{
 
-const response=
-await fetch(
-"/api/chats",
-{
-credentials:"same-origin"
+  const response =
+   await fetch(
+    "/api/chats",
+    {
+     credentials:"same-origin"
+    }
+   );
+
+
+  if(
+   response.status === 401
+  ){
+
+   showLogin();
+   return;
+
+  }
+
+
+  if(!response.ok)
+   return;
+
+
+  const chats =
+   await response.json();
+
+  history.innerHTML = "";
+
+
+  chats.forEach(
+   saved=>{
+
+    const item =
+     document.createElement("div");
+
+    item.className =
+     "historyItem";
+
+
+    const text =
+     document.createElement("div");
+
+    text.className =
+     "historyText";
+
+    text.textContent =
+     saved.title ||
+     "Conversation";
+
+
+    text.onclick =
+     ()=>loadChat(saved);
+
+
+    const del =
+     document.createElement("button");
+
+    del.className =
+     "deleteChat";
+
+    del.textContent =
+     "×";
+
+
+    del.onclick =
+     event=>{
+
+      event.stopPropagation();
+
+      deleteChat(
+       saved.id
+      );
+
+     };
+
+
+    item.appendChild(text);
+    item.appendChild(del);
+
+    history.appendChild(item);
+
+   }
+  );
+
+
+ }catch(error){
+
+  console.error(
+   "History unavailable",
+   error
+  );
+
+ }
+
 }
-);
 
-if(response.status===401){
-
-showLogin();
-return;
-
-}
-
-if(!response.ok)
-return;
-
-const chats=
-await response.json();
-
-history.innerHTML="";
-
-chats.forEach(saved=>{
-
-const item=
-document.createElement("div");
-
-item.className=
-"historyItem";
-
-const text=
-document.createElement("div");
-
-text.className=
-"historyText";
-
-text.textContent=
-saved.title;
-
-text.onclick=
-()=>loadChat(saved);
-
-const del=
-document.createElement("button");
-
-del.className=
-"deleteChat";
-
-del.textContent="×";
-
-del.onclick=
-event=>{
-
-```
- event.stopPropagation();
-
- deleteChat(saved.id);
-
-};
-```
-
-item.appendChild(text);
-item.appendChild(del);
-
-history.appendChild(item);
-
-});
-
-}catch(error){
-
-console.log(
-"History unavailable"
-);
-
-}
-
-}
-
-/* LOAD CHAT */
 
 function loadChat(saved){
 
-currentChatId=saved.id;
+ currentChatId =
+  saved.id;
 
-messages=[...saved.messages];
+ messages =
+  Array.isArray(saved.messages)
+   ? [...saved.messages]
+   : [];
 
-lastUserMessage="";
+ lastUserMessage = "";
 
-for(
-let i=messages.length-1;
-i>=0;
-i--
-){
 
-if(messages[i].role==="user"){
+ for(
+  let i=messages.length-1;
+  i>=0;
+  i--
+ ){
 
-lastUserMessage=
-messages[i].content;
+  if(
+   messages[i].role ===
+   "user"
+  ){
 
-break;
+   lastUserMessage =
+    typeof messages[i].content ===
+    "string"
+     ? messages[i].content
+     : "";
+
+   break;
+
+  }
+
+ }
+
+
+ chatInner.innerHTML = "";
+
+
+ messages.forEach(
+  message=>{
+
+   let text = "";
+
+   if(
+    typeof message.content ===
+    "string"
+   ){
+
+    text =
+     message.content;
+
+   }else{
+
+    const textPart =
+     message.content?.find?.(
+      x=>x.type==="text"
+     );
+
+    text =
+     textPart?.text ||
+     "Attached content";
+
+   }
+
+
+   addMessage(
+    text,
+    message.role === "user"
+     ? "user"
+     : "assistant"
+   );
+
+  }
+ );
+
+
+ chat.scrollTop =
+  chat.scrollHeight;
 
 }
 
-}
-
-chatInner.innerHTML="";
-
-messages.forEach(message=>{
-
-addMessage(
-message.content,
-message.role==="user"
-?"user"
-:"assistant"
-);
-
-});
-
-}
-
-/* DELETE CHAT */
 
 async function deleteChat(id){
 
-try{
+ try{
 
-const response=
-await fetch(
-"/api/chats/"+id,
-{
-method:"DELETE",
-credentials:"same-origin"
+  const response =
+   await fetch(
+    "/api/chats/"+encodeURIComponent(id),
+    {
+     method:"DELETE",
+     credentials:"same-origin"
+    }
+   );
+
+
+  if(
+   response.status === 401
+  ){
+
+   showLogin();
+   return;
+
+  }
+
+
+  if(
+   currentChatId === id
+  ){
+
+   newChat();
+
+  }
+
+
+  await loadChats();
+
+
+ }catch(error){
+
+  console.error(
+   "Delete failed",
+   error
+  );
+
+ }
+
 }
+
+
+/* =========================================
+   NEW CHAT
+========================================= */
+
+document.getElementById(
+ "newChat"
+).addEventListener(
+ "click",
+ newChat
 );
 
-if(response.status===401){
-
-showLogin();
-return;
-
-}
-
-if(currentChatId===id)
-newChat();
-
-await loadChats();
-
-}catch(error){
-
-console.log(
-"Delete failed",
-error
-);
-
-}
-
-}
-
-/* NEW CHAT */
 
 function newChat(){
 
-messages=[];
-currentChatId=null;
-lastUserMessage=null;
-selectedFiles=[];
-uploadedFiles=[];
+ messages = [];
+ attachments = [];
 
-renderFilePreview();
+ currentChatId = null;
+ lastUserMessage = "";
 
-chatInner.innerHTML=`
+ renderAttachments();
 
- <div class="welcome" id="welcome">
+ chatInner.innerHTML = `
 
-  <div class="welcomeIcon">✦</div>
+  <div class="welcome" id="welcome">
 
-  <h1>
-   Hello, <span>Bimal.</span>
-  </h1>
+   <div class="welcomeIcon">✦</div>
 
-  <p>
-   What would you like to work on today?
-  </p>
+   <h1>
+    Hello, <span>Bimal.</span>
+   </h1>
 
-  <div class="loveWelcome">
-   Bimal ❤️ Simran
+   <p>
+    What would you like to work on today?
+   </p>
+
+   <div class="loveWelcome">
+    Bimal ❤️ Simran
+   </div>
+
+   <div class="suggestions">
+
+    <div
+     class="suggestion"
+     data-suggestion="Explain thermodynamics in simple terms">
+
+     <div class="suggestionTitle">
+      📚 Study
+     </div>
+
+     <div class="suggestionText">
+      Understand a difficult topic
+     </div>
+
+    </div>
+
+
+    <div
+     class="suggestion"
+     data-suggestion="Create a productive study plan for me">
+
+     <div class="suggestionTitle">
+      🎯 Planning
+     </div>
+
+     <div class="suggestionText">
+      Build a better study routine
+     </div>
+
+    </div>
+
+
+    <div
+     class="suggestion"
+     data-suggestion="Help me write a professional email">
+
+     <div class="suggestionTitle">
+      ✍️ Writing
+     </div>
+
+     <div class="suggestionText">
+      Write or improve something
+     </div>
+
+    </div>
+
+
+    <div
+     class="suggestion"
+     data-suggestion="Explain artificial intelligence in simple language">
+
+     <div class="suggestionTitle">
+      🧠 Learn
+     </div>
+
+     <div class="suggestionText">
+      Explore something new
+     </div>
+
+    </div>
+
+   </div>
+
   </div>
 
-  <div class="suggestions">
+ `;
 
-   <div
-    class="suggestion"
-    onclick="useSuggestion('Explain thermodynamics in simple terms')">
-
-```
-<div class="suggestionTitle">📚 Study</div>
-
-<div class="suggestionText">
- Understand a difficult topic
-</div>
-```
-
-   </div>
-
-   <div
-    class="suggestion"
-    onclick="useSuggestion('Create a productive study plan for me')">
-
-```
-<div class="suggestionTitle">🎯 Planning</div>
-
-<div class="suggestionText">
- Build a better study routine
-</div>
-```
-
-   </div>
-
-   <div
-    class="suggestion"
-    onclick="useSuggestion('Help me write a professional email')">
-
-```
-<div class="suggestionTitle">✍️ Writing</div>
-
-<div class="suggestionText">
- Write or improve something
-</div>
-```
-
-   </div>
-
-   <div
-    class="suggestion"
-    onclick="useSuggestion('Explain artificial intelligence in simple language')">
-
-```
-<div class="suggestionTitle">🧠 Learn</div>
-
-<div class="suggestionText">
- Explore something new
-</div>
-```
-
-   </div>
-
-  </div>
-
- </div>
-
-`;
-
-input.focus();
+ input.focus();
 
 }
 
-/* SUGGESTION */
 
-function useSuggestion(text){
+/* =========================================
+   SUGGESTIONS
+========================================= */
 
-input.value=text;
+document.addEventListener(
+ "click",
+ event=>{
 
-input.focus();
+  const suggestion =
+   event.target.closest(
+    ".suggestion"
+   );
 
-}
+  if(!suggestion)
+   return;
 
-/* TOOLS */
+  input.value =
+   suggestion.dataset.suggestion;
 
-function toggleTools(){
+  input.focus();
 
-toolMenu.classList.toggle(
-"show"
+ }
 );
 
-}
 
-function chooseTool(tool){
+/* =========================================
+   THEME
+========================================= */
 
-toolMenu.classList.remove(
-"show"
-);
-
-if(tool==="image"){
-
-fileInput.accept=
-".jpg,.jpeg,.png,.webp";
-
-fileInput.click();
-
-input.placeholder=
-"Ask BimalAI about this image...";
-
-}
-
-if(tool==="document"){
-
-fileInput.accept=
-".pdf,.doc,.docx,.txt,.csv";
-
-fileInput.click();
-
-input.placeholder=
-"Ask BimalAI about this document...";
-
-}
-
-if(tool==="generate"){
-
-input.value=
-"Generate an image of ";
-
-input.focus();
-
-}
-
-if(tool==="study"){
-
-input.value=
-"Study mode: ";
-
-input.focus();
-
-}
-
-}
-
-/* THEME */
-
-function toggleTheme(){
-
-document.body.classList.toggle("dark");
-
-}
-
-/* VOICE */
-
-function startVoiceInput(){
-
-const SpeechRecognition=
-window.SpeechRecognition ||
-window.webkitSpeechRecognition;
-
-if(!SpeechRecognition){
-
-alert(
-"Voice input is not supported by this browser."
-);
-
-return;
-
-}
-
-const recognition=
-new SpeechRecognition();
-
-recognition.lang="en-US";
-recognition.interimResults=false;
-recognition.maxAlternatives=1;
-
-const button=
 document.getElementById(
-"voiceButton"
+ "themeButton"
+).addEventListener(
+ "click",
+ ()=>{
+
+  document.body.classList.toggle(
+   "dark"
+  );
+
+  localStorage.setItem(
+   "bimalai-theme",
+   document.body.classList.contains("dark")
+    ? "dark"
+    : "light"
+  );
+
+ }
 );
 
-button.classList.add("active");
-
-recognition.onresult=
-event=>{
-
-const transcript=
-event.results[0][0].transcript;
-
-input.value=
-input.value
-? input.value+" "+transcript
-: transcript;
-
-input.dispatchEvent(
-new Event("input")
-);
-
-};
-
-recognition.onerror=
-()=>{
-
-button.classList.remove("active");
-
-};
-
-recognition.onend=
-()=>{
-
-button.classList.remove("active");
-
-};
-
-recognition.start();
-
-}
-
-/* ENTER */
-
-input.addEventListener(
-"keydown",
-event=>{
 
 if(
-event.key==="Enter" &&
-!event.shiftKey
+ localStorage.getItem(
+  "bimalai-theme"
+ ) === "dark"
 ){
 
-event.preventDefault();
-
-sendMessage();
-
-}
+ document.body.classList.add(
+  "dark"
+ );
 
 }
-);
 
-/* AUTO RESIZE */
+
+/* =========================================
+   INPUT
+========================================= */
 
 input.addEventListener(
-"input",
-function(){
+ "keydown",
+ event=>{
 
-this.style.height="auto";
+  if(
+   event.key === "Enter" &&
+   !event.shiftKey
+  ){
 
-this.style.height=
-Math.min(
-this.scrollHeight,
-150
-)+"px";
+   event.preventDefault();
 
-}
+   sendMessage();
+
+  }
+
+ }
 );
 
-/* MODELS */
+
+input.addEventListener(
+ "input",
+ function(){
+
+  this.style.height =
+   "auto";
+
+  this.style.height =
+   Math.min(
+    this.scrollHeight,
+    150
+   )+"px";
+
+ }
+);
+
+
+send.addEventListener(
+ "click",
+ sendMessage
+);
+
+
+/* =========================================
+   MODELS
+========================================= */
 
 async function loadModels(){
 
-try{
+ try{
 
-const response=
-await fetch(
-"/api/models",
-{
-credentials:"same-origin"
+  const response =
+   await fetch(
+    "/api/models",
+    {
+     credentials:"same-origin"
+    }
+   );
+
+
+  if(
+   response.status === 401
+  ){
+
+   showLogin();
+   return;
+
+  }
+
+
+  if(!response.ok)
+   return;
+
+
+  const models =
+   await response.json();
+
+
+  models.forEach(
+   model=>{
+
+    if(
+     [...modelSelector.options]
+      .some(
+       option =>
+        option.value ===
+        model.id
+      )
+    )
+     return;
+
+
+    const option =
+     document.createElement(
+      "option"
+     );
+
+    option.value =
+     model.id;
+
+    option.textContent =
+     model.name;
+
+    modelSelector.appendChild(
+     option
+    );
+
+   }
+  );
+
+
+ }catch(error){
+
+  console.error(
+   "Models unavailable",
+   error
+  );
+
+ }
+
 }
+
+
+/* =========================================
+   IMAGE EDITOR
+========================================= */
+
+function openEditor(dataUrl){
+
+ editorImage =
+  new Image();
+
+ editorImage.onload =
+  ()=>{
+
+   editorRotation = 0;
+   editorFlipX = 1;
+   editorFlipY = 1;
+
+   drawEditor();
+
+   editorModal.classList.add(
+    "open"
+   );
+
+  };
+
+ editorImage.src =
+  dataUrl;
+
+}
+
+
+function drawEditor(){
+
+ if(!editorImage)
+  return;
+
+
+ const angle =
+  editorRotation *
+  Math.PI / 180;
+
+ const swap =
+  Math.abs(editorRotation) % 180 === 90;
+
+
+ editorCanvas.width =
+  swap
+   ? editorImage.height
+   : editorImage.width;
+
+ editorCanvas.height =
+  swap
+   ? editorImage.width
+   : editorImage.height;
+
+
+ editorContext.save();
+
+ editorContext.translate(
+  editorCanvas.width/2,
+  editorCanvas.height/2
+ );
+
+ editorContext.rotate(angle);
+
+ editorContext.scale(
+  editorFlipX,
+  editorFlipY
+ );
+
+ editorContext.drawImage(
+  editorImage,
+  -editorImage.width/2,
+  -editorImage.height/2
+ );
+
+ editorContext.restore();
+
+}
+
+
+document.getElementById(
+ "editorClose"
+).addEventListener(
+ "click",
+ ()=>{
+  editorModal.classList.remove(
+   "open"
+  );
+ }
 );
 
-if(response.status===401){
 
-showLogin();
-return;
+document.getElementById(
+ "rotateLeft"
+).addEventListener(
+ "click",
+ ()=>{
+  editorRotation =
+   (editorRotation-90+360)%360;
 
-}
-
-if(!response.ok)
-return;
-
-const models=
-await response.json();
-
-models.forEach(model=>{
-
-if(
-[...modelSelector.options]
-.some(
-option=>
-option.value===model.id
-)
-)
-return;
-
-const option=
-document.createElement("option");
-
-option.value=model.id;
-
-option.textContent=
-model.name;
-
-modelSelector.appendChild(
-option
+  drawEditor();
+ }
 );
 
-});
 
-}catch(error){
+document.getElementById(
+ "rotateRight"
+).addEventListener(
+ "click",
+ ()=>{
+  editorRotation =
+   (editorRotation+90)%360;
 
-console.log(
-"Models unavailable"
+  drawEditor();
+ }
 );
 
-}
 
-}
-
-/* CLOSE TOOL MENU */
-
-document.addEventListener(
-"click",
-function(event){
-
-if(
-!toolMenu.contains(event.target) &&
-event.target!==document.getElementById("toolsButton")
-){
-
-toolMenu.classList.remove(
-"show"
+document.getElementById(
+ "flipX"
+).addEventListener(
+ "click",
+ ()=>{
+  editorFlipX *= -1;
+  drawEditor();
+ }
 );
 
-}
 
-}
+document.getElementById(
+ "flipY"
+).addEventListener(
+ "click",
+ ()=>{
+  editorFlipY *= -1;
+  drawEditor();
+ }
 );
 
-/* START */
+
+document.getElementById(
+ "downloadImage"
+).addEventListener(
+ "click",
+ ()=>{
+
+  const link =
+   document.createElement("a");
+
+  link.download =
+   "bimalai-edited-image.png";
+
+  link.href =
+   editorCanvas.toDataURL(
+    "image/png"
+   );
+
+  link.click();
+
+ }
+);
+
+
+document.getElementById(
+ "analyzeImage"
+).addEventListener(
+ "click",
+ ()=>{
+
+  if(!editorCanvas.width)
+   return;
+
+  const data =
+   editorCanvas.toDataURL(
+    "image/jpeg",
+    .85
+   );
+
+  attachments.push({
+
+   id:
+    Date.now()+"-"+Math.random(),
+
+   name:
+    "edited-image.jpg",
+
+   type:
+    "image/jpeg",
+
+   size:
+    data.length,
+
+   data,
+
+   text:null
+
+  });
+
+  renderAttachments();
+
+  editorModal.classList.remove(
+   "open"
+  );
+
+  input.value =
+   "Analyze this edited image in detail.";
+
+  input.focus();
+
+ }
+);
+
+
+/* =========================================
+   OPEN IMAGE EDITOR FROM ATTACHMENTS
+========================================= */
+
+attachmentsBox.addEventListener(
+ "dblclick",
+ event=>{
+
+  const chip =
+   event.target.closest(
+    ".attachmentChip"
+   );
+
+  if(!chip)
+   return;
+
+  const index =
+   Number(
+    chip.querySelector(
+     ".removeAttachment"
+    )?.dataset.index
+   );
+
+  const file =
+   attachments[index];
+
+  if(
+   file &&
+   file.type.startsWith("image/")
+  ){
+
+   openEditor(
+    file.data
+   );
+
+  }
+
+ }
+);
+
+
+/* =========================================
+   LOGIN FORM
+========================================= */
+
+loginForm.addEventListener(
+ "submit",
+ login
+);
+
+
+/* =========================================
+   START
+========================================= */
 
 checkAuth();
 
