@@ -1,5 +1,4 @@
-````javascript
-const state = {
+﻿const state = {
     chats: [],
     currentChatId: null,
     messages: [],
@@ -54,8 +53,7 @@ function simpleMarkdown(text) {
 
     html = html.replace(
         /```([\s\S]*?)```/g,
-        (_, code) =>
-            `<pre><code>${code.trim()}</code></pre>`
+        (_, code) => `<pre><code>${code.trim()}</code></pre>`
     );
 
     html = html.replace(
@@ -88,10 +86,7 @@ function simpleMarkdown(text) {
         "<h1>$1</h1>"
     );
 
-    html = html.replace(
-        /\n/g,
-        "<br>"
-    );
+    html = html.replace(/\n/g, "<br>");
 
     return html;
 }
@@ -99,15 +94,12 @@ function simpleMarkdown(text) {
 function createId() {
     return String(
         Date.now() +
-        Math.random()
-            .toString(36)
-            .slice(2)
+        Math.random().toString(36).slice(2)
     );
 }
 
 function scrollToBottom() {
-    messagesEl.scrollTop =
-        messagesEl.scrollHeight;
+    messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
 /* =========================================
@@ -116,11 +108,8 @@ function scrollToBottom() {
 
 async function checkAuth() {
     try {
-        const response =
-            await fetch("/api/auth");
-
-        const data =
-            await response.json();
+        const response = await fetch("/api/auth");
+        const data = await response.json();
 
         if (data.authenticated) {
             await showApp();
@@ -133,23 +122,13 @@ async function checkAuth() {
 }
 
 function showLogin() {
-    loginScreen.classList.remove(
-        "hidden"
-    );
-
-    appScreen.classList.add(
-        "hidden"
-    );
+    loginScreen.classList.remove("hidden");
+    appScreen.classList.add("hidden");
 }
 
 async function showApp() {
-    loginScreen.classList.add(
-        "hidden"
-    );
-
-    appScreen.classList.remove(
-        "hidden"
-    );
+    loginScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
 
     await loadModels();
     await loadChats();
@@ -159,78 +138,56 @@ async function showApp() {
     }
 }
 
-loginForm.addEventListener(
-    "submit",
-    async (event) => {
-        event.preventDefault();
+loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-        loginError.textContent = "";
+    loginError.textContent = "";
 
-        const username =
-            $("username").value.trim();
+    const username = $("username").value.trim();
+    const password = $("password").value;
 
-        const password =
-            $("password").value;
+    try {
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                username,
+                password
+            })
+        });
 
-        try {
-            const response =
-                await fetch(
-                    "/api/login",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-                        credentials: "include",
-                        body:
-                            JSON.stringify({
-                                username,
-                                password
-                            })
-                    }
-                );
+        const data = await response.json();
 
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "Login failed"
-                );
-            }
-
-            await showApp();
-
-        } catch (error) {
-            loginError.textContent =
-                error.message;
-        }
-    }
-);
-
-logoutBtn.addEventListener(
-    "click",
-    async () => {
-        try {
-            await fetch(
-                "/api/logout",
-                {
-                    method: "POST",
-                    credentials: "include"
-                }
+        if (!response.ok) {
+            throw new Error(
+                data.error || "Login failed"
             );
-        } catch {}
+        }
 
-        state.chats = [];
-        state.currentChatId = null;
-        state.messages = [];
-        state.files = [];
+        await showApp();
 
-        showLogin();
+    } catch (error) {
+        loginError.textContent = error.message;
     }
-);
+});
+
+logoutBtn.addEventListener("click", async () => {
+    try {
+        await fetch("/api/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+    } catch {}
+
+    state.chats = [];
+    state.currentChatId = null;
+    state.messages = [];
+
+    showLogin();
+});
 
 /* =========================================
    MODELS
@@ -238,17 +195,13 @@ logoutBtn.addEventListener(
 
 async function loadModels() {
     try {
-        const response =
-            await fetch(
-                "/api/models"
-            );
+        const response = await fetch("/api/models");
 
         if (!response.ok) {
             return;
         }
 
-        const models =
-            await response.json();
+        const models = await response.json();
 
         modelSelect.innerHTML = "";
 
@@ -257,55 +210,30 @@ async function loadModels() {
                 ? models
                 : [];
 
-        if (
-            freeModels.length ===
-            0
-        ) {
+        if (freeModels.length === 0) {
             const option =
-                document.createElement(
-                    "option"
-                );
+                document.createElement("option");
 
-            option.value =
-                "openrouter/free";
+            option.value = "openrouter/free";
+            option.textContent = "Free model";
 
-            option.textContent =
-                "Free model";
-
-            modelSelect.appendChild(
-                option
-            );
-
-            modelSelect.value =
-                "openrouter/free";
-
+            modelSelect.appendChild(option);
             return;
         }
 
-        for (
-            const model
-            of freeModels
-        ) {
+        for (const model of freeModels) {
             const option =
-                document.createElement(
-                    "option"
-                );
+                document.createElement("option");
 
-            option.value =
-                model.id;
-
+            option.value = model.id;
             option.textContent =
-                model.name ||
-                model.id;
+                model.name || model.id;
 
-            modelSelect.appendChild(
-                option
-            );
+            modelSelect.appendChild(option);
         }
 
         modelSelect.value =
-            state.model ||
-            "openrouter/free";
+            state.model || "openrouter/free";
 
     } catch (error) {
         console.error(
@@ -315,35 +243,27 @@ async function loadModels() {
     }
 }
 
-modelSelect.addEventListener(
-    "change",
-    () => {
-        state.model =
-            modelSelect.value;
-    }
-);
+modelSelect.addEventListener("change", () => {
+    state.model = modelSelect.value;
+});
 
 /* =========================================
    MODES
 ========================================= */
 
-modeSelect.addEventListener(
-    "change",
-    () => {
-        state.mode =
-            modeSelect.value;
+modeSelect.addEventListener("change", () => {
+    state.mode = modeSelect.value;
 
-        const selected =
-            modeSelect.options[
-                modeSelect.selectedIndex
-            ];
+    const selected =
+        modeSelect.options[
+            modeSelect.selectedIndex
+        ];
 
-        modeLabelEl.textContent =
-            selected
-                ? selected.textContent
-                : "General";
-    }
-);
+    modeLabelEl.textContent =
+        selected
+            ? selected.textContent
+            : "General";
+});
 
 /* =========================================
    CHATS
@@ -352,19 +272,15 @@ modeSelect.addEventListener(
 async function loadChats() {
     try {
         const response =
-            await fetch(
-                "/api/chats",
-                {
-                    credentials: "include"
-                }
-            );
+            await fetch("/api/chats", {
+                credentials: "include"
+            });
 
         if (!response.ok) {
             return;
         }
 
-        const data =
-            await response.json();
+        const data = await response.json();
 
         state.chats =
             Array.isArray(data)
@@ -384,27 +300,17 @@ async function loadChats() {
 function renderChatList() {
     chatListEl.innerHTML = "";
 
-    for (
-        const chat
-        of state.chats
-    ) {
+    for (const chat of state.chats) {
         const item =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
-        item.className =
-            "chat-item";
+        item.className = "chat-item";
 
         if (
             String(chat.id) ===
-            String(
-                state.currentChatId
-            )
+            String(state.currentChatId)
         ) {
-            item.classList.add(
-                "active"
-            );
+            item.classList.add("active");
         }
 
         item.innerHTML = `
@@ -419,20 +325,14 @@ function renderChatList() {
 
         item.addEventListener(
             "click",
-            () => {
-                openChat(chat.id);
-            }
+            () => openChat(chat.id)
         );
 
-        chatListEl.appendChild(
-            item
-        );
+        chatListEl.appendChild(item);
     }
 }
 
-function createNewChat(
-    save = true
-) {
+function createNewChat(save = true) {
     const id = createId();
 
     state.currentChatId = id;
@@ -440,16 +340,13 @@ function createNewChat(
 
     const chat = {
         id,
-        title:
-            "New conversation",
+        title: "New conversation",
         messages: [],
         updatedAt:
             new Date().toISOString()
     };
 
-    state.chats.unshift(
-        chat
-    );
+    state.chats.unshift(chat);
 
     renderChatList();
     renderMessages();
@@ -482,13 +379,10 @@ function openChat(id) {
         return;
     }
 
-    state.currentChatId =
-        chat.id;
+    state.currentChatId = chat.id;
 
     state.messages =
-        Array.isArray(
-            chat.messages
-        )
+        Array.isArray(chat.messages)
             ? [...chat.messages]
             : [];
 
@@ -505,18 +399,14 @@ async function saveCurrentChat() {
         state.chats.find(
             (item) =>
                 String(item.id) ===
-                String(
-                    state.currentChatId
-                )
+                String(state.currentChatId)
         );
 
     if (!chat) {
         return;
     }
 
-    chat.messages =
-        state.messages;
-
+    chat.messages = state.messages;
     chat.updatedAt =
         new Date().toISOString();
 
@@ -531,10 +421,9 @@ async function saveCurrentChat() {
                             "application/json"
                     },
                     credentials: "include",
-                    body:
-                        JSON.stringify({
-                            chat
-                        })
+                    body: JSON.stringify({
+                        chat
+                    })
                 }
             );
 
@@ -561,9 +450,7 @@ renameBtn.addEventListener(
             state.chats.find(
                 (item) =>
                     String(item.id) ===
-                    String(
-                        state.currentChatId
-                    )
+                    String(state.currentChatId)
             );
 
         if (!chat) {
@@ -596,11 +483,10 @@ renameBtn.addEventListener(
                                 "application/json"
                         },
                         credentials: "include",
-                        body:
-                            JSON.stringify({
-                                title:
-                                    title.trim()
-                            })
+                        body: JSON.stringify({
+                            title:
+                                title.trim()
+                        })
                     }
                 );
 
@@ -624,9 +510,7 @@ renameBtn.addEventListener(
             renderChatList();
 
         } catch (error) {
-            alert(
-                error.message
-            );
+            alert(error.message);
         }
     }
 );
@@ -638,21 +522,18 @@ deleteBtn.addEventListener(
             state.chats.find(
                 (item) =>
                     String(item.id) ===
-                    String(
-                        state.currentChatId
-                    )
+                    String(state.currentChatId)
             );
 
         if (!chat) {
             return;
         }
 
-        const confirmed =
-            confirm(
+        if (
+            !confirm(
                 "Delete this conversation?"
-            );
-
-        if (!confirmed) {
+            )
+        ) {
             return;
         }
 
@@ -663,10 +544,8 @@ deleteBtn.addEventListener(
                         chat.id
                     )}`,
                     {
-                        method:
-                            "DELETE",
-                        credentials:
-                            "include"
+                        method: "DELETE",
+                        credentials: "include"
                     }
                 );
 
@@ -686,9 +565,7 @@ deleteBtn.addEventListener(
             createNewChat(false);
 
         } catch (error) {
-            alert(
-                error.message
-            );
+            alert(error.message);
         }
     }
 );
@@ -700,10 +577,7 @@ deleteBtn.addEventListener(
 function renderMessages() {
     messagesEl.innerHTML = "";
 
-    if (
-        state.messages.length ===
-        0
-    ) {
+    if (state.messages.length === 0) {
         messagesEl.innerHTML = `
             <div id="welcome" class="welcome">
                 <div class="welcome-icon">✦</div>
@@ -734,57 +608,43 @@ function renderMessages() {
             .querySelectorAll(
                 ".suggestions button"
             )
-            .forEach(
-                (button) => {
-                    button.addEventListener(
-                        "click",
-                        () => {
-                            messageInput.value =
-                                button.dataset
-                                    .prompt ||
-                                "";
+            .forEach((button) => {
+                button.addEventListener(
+                    "click",
+                    () => {
+                        messageInput.value =
+                            button.dataset.prompt ||
+                            "";
 
-                            messageInput.focus();
-                            autoResize();
-                        }
-                    );
-                }
-            );
+                        messageInput.focus();
+                        autoResize();
+                    }
+                );
+            });
 
         return;
     }
 
-    for (
-        const message
-        of state.messages
-    ) {
-        addMessageElement(
-            message
-        );
+    for (const message of state.messages) {
+        addMessageElement(message);
     }
 
     scrollToBottom();
 }
 
-function addMessageElement(
-    message
-) {
+function addMessageElement(message) {
     const wrapper =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     wrapper.className =
         `message ${
-            message.role ===
-            "user"
+            message.role === "user"
                 ? "user"
                 : "assistant"
         }`;
 
     const avatar =
-        message.role ===
-        "user"
+        message.role === "user"
             ? "B"
             : "✦";
 
@@ -796,8 +656,7 @@ function addMessageElement(
         <div class="message-body">
             <div class="message-role">
                 ${
-                    message.role ===
-                    "user"
+                    message.role === "user"
                         ? "Bimal"
                         : "BimalAI"
                 }
@@ -805,25 +664,22 @@ function addMessageElement(
 
             <div class="message-content">
                 ${
-                    message.role ===
-                    "assistant"
+                    message.role === "assistant"
                         ? simpleMarkdown(
-                              message.content
-                          )
+                            message.content
+                        )
                         : escapeHTML(
-                              message.content
-                          ).replace(
-                              /\n/g,
-                              "<br>"
-                          )
+                            message.content
+                        ).replace(
+                            /\n/g,
+                            "<br>"
+                        )
                 }
             </div>
         </div>
     `;
 
-    messagesEl.appendChild(
-        wrapper
-    );
+    messagesEl.appendChild(wrapper);
 
     return wrapper.querySelector(
         ".message-content"
@@ -836,9 +692,7 @@ function addMessageElement(
 
 attachBtn.addEventListener(
     "click",
-    () => {
-        fileInput.click();
-    }
+    () => fileInput.click()
 );
 
 fileInput.addEventListener(
@@ -854,23 +708,13 @@ fileInput.addEventListener(
 );
 
 function renderFilePreview() {
-    if (
-        state.files.length ===
-        0
-    ) {
-        filePreview.classList.add(
-            "hidden"
-        );
-
-        filePreview.innerHTML =
-            "";
-
+    if (state.files.length === 0) {
+        filePreview.classList.add("hidden");
+        filePreview.innerHTML = "";
         return;
     }
 
-    filePreview.classList.remove(
-        "hidden"
-    );
+    filePreview.classList.remove("hidden");
 
     filePreview.innerHTML =
         state.files
@@ -878,9 +722,7 @@ function renderFilePreview() {
                 (file) => `
                     <span class="file-chip">
                         📎
-                        ${escapeHTML(
-                            file.name
-                        )}
+                        ${escapeHTML(file.name)}
                     </span>
                 `
             )
@@ -888,20 +730,14 @@ function renderFilePreview() {
 }
 
 async function uploadFiles() {
-    if (
-        state.files.length ===
-        0
-    ) {
+    if (state.files.length === 0) {
         return [];
     }
 
     const formData =
         new FormData();
 
-    for (
-        const file
-        of state.files
-    ) {
+    for (const file of state.files) {
         formData.append(
             "files",
             file
@@ -954,22 +790,18 @@ async function generateBimalAIFile(
                         "application/json"
                 },
                 credentials: "include",
-                body:
-                    JSON.stringify({
-                        type,
-                        filename,
-                        content
-                    })
+                body: JSON.stringify({
+                    type,
+                    filename,
+                    content
+                })
             }
         );
 
     const data =
         await response.json();
 
-    if (
-        !response.ok ||
-        !data.success
-    ) {
+    if (!response.ok || !data.success) {
         throw new Error(
             data.error ||
             "File generation failed"
@@ -977,22 +809,13 @@ async function generateBimalAIFile(
     }
 
     const link =
-        document.createElement(
-            "a"
-        );
+        document.createElement("a");
 
-    link.href =
-        data.downloadUrl;
+    link.href = data.downloadUrl;
+    link.download = data.filename;
 
-    link.download =
-        data.filename;
-
-    document.body.appendChild(
-        link
-    );
-
+    document.body.appendChild(link);
     link.click();
-
     link.remove();
 
     return data;
@@ -1016,8 +839,7 @@ async function sendMessage() {
 
     if (
         !text &&
-        state.files.length ===
-            0
+        state.files.length === 0
     ) {
         return;
     }
@@ -1025,52 +847,42 @@ async function sendMessage() {
     sendBtn.disabled = true;
 
     try {
-        let uploadedFiles =
-            [];
+        let uploadedFiles = [];
 
-        if (
-            state.files.length
-        ) {
+        if (state.files.length) {
             uploadedFiles =
                 await uploadFiles();
         }
 
-        let finalText =
-            text;
+        let finalText = text;
 
-        if (
-            uploadedFiles.length
-        ) {
+        if (uploadedFiles.length) {
             const fileText =
                 uploadedFiles
-                    .map(
-                        (file) => {
-                            if (
-                                file.type ===
-                                "text"
-                            ) {
-                                return (
-                                    `[Attached file: ${file.name}]\n` +
-                                    `${file.content}`
-                                );
-                            }
-
-                            if (
-                                file.type ===
-                                "image"
-                            ) {
-                                return (
-                                    `[Attached image: ${file.name}]`
-                                );
-                            }
-
+                    .map((file) => {
+                        if (
+                            file.type === "text"
+                        ) {
                             return (
                                 `[Attached file: ${file.name}]\n` +
-                                `${file.content || ""}`
+                                `${file.content}`
                             );
                         }
-                    )
-                    .join("\n\n");
+
+                        if (
+                            file.type === "image"
+                        ) {
+                            return (
+                                `[Attached image: ${file.name}]`
+                            );
+                        }
+
+                        return (
+                            `[Attached file: ${file.name}]\n` +
+                            `${file.content || ""}`
+                        );
+                    })
+                    .join("\n");
 
             finalText =
                 `${text || "Please analyze the attached files."}\n\n${fileText}`;
@@ -1080,10 +892,7 @@ async function sendMessage() {
             return;
         }
 
-        if (
-            state.messages.length ===
-            0
-        ) {
+        if (state.messages.length === 0) {
             const chat =
                 state.chats.find(
                     (item) =>
@@ -1095,10 +904,7 @@ async function sendMessage() {
 
             if (chat) {
                 chat.title =
-                    text.slice(
-                        0,
-                        60
-                    ) ||
+                    text.slice(0, 60) ||
                     "New conversation";
 
                 chatTitleEl.textContent =
@@ -1108,13 +914,10 @@ async function sendMessage() {
 
         const userMessage = {
             role: "user",
-            content:
-                finalText
+            content: finalText
         };
 
-        state.messages.push(
-            userMessage
-        );
+        state.messages.push(userMessage);
 
         renderMessages();
 
@@ -1147,29 +950,25 @@ async function sendMessage() {
                             "application/json"
                     },
                     credentials: "include",
-                    body:
-                        JSON.stringify({
-                            messages:
-                                state.messages
-                                    .filter(
-                                        (message) =>
-                                            message.content
-                                    )
-                                    .slice(
-                                        0,
-                                        -1
-                                    ),
+                    body: JSON.stringify({
+                        messages:
+                            state.messages
+                                .filter(
+                                    (message) =>
+                                        message.content
+                                )
+                                .slice(0, -1),
 
-                            model:
-                                state.model ||
-                                modelSelect.value ||
-                                "openrouter/free",
+                        model:
+                            state.model ||
+                            modelSelect.value ||
+                            "openrouter/free",
 
-                            mode:
-                                state.mode ||
-                                modeSelect.value ||
-                                ""
-                        })
+                        mode:
+                            state.mode ||
+                            modeSelect.value ||
+                            ""
+                    })
                 }
             );
 
@@ -1216,8 +1015,7 @@ async function sendMessage() {
             const {
                 value,
                 done
-            } =
-                await reader.read();
+            } = await reader.read();
 
             if (done) {
                 break;
@@ -1232,17 +1030,12 @@ async function sendMessage() {
                 );
 
             const lines =
-                buffer.split(
-                    "\n"
-                );
+                buffer.split("\n");
 
             buffer =
                 lines.pop() || "";
 
-            for (
-                const line
-                of lines
-            ) {
+            for (const line of lines) {
                 const trimmed =
                     line.trim();
 
@@ -1276,8 +1069,7 @@ async function sendMessage() {
                     const delta =
                         data
                             .choices?.[0]
-                            ?.delta
-                            ?.content;
+                            ?.delta?.content;
 
                     if (delta) {
                         assistantMessage.content +=
@@ -1292,13 +1084,13 @@ async function sendMessage() {
                     }
 
                 } catch {
-                    // Ignore incomplete SSE chunks
+                    /* Ignore incomplete SSE chunks */
                 }
             }
         }
 
         /* =========================================
-           AUTO FILE GENERATION
+           AUTOMATIC FILE GENERATION
         ========================================= */
 
         const pdfRequested =
@@ -1310,38 +1102,35 @@ async function sendMessage() {
                 .test(text);
 
         const xlsxRequested =
-            /\b(xlsx|excel|spreadsheet|generate excel|create excel)\b/i
+            /\b(xlsx|excel|spreadsheet|excel file|create spreadsheet)\b/i
                 .test(text);
 
         const pptxRequested =
-            /\b(pptx|powerpoint|presentation|generate powerpoint|create powerpoint)\b/i
+            /\b(pptx|powerpoint|presentation|ppt)\b/i
                 .test(text);
 
-        if (
-            assistantMessage.content.trim()
-        ) {
+        if (assistantMessage.content.trim()) {
             try {
                 if (pdfRequested) {
                     console.log(
                         "BimalAI: Generating PDF..."
                     );
 
-                    const result =
-                        await generateBimalAIFile(
-                            "pdf",
-                            "BimalAI-PDF",
-                            assistantMessage.content
-                        );
-
-                    console.log(
-                        "BimalAI: PDF generated",
-                        result
+                    await generateBimalAIFile(
+                        "pdf",
+                        "BimalAI-PDF",
+                        assistantMessage.content
                     );
 
                     assistantMessage.content +=
                         "\n\n📄 PDF generated and downloaded successfully.";
+                }
 
-                } else if (docxRequested) {
+                else if (docxRequested) {
+                    console.log(
+                        "BimalAI: Generating DOCX..."
+                    );
+
                     await generateBimalAIFile(
                         "docx",
                         "BimalAI-Document",
@@ -1349,9 +1138,14 @@ async function sendMessage() {
                     );
 
                     assistantMessage.content +=
-                        "\n\n📄 Word document generated and downloaded successfully.";
+                        "\n\n📄 DOCX generated and downloaded successfully.";
+                }
 
-                } else if (xlsxRequested) {
+                else if (xlsxRequested) {
+                    console.log(
+                        "BimalAI: Generating XLSX..."
+                    );
+
                     await generateBimalAIFile(
                         "xlsx",
                         "BimalAI-Spreadsheet",
@@ -1359,9 +1153,14 @@ async function sendMessage() {
                     );
 
                     assistantMessage.content +=
-                        "\n\n📊 Excel spreadsheet generated and downloaded successfully.";
+                        "\n\n📊 XLSX generated and downloaded successfully.";
+                }
 
-                } else if (pptxRequested) {
+                else if (pptxRequested) {
+                    console.log(
+                        "BimalAI: Generating PPTX..."
+                    );
+
                     await generateBimalAIFile(
                         "pptx",
                         "BimalAI-Presentation",
@@ -1369,13 +1168,15 @@ async function sendMessage() {
                     );
 
                     assistantMessage.content +=
-                        "\n\n📊 PowerPoint presentation generated and downloaded successfully.";
+                        "\n\n📊 PPTX generated and downloaded successfully.";
                 }
 
                 assistantContent.innerHTML =
                     simpleMarkdown(
                         assistantMessage.content
                     );
+
+                scrollToBottom();
 
             } catch (fileError) {
                 console.error(
@@ -1406,14 +1207,12 @@ async function sendMessage() {
 
         const last =
             state.messages[
-                state.messages.length -
-                    1
+                state.messages.length - 1
             ];
 
         if (
             last &&
-            last.role ===
-                "assistant"
+            last.role === "assistant"
         ) {
             last.content =
                 `❌ ${
@@ -1425,9 +1224,7 @@ async function sendMessage() {
         }
 
     } finally {
-        sendBtn.disabled =
-            false;
-
+        sendBtn.disabled = false;
         messageInput.focus();
     }
 }
@@ -1445,8 +1242,7 @@ messageInput.addEventListener(
     "keydown",
     (event) => {
         if (
-            event.key ===
-                "Enter" &&
+            event.key === "Enter" &&
             !event.shiftKey
         ) {
             event.preventDefault();
@@ -1456,8 +1252,7 @@ messageInput.addEventListener(
 );
 
 function autoResize() {
-    messageInput.style.height =
-        "auto";
+    messageInput.style.height = "auto";
 
     messageInput.style.height =
         Math.min(
@@ -1471,4 +1266,3 @@ function autoResize() {
 ========================================= */
 
 checkAuth();
-````
